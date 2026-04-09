@@ -12,9 +12,65 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
+                    @can('view dashboard')
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            Dashboard
+                        </x-nav-link>
+                    @endcan
+
+                    @can('manage users')
+                        <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
+                            Usuarios
+                        </x-nav-link>
+                    @endcan
+
+                    @can('manage clients')
+                        <x-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">
+                            Clientes
+                        </x-nav-link>
+                    @endcan
+
+                    @can('manage services')
+                        <x-nav-link :href="route('services.index')" :active="request()->routeIs('services.*')">
+                            Servicios
+                        </x-nav-link>
+                    @endcan
+
+                    @can('manage events')
+                        <x-nav-link :href="route('events.index')" :active="request()->routeIs('events.*')">
+                            Eventos
+                        </x-nav-link>
+                    @endcan
+
+                    @can('manage quotations')
+                        <x-nav-link :href="route('quotations.index')" :active="request()->routeIs('quotations.*')">
+                            Cotizaciones
+                        </x-nav-link>
+                    @endcan
+
+                    @can('manage payments')
+                        <x-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">
+                            Pagos
+                        </x-nav-link>
+                    @endcan
+
+                    @can('manage documents')
+                        <x-nav-link :href="route('documents.index')" :active="request()->routeIs('documents.*')">
+                            Documentos
+                        </x-nav-link>
+                    @endcan
+
+                    @can('view calendar')
+                        <x-nav-link :href="route('calendar.index')" :active="request()->routeIs('calendar.*')">
+                            Calendario
+                        </x-nav-link>
+                    @endcan
+
+                    @can('access client portal')
+                        <x-nav-link :href="route('client.portal')" :active="request()->routeIs('client.portal')">
+                            Mi portal
+                        </x-nav-link>
+                    @endcan
                 </div>
             </div>
 
@@ -34,9 +90,7 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
-                        </x-dropdown-link>
+                       
 
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
@@ -67,9 +121,65 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
+            @can('view dashboard')
+                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    Dashboard
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('manage users')
+                <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
+                    Usuarios
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('manage clients')
+                <x-responsive-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">
+                    Clientes
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('manage services')
+                <x-responsive-nav-link :href="route('services.index')" :active="request()->routeIs('services.*')">
+                    Servicios
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('manage events')
+                <x-responsive-nav-link :href="route('events.index')" :active="request()->routeIs('events.*')">
+                    Eventos
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('manage quotations')
+                <x-responsive-nav-link :href="route('quotations.index')" :active="request()->routeIs('quotations.*')">
+                    Cotizaciones
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('manage payments')
+                <x-responsive-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">
+                    Pagos
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('manage documents')
+                <x-responsive-nav-link :href="route('documents.index')" :active="request()->routeIs('documents.*')">
+                    Documentos
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('view calendar')
+                <x-responsive-nav-link :href="route('calendar.index')" :active="request()->routeIs('calendar.*')">
+                    Calendario
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('access client portal')
+                <x-responsive-nav-link :href="route('client.portal')" :active="request()->routeIs('client.portal')">
+                    Mi portal
+                </x-responsive-nav-link>
+            @endcan
         </div>
 
         <!-- Responsive Settings Options -->
@@ -80,9 +190,7 @@
             </div>
 
             <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
-                </x-responsive-nav-link>
+            
 
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">
