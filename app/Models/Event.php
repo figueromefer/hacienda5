@@ -20,7 +20,6 @@ class Event extends Model
         'guest_count',
         'budget_estimate',
         'total_amount',
-        'address',
         'notes',
     ];
 

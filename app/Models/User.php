@@ -32,4 +32,9 @@ class User extends Authenticatable
             'is_active' => 'boolean',
         ];
     }
+
+    public function client()
+    {
+        return $this->hasOne(Client::class);
+    }
 }

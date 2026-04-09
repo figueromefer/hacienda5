@@ -26,13 +26,6 @@
                     <div><strong>Total:</strong> ${{ number_format($event->total_amount, 2) }}</div>
                 </div>
 
-                @if($event->address)
-                    <div class="mt-4">
-                        <strong>Dirección:</strong>
-                        <p>{{ $event->address }}</p>
-                    </div>
-                @endif
-
                 @if($event->notes)
                     <div class="mt-4">
                         <strong>Notas generales:</strong>

@@ -22,7 +22,22 @@
                     <div><strong>Teléfono:</strong> {{ $client->phone ?: '-' }}</div>
                     <div><strong>Teléfono alterno:</strong> {{ $client->alternate_phone ?: '-' }}</div>
                     <div><strong>Origen:</strong> {{ $client->source ?: '-' }}</div>
+                    <div>
+                        <strong>Acceso al portal:</strong>
+                        @if($client->user)
+                            <span class="text-green-700">Sí</span>
+                        @else
+                            <span class="text-red-700">No</span>
+                        @endif
+                    </div>
                 </div>
+
+                @if($client->user)
+                    <div class="mt-4 rounded border border-green-200 bg-green-50 p-4">
+                        <div><strong>Usuario vinculado:</strong> {{ $client->user->name }}</div>
+                        <div><strong>Email de acceso:</strong> {{ $client->user->email }}</div>
+                    </div>
+                @endif
 
                 @if($client->notes)
                     <div class="mt-4">
