@@ -1,84 +1,84 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
-    <!-- Primary Navigation Menu -->
+<nav x-data="{ open: false }" class="brand-navbar shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
+        <div class="flex justify-between h-20">
             <div class="flex">
-                <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                    <a href="{{ Auth::user()->can('access client portal') && !Auth::user()->can('view dashboard') ? route('client.portal') : route('dashboard') }}" class="flex items-center gap-3">
+                        <x-application-logo class="block h-12 w-auto" />
+                        <div class="hidden md:block leading-tight">
+                            <div class="text-brand-gold text-xs uppercase tracking-[0.35em]">Hacienda Cinco</div>
+                            <div class="text-white/90 text-[11px] uppercase tracking-[0.28em]">La Victoria</div>
+                        </div>
                     </a>
                 </div>
 
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <div class="hidden space-x-1 sm:-my-px sm:ms-8 sm:flex sm:items-center">
                     @can('view dashboard')
-                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="brand-nav-link">
                             Dashboard
                         </x-nav-link>
                     @endcan
 
                     @can('manage users')
-                        <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
+                        <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')" class="brand-nav-link">
                             Usuarios
                         </x-nav-link>
                     @endcan
 
                     @can('manage clients')
-                        <x-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">
+                        <x-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')" class="brand-nav-link">
                             Clientes
                         </x-nav-link>
                     @endcan
 
                     @can('manage services')
-                        <x-nav-link :href="route('services.index')" :active="request()->routeIs('services.*')">
+                        <x-nav-link :href="route('services.index')" :active="request()->routeIs('services.*')" class="brand-nav-link">
                             Servicios
                         </x-nav-link>
                     @endcan
 
                     @can('manage events')
-                        <x-nav-link :href="route('events.index')" :active="request()->routeIs('events.*')">
+                        <x-nav-link :href="route('events.index')" :active="request()->routeIs('events.*')" class="brand-nav-link">
                             Eventos
                         </x-nav-link>
                     @endcan
 
                     @can('manage quotations')
-                        <x-nav-link :href="route('quotations.index')" :active="request()->routeIs('quotations.*')">
+                        <x-nav-link :href="route('quotations.index')" :active="request()->routeIs('quotations.*')" class="brand-nav-link">
                             Cotizaciones
                         </x-nav-link>
                     @endcan
 
                     @can('manage payments')
-                        <x-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">
+                        <x-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')" class="brand-nav-link">
                             Pagos
                         </x-nav-link>
                     @endcan
 
                     @can('manage documents')
-                        <x-nav-link :href="route('documents.index')" :active="request()->routeIs('documents.*')">
+                        <x-nav-link :href="route('documents.index')" :active="request()->routeIs('documents.*')" class="brand-nav-link">
                             Documentos
                         </x-nav-link>
                     @endcan
 
                     @can('view calendar')
-                        <x-nav-link :href="route('calendar.index')" :active="request()->routeIs('calendar.*')">
+                        <x-nav-link :href="route('calendar.index')" :active="request()->routeIs('calendar.*')" class="brand-nav-link">
                             Calendario
                         </x-nav-link>
                     @endcan
 
                     @can('access client portal')
-                        <x-nav-link :href="route('client.portal')" :active="request()->routeIs('client.portal')">
+                        <x-nav-link :href="route('client.portal')" :active="request()->routeIs('client.portal')" class="brand-nav-link">
                             Mi portal
                         </x-nav-link>
                     @endcan
                 </div>
             </div>
 
-            <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <x-dropdown align="right" width="48">
+                <x-dropdown align="right" width="56">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                        <button class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brand-gold/40 bg-white/5 text-sm font-medium text-white hover:bg-white/10 hover:text-brand-gold focus:outline-none transition ease-in-out duration-150">
                             <div>{{ Auth::user()->name }}</div>
 
                             <div class="ms-1">
@@ -90,25 +90,20 @@
                     </x-slot>
 
                     <x-slot name="content">
-                       
+                        <div class="px-4 py-3 border-b border-brand-gold/10">
+                            <div class="text-sm font-semibold text-brand-green">{{ Auth::user()->name }}</div>
+                            <div class="text-xs text-brand-gray/80">{{ Auth::user()->email }}</div>
+                        </div>
 
-                        <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </form>
+                        <x-dropdown-link :href="route('logout.get')">
+                            Cerrar sesión
+                        </x-dropdown-link>
                     </x-slot>
                 </x-dropdown>
             </div>
 
-            <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
+                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-white/80 hover:text-brand-gold hover:bg-white/10 focus:outline-none transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -118,8 +113,7 @@
         </div>
     </div>
 
-    <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
+    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden border-t border-brand-gold/15 bg-brand-green">
         <div class="pt-2 pb-3 space-y-1">
             @can('view dashboard')
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
@@ -182,26 +176,16 @@
             @endcan
         </div>
 
-        <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200">
+        <div class="pt-4 pb-4 border-t border-brand-gold/15">
             <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                <div class="font-medium text-base text-white">{{ Auth::user()->name }}</div>
+                <div class="font-medium text-sm text-white/70">{{ Auth::user()->email }}</div>
             </div>
 
             <div class="mt-3 space-y-1">
-            
-
-                <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();">
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
-                </form>
+                <x-responsive-nav-link :href="route('logout.get')">
+                    Cerrar sesión
+                </x-responsive-nav-link>
             </div>
         </div>
     </div>
