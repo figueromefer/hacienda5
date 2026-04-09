@@ -9,9 +9,11 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventNoteController;
 use App\Http\Controllers\EventTaskController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -73,6 +75,20 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/portal', [ClientPortalController::class, 'index'])
         ->middleware('permission:access client portal')
         ->name('client.portal');
+
+    Route::get('/logout', function () {
+        Auth::guard('web')->logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+
+        return redirect()->route('login');
+    })->name('logout.get');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 require __DIR__.'/auth.php';
