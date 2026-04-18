@@ -55,7 +55,23 @@
                         </x-nav-link>
                     @endcan
 
-                    
+                    @can('manage documents')
+                        <x-nav-link :href="route('documents.index')" :active="request()->routeIs('documents.*')" class="brand-nav-link">
+                            Documentos
+                        </x-nav-link>
+                    @endcan
+
+                    @can('view calendar')
+                        <x-nav-link :href="route('calendar.index')" :active="request()->routeIs('calendar.*')" class="brand-nav-link">
+                            Calendario
+                        </x-nav-link>
+                    @endcan
+
+                    @can('access client portal')
+                        <x-nav-link :href="route('client.portal')" :active="request()->routeIs('client.portal')" class="brand-nav-link">
+                            Mi portal
+                        </x-nav-link>
+                    @endcan
                 </div>
             </div>
 
@@ -141,7 +157,23 @@
                 </x-responsive-nav-link>
             @endcan
 
-            
+            @can('manage documents')
+                <x-responsive-nav-link :href="route('documents.index')" :active="request()->routeIs('documents.*')">
+                    Documentos
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('view calendar')
+                <x-responsive-nav-link :href="route('calendar.index')" :active="request()->routeIs('calendar.*')">
+                    Calendario
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('access client portal')
+                <x-responsive-nav-link :href="route('client.portal')" :active="request()->routeIs('client.portal')">
+                    Mi portal
+                </x-responsive-nav-link>
+            @endcan
         </div>
 
         <div class="pt-4 pb-4 border-t border-brand-gold/15">
