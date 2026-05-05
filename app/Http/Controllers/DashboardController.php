@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Models\Event;
 use App\Models\Quotation;
 use App\Models\Transaction;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -16,12 +17,17 @@ class DashboardController extends Controller
         $balance = $income - $expenses;
         $pendingIncome = Transaction::where('type', Transaction::TYPE_INCOME)->where('status', 'pending')->sum('amount');
 
-        $monthly = Transaction::selectRaw("strftime('%Y-%m', transaction_date) as month")
+        $driver = DB::connection()->getDriverName();
+        $monthExpression = $driver === 'sqlite'
+            ? "strftime('%Y-%m', transaction_date)"
+            : "DATE_FORMAT(transaction_date, '%Y-%m')";
+
+        $monthly = Transaction::selectRaw("{$monthExpression} as month")
             ->selectRaw("SUM(CASE WHEN type = 'income' AND status = 'paid' THEN amount ELSE 0 END) as income")
             ->selectRaw("SUM(CASE WHEN type = 'expense' AND status = 'paid' THEN amount ELSE 0 END) as expenses")
-            ->groupBy('month')
+            ->groupByRaw($monthExpression)
             ->orderBy('month')
-            ->take(6)
+            ->limit(6)
             ->get();
 
         $chartLabels = $monthly->pluck('month')->values();
