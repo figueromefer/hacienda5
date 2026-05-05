@@ -30,14 +30,12 @@
                                 <td class="py-2">{{ $client->type }}</td>
                                 <td class="py-2">{{ $client->email }}</td>
                                 <td class="py-2">{{ $client->phone }}</td>
-                                <td class="py-2 flex gap-2">
-                                    <a href="{{ route('clients.show', $client) }}" class="text-blue-600">Ver</a>
-                                    <a href="{{ route('clients.edit', $client) }}" class="text-yellow-600">Editar</a>
-                                    <form action="{{ route('clients.destroy', $client) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600">Eliminar</button>
-                                    </form>
+                                <td class="py-2">
+                                    <x-action-buttons
+                                        :show="route('clients.show', $client)"
+                                        :edit="route('clients.edit', $client)"
+                                        :delete="route('clients.destroy', $client)"
+                                    />
                                 </td>
                             </tr>
                         @empty
