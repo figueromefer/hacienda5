@@ -16,6 +16,8 @@
         <div class="min-h-screen bg-brand-cream">
             @include('layouts.navigation')
 
+            <x-toast-notifications />
+
             @isset($header)
                 <header class="brand-page-header border-b border-brand-gold/20">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
