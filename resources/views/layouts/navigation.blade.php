@@ -1,9 +1,13 @@
 <nav x-data="{ open: false }" class="brand-navbar shadow-sm">
+    @php
+        $showClientPortal = Auth::user()->can('access client portal') && ! Auth::user()->can('view dashboard');
+    @endphp
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-20">
             <div class="flex">
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ Auth::user()->can('access client portal') && !Auth::user()->can('view dashboard') ? route('client.portal') : route('dashboard') }}" class="flex items-center gap-3">
+                    <a href="{{ $showClientPortal ? route('client.portal') : route('dashboard') }}" class="flex items-center gap-3">
                         <x-application-logo class="block h-12 w-auto" />
                         <div class="hidden md:block leading-tight">
                             <div class="text-brand-gold text-xs uppercase tracking-[0.35em]">Hacienda Cinco</div>
@@ -67,25 +71,25 @@
                         </x-nav-link>
                     @endcan
 
-                    @can('access client portal')
+                    @if($showClientPortal)
                         <x-nav-link :href="route('client.portal')" :active="request()->routeIs('client.portal')" class="brand-nav-link">
                             Mi portal
                         </x-nav-link>
-                    @endcan
+                    @endif
                 </div>
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="56">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brand-gold/40 bg-white/5 text-sm font-medium text-white hover:bg-white/10 hover:text-brand-gold focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
+                        <button class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-full bg-transparent text-white hover:bg-white/10 hover:text-brand-gold focus:outline-none transition ease-in-out duration-150" aria-label="Abrir menú de usuario">
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a8.25 8.25 0 1115 0" />
+                            </svg>
 
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
+                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
                         </button>
                     </x-slot>
 
@@ -169,11 +173,11 @@
                 </x-responsive-nav-link>
             @endcan
 
-            @can('access client portal')
+            @if($showClientPortal)
                 <x-responsive-nav-link :href="route('client.portal')" :active="request()->routeIs('client.portal')">
                     Mi portal
                 </x-responsive-nav-link>
-            @endcan
+            @endif
         </div>
 
         <div class="pt-4 pb-4 border-t border-brand-gold/15">
