@@ -8,7 +8,7 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventNoteController;
 use App\Http\Controllers\EventTaskController;
-use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\ServiceController;
@@ -41,7 +41,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('quotations', QuotationController::class)
         ->middleware('permission:manage quotations');
 
-    Route::resource('payments', PaymentController::class)
+    Route::resource('transactions', TransactionController::class)
         ->middleware('permission:manage payments');
 
     Route::resource('documents', DocumentController::class)
