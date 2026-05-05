@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\Event;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
@@ -46,20 +47,30 @@ class EventController extends Controller
     }
 
     public function show(Event $event)
-{
-    $event->load([
-        'client',
-        'payments',
-        'documents',
-        'tasks.assignedUser',
-        'notesList.user',
-        'quotations',
-    ]);
+    {
+        $event->load([
+            'client',
+            'transactions' => fn ($query) => $query->latest('transaction_date'),
+            'documents',
+            'tasks.assignedUser',
+            'notesList.user',
+            'quotations',
+        ]);
 
-    $users = \App\Models\User::orderBy('name')->get();
+        $paidTransactions = $event->transactions->where('status', 'paid');
+        $income = $paidTransactions->where('type', Transaction::TYPE_INCOME)->sum('amount');
+        $expenses = $paidTransactions->where('type', Transaction::TYPE_EXPENSE)->sum('amount');
+        $balance = $income - $expenses;
 
-    return view('events.show', compact('event', 'users'));
-}
+        $pendingIncome = $event->transactions
+            ->where('status', 'pending')
+            ->where('type', Transaction::TYPE_INCOME)
+            ->sum('amount');
+
+        $users = \App\Models\User::orderBy('name')->get();
+
+        return view('events.show', compact('event', 'users', 'income', 'expenses', 'balance', 'pendingIncome'));
+    }
 
     public function edit(Event $event)
     {
