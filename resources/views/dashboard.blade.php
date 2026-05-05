@@ -1,11 +1,20 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>
+        <div class="flex items-center justify-between">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>
+
+            <form method="GET">
+                <select name="period" onchange="this.form.submit()" class="border rounded px-3 py-2">
+                    <option value="6" {{ $period == '6' ? 'selected' : '' }}>Últimos 6 meses</option>
+                    <option value="12" {{ $period == '12' ? 'selected' : '' }}>Últimos 12 meses</option>
+                    <option value="year" {{ $period == 'year' ? 'selected' : '' }}>Este año</option>
+                </select>
+            </form>
+        </div>
     </x-slot>
 
     <div class="py-6 space-y-6">
 
-        <!-- RESUMEN FINANCIERO -->
         <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-4">
             <div class="bg-white p-5 shadow rounded">
                 <div class="text-sm text-gray-500">Ingresos</div>
@@ -25,29 +34,9 @@
             </div>
         </div>
 
-        <!-- GRÁFICA -->
         <div class="max-w-7xl mx-auto bg-white p-6 shadow rounded">
             <h3 class="text-lg font-semibold mb-4">Flujo financiero</h3>
             <canvas id="financeChart" height="120"></canvas>
-        </div>
-
-        <!-- EVENTOS -->
-        <div class="max-w-7xl mx-auto">
-            <div class="bg-white p-6 shadow rounded">
-                <h3 class="text-lg font-semibold mb-4">Próximos eventos</h3>
-                <div class="space-y-3">
-                    @forelse ($nextEvents as $event)
-                        <div class="border-b pb-2">
-                            <div class="font-medium">{{ $event->title }}</div>
-                            <div class="text-sm text-gray-600">
-                                {{ $event->client->full_name }} — {{ $event->event_date->format('d/m/Y') }}
-                            </div>
-                        </div>
-                    @empty
-                        <p>No hay próximos eventos.</p>
-                    @endforelse
-                </div>
-            </div>
         </div>
 
     </div>
@@ -84,14 +73,6 @@
                         tension: 0.3
                     }
                 ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top'
-                    }
-                }
             }
         });
     </script>
