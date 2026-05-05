@@ -25,11 +25,10 @@
             </div>
         </div>
 
-        <!-- INFO GENERAL -->
-        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-white p-4 shadow rounded">Clientes: {{ $clientsCount }}</div>
-            <div class="bg-white p-4 shadow rounded">Eventos: {{ $eventsCount }}</div>
-            <div class="bg-white p-4 shadow rounded">Cotizaciones draft: {{ $draftQuotations }}</div>
+        <!-- GRÁFICA -->
+        <div class="max-w-7xl mx-auto bg-white p-6 shadow rounded">
+            <h3 class="text-lg font-semibold mb-4">Flujo financiero</h3>
+            <canvas id="financeChart" height="120"></canvas>
         </div>
 
         <!-- EVENTOS -->
@@ -52,4 +51,49 @@
         </div>
 
     </div>
+
+    @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('financeChart');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: @json($chartLabels),
+                datasets: [
+                    {
+                        label: 'Ingresos',
+                        data: @json($chartIncome),
+                        borderColor: '#16a34a',
+                        backgroundColor: 'rgba(22,163,74,0.1)',
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Gastos',
+                        data: @json($chartExpenses),
+                        borderColor: '#dc2626',
+                        backgroundColor: 'rgba(220,38,38,0.1)',
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Balance',
+                        data: @json($chartBalance),
+                        borderColor: '#000000',
+                        borderDash: [5,5],
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                }
+            }
+        });
+    </script>
+    @endpush
 </x-app-layout>
