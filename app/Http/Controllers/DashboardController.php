@@ -6,7 +6,6 @@ use App\Models\Client;
 use App\Models\Event;
 use App\Models\Quotation;
 use App\Models\Transaction;
-use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -25,6 +24,11 @@ class DashboardController extends Controller
             ->take(6)
             ->get();
 
+        $chartLabels = $monthly->pluck('month')->values();
+        $chartIncome = $monthly->pluck('income')->map(fn ($value) => (float) $value)->values();
+        $chartExpenses = $monthly->pluck('expenses')->map(fn ($value) => (float) $value)->values();
+        $chartBalance = $monthly->map(fn ($row) => (float) $row->income - (float) $row->expenses)->values();
+
         return view('dashboard', [
             'clientsCount' => Client::count(),
             'eventsCount' => Event::count(),
@@ -35,6 +39,10 @@ class DashboardController extends Controller
             'draftQuotations' => Quotation::where('status', 'draft')->count(),
             'nextEvents' => Event::with('client')->orderBy('event_date')->take(5)->get(),
             'monthly' => $monthly,
+            'chartLabels' => $chartLabels,
+            'chartIncome' => $chartIncome,
+            'chartExpenses' => $chartExpenses,
+            'chartBalance' => $chartBalance,
         ]);
     }
 }
