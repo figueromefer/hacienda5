@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Editar evento</h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Nuevo evento</h2>
     </x-slot>
 
     <div class="py-6">
@@ -17,15 +17,15 @@
                     </div>
                 @endif
 
-                <form action="{{ route('events.update', $event) }}" method="POST" class="space-y-4">
+                <form action="{{ route('events.store') }}" method="POST" class="space-y-4">
                     @csrf
-                    @method('PUT')
 
                     <div>
                         <label class="block mb-1">Cliente</label>
                         <select name="client_id" class="w-full border rounded">
+                            <option value="">Selecciona</option>
                             @foreach($clients as $client)
-                                <option value="{{ $client->id }}" @selected(old('client_id', $event->client_id) == $client->id)>
+                                <option value="{{ $client->id }}" @selected(old('client_id') == $client->id)>
                                     {{ $client->full_name }}
                                 </option>
                             @endforeach
@@ -34,62 +34,62 @@
 
                     <div>
                         <label class="block mb-1">Título</label>
-                        <input type="text" name="title" class="w-full border rounded" value="{{ old('title', $event->title) }}">
+                        <input type="text" name="title" class="w-full border rounded" value="{{ old('title') }}">
                     </div>
 
                     <div>
                         <label class="block mb-1">Tipo de evento</label>
-                        <input type="text" name="event_type" class="w-full border rounded" value="{{ old('event_type', $event->event_type) }}">
+                        <input type="text" name="event_type" class="w-full border rounded" value="{{ old('event_type') }}">
                     </div>
 
                     <div>
                         <label class="block mb-1">Estatus</label>
                         <select name="status" class="w-full border rounded">
-                            <option value="tentative" @selected(old('status', $event->status) === 'tentative')>Tentativo</option>
-                            <option value="confirmed" @selected(old('status', $event->status) === 'confirmed')>Confirmado</option>
-                            <option value="completed" @selected(old('status', $event->status) === 'completed')>Completado</option>
-                            <option value="cancelled" @selected(old('status', $event->status) === 'cancelled')>Cancelado</option>
+                            <option value="tentative" @selected(old('status') === 'tentative')>Tentativo</option>
+                            <option value="confirmed" @selected(old('status') === 'confirmed')>Confirmado</option>
+                            <option value="completed" @selected(old('status') === 'completed')>Completado</option>
+                            <option value="cancelled" @selected(old('status') === 'cancelled')>Cancelado</option>
                         </select>
                     </div>
 
                     <div>
                         <label class="block mb-1">Fecha</label>
-                        <input type="date" name="event_date" class="w-full border rounded" value="{{ old('event_date', $event->event_date->format('Y-m-d')) }}">
+                        <input type="date" name="event_date" class="w-full border rounded" value="{{ old('event_date') }}">
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block mb-1">Hora inicio</label>
-                            <input type="time" name="start_time" class="w-full border rounded" value="{{ old('start_time', $event->start_time) }}">
+                            <input type="time" name="start_time" class="w-full border rounded" value="{{ old('start_time') }}">
                         </div>
                         <div>
                             <label class="block mb-1">Hora fin</label>
-                            <input type="time" name="end_time" class="w-full border rounded" value="{{ old('end_time', $event->end_time) }}">
+                            <input type="time" name="end_time" class="w-full border rounded" value="{{ old('end_time') }}">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block mb-1">Invitados</label>
-                            <input type="number" name="guest_count" class="w-full border rounded" value="{{ old('guest_count', $event->guest_count) }}">
+                            <input type="number" name="guest_count" class="w-full border rounded" value="{{ old('guest_count') }}">
                         </div>
                         <div>
                             <label class="block mb-1">Presupuesto estimado</label>
-                            <input type="number" step="0.01" name="budget_estimate" class="w-full border rounded" value="{{ old('budget_estimate', $event->budget_estimate) }}">
+                            <input type="number" step="0.01" name="budget_estimate" class="w-full border rounded" value="{{ old('budget_estimate') }}">
                         </div>
                     </div>
 
                     <div>
                         <label class="block mb-1">Monto total</label>
-                        <input type="number" step="0.01" name="total_amount" class="w-full border rounded" value="{{ old('total_amount', $event->total_amount) }}">
+                        <input type="number" step="0.01" name="total_amount" class="w-full border rounded" value="{{ old('total_amount', 0) }}">
                     </div>
 
                     <div>
                         <label class="block mb-1">Notas</label>
-                        <textarea name="notes" class="w-full border rounded">{{ old('notes', $event->notes) }}</textarea>
+                        <textarea name="notes" class="w-full border rounded">{{ old('notes') }}</textarea>
                     </div>
 
-                    <button class="px-4 py-2 bg-black text-white rounded">Actualizar evento</button>
+                    <button class="px-4 py-2 bg-black text-white rounded">Guardar evento</button>
                 </form>
             </div>
         </div>
