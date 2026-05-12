@@ -60,6 +60,10 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('permission:manage events')
         ->name('events.tasks.store');
 
+    Route::patch('/event-tasks/{eventTask}/status', [EventTaskController::class, 'updateStatus'])
+        ->middleware('permission:manage events')
+        ->name('events.tasks.status');
+
     Route::delete('/event-tasks/{eventTask}', [EventTaskController::class, 'destroy'])
         ->middleware('permission:manage events')
         ->name('events.tasks.destroy');
