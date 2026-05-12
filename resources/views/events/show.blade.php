@@ -85,45 +85,82 @@
                     <div class="space-y-3">
                         @forelse($event->documents as $document)
                             <div class="border rounded-xl p-4 flex items-start justify-between gap-4">
-                                <div class="flex items-start gap-3 min-w-0">
-                                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-gray-700">
-                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-.988-2.386l-4.751-4.751A3.375 3.375 0 0011.375 3.5H8.25A2.25 2.25 0 006 5.75v12.5a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-4z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3.75V9a2.25 2.25 0 002.25 2.25h5.25" />
-                                        </svg>
+                                <div class="min-w-0">
+                                    <div class="font-semibold truncate">{{ $document->original_name }}</div>
+                                    <div class="text-sm text-gray-500">
+                                        {{ $document->category }} · {{ number_format(($document->file_size ?? 0) / 1024, 1) }} KB
                                     </div>
-                                    <div class="min-w-0">
-                                        <div class="font-semibold truncate">{{ $document->original_name }}</div>
-                                        <div class="text-sm text-gray-500">
-                                            {{ $document->category }} · {{ number_format(($document->file_size ?? 0) / 1024, 1) }} KB
-                                        </div>
-                                        @if($document->notes)
-                                            <div class="text-sm text-gray-600 mt-1">{{ $document->notes }}</div>
-                                        @endif
-                                    </div>
+                                    @if($document->notes)
+                                        <div class="text-sm text-gray-600 mt-1">{{ $document->notes }}</div>
+                                    @endif
                                 </div>
 
                                 <div class="flex items-center gap-2 shrink-0">
-                                    <a href="{{ asset('storage/' . $document->file_path) }}" target="_blank" class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white transition" title="Ver">
-                                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                    </a>
+                                    <a href="{{ asset('storage/' . $document->file_path) }}" target="_blank" class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white transition" title="Ver">👁</a>
                                     <form action="{{ route('documents.destroy', $document) }}" method="POST" onsubmit="return confirm('¿Eliminar este documento?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-red-50 text-red-700 hover:bg-red-600 hover:text-white transition" title="Eliminar">
-                                            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166M18.16 19.673A2.25 2.25 0 0115.916 21H8.084a2.25 2.25 0 01-2.244-1.327L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .563c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                            </svg>
-                                        </button>
+                                        <button type="submit" class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-red-50 text-red-700 hover:bg-red-600 hover:text-white transition" title="Eliminar">🗑</button>
                                     </form>
                                 </div>
                             </div>
                         @empty
                             <div class="border border-dashed rounded-xl p-6 text-center text-gray-500">
                                 No hay documentos cargados para este evento.
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white shadow rounded p-6">
+                <h3 class="text-lg font-semibold mb-6">Timeline del evento</h3>
+
+                <div class="relative">
+                    <div class="absolute left-4 top-0 bottom-0 w-px bg-gray-200"></div>
+
+                    <div class="space-y-6">
+                        @forelse($timeline as $item)
+                            @php
+                                $colorClasses = match($item['color']) {
+                                    'green' => 'bg-green-100 text-green-700 ring-green-200',
+                                    'red' => 'bg-red-100 text-red-700 ring-red-200',
+                                    'blue' => 'bg-blue-100 text-blue-700 ring-blue-200',
+                                    default => 'bg-gray-100 text-gray-700 ring-gray-200',
+                                };
+                            @endphp
+
+                            <div class="relative flex gap-4 pl-12">
+                                <div class="absolute left-0 top-1 flex h-8 w-8 items-center justify-center rounded-full ring-4 {{ $colorClasses }}">
+                                    @if($item['type'] === 'Ingreso')
+                                        $
+                                    @elseif($item['type'] === 'Gasto')
+                                        -
+                                    @elseif($item['type'] === 'Documento')
+                                        📎
+                                    @else
+                                        📝
+                                    @endif
+                                </div>
+
+                                <div class="flex-1 rounded-xl border bg-gray-50 p-4">
+                                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-1">
+                                        <div>
+                                            <div class="text-sm font-semibold text-gray-900">{{ $item['title'] }}</div>
+                                            <div class="text-sm text-gray-600 mt-1">{{ $item['description'] }}</div>
+                                        </div>
+                                        <div class="text-xs text-gray-500 whitespace-nowrap">
+                                            {{ $item['date']?->format('d/m/Y H:i') }}
+                                        </div>
+                                    </div>
+                                    <div class="mt-2 inline-flex rounded-full bg-white px-2 py-1 text-xs text-gray-500 border">
+                                        {{ $item['type'] }}
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="border border-dashed rounded-xl p-6 text-center text-gray-500">
+                                Todavía no hay actividad registrada en este evento.
                             </div>
                         @endforelse
                     </div>
