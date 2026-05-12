@@ -67,9 +67,34 @@ class EventController extends Controller
             ->where('type', Transaction::TYPE_INCOME)
             ->sum('amount');
 
+        $timeline = collect()
+            ->merge($event->transactions->map(fn ($transaction) => [
+                'date' => $transaction->created_at,
+                'type' => $transaction->type === Transaction::TYPE_INCOME ? 'Ingreso' : 'Gasto',
+                'title' => ($transaction->type === Transaction::TYPE_INCOME ? 'Ingreso registrado' : 'Gasto registrado'),
+                'description' => '$' . number_format($transaction->amount, 2) . ' · ' . ($transaction->category ?? 'Sin categoría'),
+                'color' => $transaction->type === Transaction::TYPE_INCOME ? 'green' : 'red',
+            ]))
+            ->merge($event->documents->map(fn ($document) => [
+                'date' => $document->created_at,
+                'type' => 'Documento',
+                'title' => 'Documento cargado',
+                'description' => $document->original_name,
+                'color' => 'blue',
+            ]))
+            ->merge($event->notesList->map(fn ($note) => [
+                'date' => $note->created_at,
+                'type' => 'Nota',
+                'title' => 'Nota agregada',
+                'description' => $note->note,
+                'color' => 'gray',
+            ]))
+            ->sortByDesc('date')
+            ->values();
+
         $users = \App\Models\User::orderBy('name')->get();
 
-        return view('events.show', compact('event', 'users', 'income', 'expenses', 'balance', 'pendingIncome'));
+        return view('events.show', compact('event', 'users', 'income', 'expenses', 'balance', 'pendingIncome', 'timeline'));
     }
 
     public function edit(Event $event)
