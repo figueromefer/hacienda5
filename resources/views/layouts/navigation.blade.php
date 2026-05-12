@@ -45,10 +45,6 @@
                         <x-nav-link :href="route('transactions.index')" :active="request()->routeIs('transactions.*')" class="brand-nav-link">Movimientos</x-nav-link>
                     @endcan
 
-                    @can('manage documents')
-                        <x-nav-link :href="route('documents.index')" :active="request()->routeIs('documents.*')" class="brand-nav-link">Documentos</x-nav-link>
-                    @endcan
-
                     @can('view calendar')
                         <x-nav-link :href="route('calendar.index')" :active="request()->routeIs('calendar.*')" class="brand-nav-link">Calendario</x-nav-link>
                     @endcan
