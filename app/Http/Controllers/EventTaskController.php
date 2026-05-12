@@ -25,6 +25,21 @@ class EventTaskController extends Controller
             ->with('success', 'Tarea agregada correctamente.');
     }
 
+    public function updateStatus(Request $request, EventTask $eventTask)
+    {
+        $data = $request->validate([
+            'status' => ['required', 'in:pending,done,cancelled'],
+        ]);
+
+        $eventTask->update(['status' => $data['status']]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tarea actualizada correctamente.',
+            'status' => $eventTask->status,
+        ]);
+    }
+
     public function destroy(EventTask $eventTask)
     {
         $eventId = $eventTask->event_id;
