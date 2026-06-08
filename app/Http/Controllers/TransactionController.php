@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\IncomeReceiptMail;
 use App\Models\Client;
 use App\Models\Event;
 use App\Models\Quotation;
@@ -9,6 +10,8 @@ use App\Models\Transaction;
 use App\Support\SpanishMoney;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class TransactionController extends Controller
@@ -91,13 +94,40 @@ class TransactionController extends Controller
             $data['receipt_token'] = (string) Str::uuid();
         }
 
-        Transaction::create($data);
+        $transaction = Transaction::create($data);
+        $transaction->load(['client', 'event', 'quotation']);
 
-        if (!empty($data['event_id'])) {
-            return redirect()->route('events.show', $data['event_id'])->with('success', 'Movimiento registrado correctamente.');
+        $emailSent = false;
+
+        if ($transaction->type === Transaction::TYPE_INCOME && $transaction->status === 'paid' && $transaction->client?->email) {
+            try {
+                Mail::to($transaction->client->email)
+                    ->cc(config('mail.from.address', 'info@haciendacinco.mx'))
+                    ->send(new IncomeReceiptMail($transaction));
+
+                $emailSent = true;
+            } catch (\Throwable $exception) {
+                Log::error('No se pudo enviar el recibo de ingreso.', [
+                    'transaction_id' => $transaction->id,
+                    'client_email' => $transaction->client?->email,
+                    'error' => $exception->getMessage(),
+                ]);
+            }
         }
 
-        return redirect()->route('transactions.index')->with('success', 'Movimiento registrado correctamente.');
+        $message = 'Movimiento registrado correctamente.';
+
+        if ($transaction->type === Transaction::TYPE_INCOME && $transaction->status === 'paid') {
+            $message .= $emailSent
+                ? ' Se envió el recibo por correo al cliente.'
+                : ' No se pudo enviar el recibo por correo; revisa que el cliente tenga email y la configuración SMTP.';
+        }
+
+        if (!empty($data['event_id'])) {
+            return redirect()->route('events.show', $data['event_id'])->with('success', $message);
+        }
+
+        return redirect()->route('transactions.index')->with('success', $message);
     }
 
     public function show(Transaction $transaction)
