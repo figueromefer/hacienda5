@@ -41,6 +41,10 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('quotations', QuotationController::class)
         ->middleware('permission:manage quotations');
 
+    Route::get('/transactions/{transaction}/pdf', [TransactionController::class, 'pdf'])
+        ->middleware('permission:manage payments')
+        ->name('transactions.pdf');
+
     Route::resource('transactions', TransactionController::class)
         ->middleware('permission:manage payments');
 
