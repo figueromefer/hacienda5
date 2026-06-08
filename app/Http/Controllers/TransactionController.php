@@ -87,6 +87,10 @@ class TransactionController extends Controller
             return back()->withErrors(['event_id' => 'Selecciona un evento para movimientos de evento.'])->withInput();
         }
 
+        if (empty($data['receipt_token'])) {
+            $data['receipt_token'] = (string) Str::uuid();
+        }
+
         Transaction::create($data);
 
         if (!empty($data['event_id'])) {
@@ -165,12 +169,17 @@ class TransactionController extends Controller
 
     private function receiptViewData(Transaction $transaction): array
     {
+        $publicUrl = $transaction->receipt_token
+            ? route('receipts.public.show', $transaction->receipt_token)
+            : null;
+
         return [
             'transaction' => $transaction,
             'receiptTitle' => $transaction->type === Transaction::TYPE_INCOME ? 'RECIBO DE ANTICIPO' : 'RECIBO PAGO TRABAJOS',
             'amountInWords' => SpanishMoney::toWords((float) $transaction->amount),
             'logoPath' => public_path('images/hacienda-cinco-logo.png'),
             'brandGreen' => '#243834',
+            'publicUrl' => $publicUrl,
         ];
     }
 }
