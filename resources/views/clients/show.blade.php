@@ -47,6 +47,33 @@
                 @endif
             </div>
 
+            <div class="bg-white shadow rounded p-6">
+                <h3 class="text-lg font-semibold mb-4">Recibos</h3>
+                <div class="space-y-3">
+                    @forelse($client->transactions->sortByDesc('transaction_date') as $transaction)
+                        <div class="border rounded-xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            <div>
+                                <div class="font-semibold">
+                                    Recibo #{{ $transaction->id }} · {{ $transaction->type_label }} · ${{ number_format($transaction->amount, 2) }}
+                                </div>
+                                <div class="text-sm text-gray-600">
+                                    {{ $transaction->transaction_date?->format('d/m/Y') }} · {{ $transaction->event?->title ?? 'Sin evento' }} · {{ $transaction->category ?? 'Sin categoría' }} · {{ $transaction->status }}
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <a href="{{ route('transactions.show', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:9999px;background:#eff6ff;color:#1d4ed8;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">Ver recibo</a>
+                                <a href="{{ route('transactions.pdf', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:9999px;background:#243834;color:#ffffff !important;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">PDF</a>
+                                @if($transaction->receipt_token)
+                                    <a href="{{ route('receipts.public.show', $transaction->receipt_token) }}" target="_blank" style="display:inline-flex;align-items:center;border-radius:9999px;background:#ecfdf5;color:#047857;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">Validar</a>
+                                @endif
+                            </div>
+                        </div>
+                    @empty
+                        <div class="border border-dashed rounded-xl p-6 text-center text-gray-500">No hay recibos generados para este cliente.</div>
+                    @endforelse
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-white shadow rounded p-6">
                     <h3 class="text-lg font-semibold mb-4">Eventos</h3>
@@ -90,29 +117,6 @@
                             </div>
                         @empty
                             <p>No hay cotizaciones registradas.</p>
-                        @endforelse
-                    </div>
-                </div>
-
-                <div class="bg-white shadow rounded p-6">
-                    <h3 class="text-lg font-semibold mb-4">Pagos</h3>
-
-                    <div class="space-y-3">
-                        @forelse($client->payments as $payment)
-                            <div class="border rounded p-3">
-                                <div class="font-medium">${{ number_format($payment->amount, 2) }}</div>
-                                <div class="text-sm text-gray-600">
-                                    {{ $payment->payment_date->format('d/m/Y') }} · {{ $payment->status }}
-                                </div>
-                                <div class="text-sm text-gray-600">
-                                    Método: {{ $payment->method }}
-                                </div>
-                                <a href="{{ route('payments.show', $payment) }}" class="text-blue-600 text-sm">
-                                    Ver pago
-                                </a>
-                            </div>
-                        @empty
-                            <p>No hay pagos registrados.</p>
                         @endforelse
                     </div>
                 </div>
