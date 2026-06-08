@@ -72,7 +72,7 @@
             </div>
 
             <div class="bg-white shadow rounded p-6 overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+                <table class="w-full min-w-[1150px] text-left border-collapse">
                     <thead>
                         <tr class="border-b">
                             <th class="py-2">Fecha</th>
@@ -83,29 +83,32 @@
                             <th class="py-2">Categoría</th>
                             <th class="py-2 text-right">Monto</th>
                             <th class="py-2">Estatus</th>
-                            <th class="py-2">Acciones</th>
+                            <th class="py-2 w-[360px]">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($transactions as $transaction)
                             <tr class="border-b">
-                                <td class="py-2">{{ $transaction->transaction_date->format('d/m/Y') }}</td>
-                                <td class="py-2">
+                                <td class="py-2 whitespace-nowrap">{{ $transaction->transaction_date->format('d/m/Y') }}</td>
+                                <td class="py-2 whitespace-nowrap">
                                     <span class="px-2 py-1 rounded text-xs {{ $transaction->type === 'income' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
                                         {{ $transaction->type_label }}
                                     </span>
                                 </td>
-                                <td class="py-2">{{ $transaction->scope_label }}</td>
+                                <td class="py-2 whitespace-nowrap">{{ $transaction->scope_label }}</td>
                                 <td class="py-2">{{ $transaction->client->full_name }}</td>
                                 <td class="py-2">{{ $transaction->event?->title ?? '-' }}</td>
                                 <td class="py-2">{{ $transaction->category ?? '-' }}</td>
-                                <td class="py-2 text-right {{ $transaction->type === 'income' ? 'text-green-700' : 'text-red-700' }}">
+                                <td class="py-2 text-right whitespace-nowrap {{ $transaction->type === 'income' ? 'text-green-700' : 'text-red-700' }}">
                                     {{ $transaction->type === 'expense' ? '-' : '' }}${{ number_format($transaction->amount, 2) }}
                                 </td>
-                                <td class="py-2">{{ $transaction->status }}</td>
+                                <td class="py-2 whitespace-nowrap">{{ $transaction->status }}</td>
                                 <td class="py-2">
                                     <div class="flex flex-wrap gap-2">
-                                        <a href="{{ route('transactions.pdf', $transaction) }}" class="inline-flex items-center rounded-full bg-[#243834] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90">
+                                        <a href="{{ route('transactions.show', $transaction) }}" class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100">
+                                            Ver recibo
+                                        </a>
+                                        <a href="{{ route('transactions.pdf', $transaction) }}" class="inline-flex items-center rounded-full bg-[#243834] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#1b2b28]">
                                             PDF
                                         </a>
                                         @if($transaction->receipt_token)
