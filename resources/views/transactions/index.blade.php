@@ -103,14 +103,25 @@
                                     {{ $transaction->type === 'expense' ? '-' : '' }}${{ number_format($transaction->amount, 2) }}
                                 </td>
                                 <td class="py-2">{{ $transaction->status }}</td>
-                                <td class="py-2 flex gap-2">
-                                    <a href="{{ route('transactions.show', $transaction) }}" class="text-blue-600">Ver</a>
-                                    <a href="{{ route('transactions.edit', $transaction) }}" class="text-yellow-600">Editar</a>
-                                    <form action="{{ route('transactions.destroy', $transaction) }}" method="POST" onsubmit="return confirm('¿Eliminar este movimiento?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600">Eliminar</button>
-                                    </form>
+                                <td class="py-2">
+                                    <div class="flex flex-wrap gap-2">
+                                        <a href="{{ route('transactions.pdf', $transaction) }}" class="inline-flex items-center rounded-full bg-[#243834] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90">
+                                            PDF
+                                        </a>
+                                        @if($transaction->receipt_token)
+                                            <a href="{{ route('receipts.public.show', $transaction->receipt_token) }}" target="_blank" class="inline-flex items-center rounded-full bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700 hover:bg-green-100">
+                                                Validar
+                                            </a>
+                                        @endif
+                                        <a href="{{ route('transactions.edit', $transaction) }}" class="inline-flex items-center rounded-full bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100">
+                                            Editar
+                                        </a>
+                                        <form action="{{ route('transactions.destroy', $transaction) }}" method="POST" onsubmit="return confirm('¿Eliminar este movimiento?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="inline-flex items-center rounded-full bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100">Eliminar</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
