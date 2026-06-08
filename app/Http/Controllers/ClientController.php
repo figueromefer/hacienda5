@@ -84,6 +84,7 @@ class ClientController extends Controller
             'quotations',
             'payments',
             'documents',
+            'transactions.event',
         ]);
 
         return view('clients.show', compact('client'));
