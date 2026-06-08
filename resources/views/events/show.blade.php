@@ -42,8 +42,11 @@
                     </div>
                     <div class="space-y-3">
                         @forelse($event->transactions as $transaction)
-                            <div class="border rounded p-3 flex justify-between items-center">
-                                <div><div class="font-semibold">{{ $transaction->type === 'income' ? 'Ingreso' : 'Gasto' }} - ${{ number_format($transaction->amount, 2) }}</div><div class="text-sm text-gray-600">{{ $transaction->transaction_date->format('d/m/Y') }} · {{ $transaction->category ?? 'Sin categoría' }}</div></div>
+                            <div class="border rounded p-3 flex justify-between items-center gap-4">
+                                <div>
+                                    <div class="font-semibold">{{ $transaction->type === 'income' ? 'Ingreso' : 'Gasto' }} - ${{ number_format($transaction->amount, 2) }}</div>
+                                    <div class="text-sm text-gray-600">{{ $transaction->transaction_date->format('d/m/Y') }} · {{ $transaction->category ?? 'Sin categoría' }}</div>
+                                </div>
                                 <div class="text-sm {{ $transaction->type === 'income' ? 'text-green-600' : 'text-red-600' }}">{{ $transaction->status }}</div>
                             </div>
                         @empty
@@ -54,19 +57,48 @@
 
                 <div class="bg-white shadow rounded p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold">Documentos</h3>
-                        <a href="{{ route('documents.create', ['event_id' => $event->id]) }}" class="px-3 py-2 bg-black text-white rounded text-sm">+ Documento</a>
+                        <h3 class="text-lg font-semibold">Recibos emitidos</h3>
                     </div>
                     <div class="space-y-3">
-                        @forelse($event->documents as $document)
-                            <div class="border rounded-xl p-4 flex items-start justify-between gap-4">
-                                <div class="min-w-0"><div class="font-semibold truncate">{{ $document->original_name }}</div><div class="text-sm text-gray-500">{{ $document->category }} · {{ number_format(($document->file_size ?? 0) / 1024, 1) }} KB</div>@if($document->notes)<div class="text-sm text-gray-600 mt-1">{{ $document->notes }}</div>@endif</div>
-                                <div class="flex items-center gap-2 shrink-0"><a href="{{ asset('storage/' . $document->file_path) }}" target="_blank" class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white transition" title="Ver">👁</a><form action="{{ route('documents.destroy', $document) }}" method="POST" onsubmit="return confirm('¿Eliminar este documento?')">@csrf @method('DELETE')<button type="submit" class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-red-50 text-red-700 hover:bg-red-600 hover:text-white transition" title="Eliminar">🗑</button></form></div>
+                        @forelse($event->transactions->sortByDesc('transaction_date') as $transaction)
+                            <div class="border rounded-xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                <div>
+                                    <div class="font-semibold">
+                                        Recibo #{{ $transaction->id }} · {{ $transaction->type_label }} · ${{ number_format($transaction->amount, 2) }}
+                                    </div>
+                                    <div class="text-sm text-gray-600">
+                                        {{ $transaction->transaction_date?->format('d/m/Y') }} · {{ $transaction->category ?? 'Sin categoría' }} · {{ $transaction->status }}
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                    <a href="{{ route('transactions.show', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:9999px;background:#eff6ff;color:#1d4ed8;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">Ver recibo</a>
+                                    <a href="{{ route('transactions.pdf', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:9999px;background:#243834;color:#ffffff !important;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">PDF</a>
+                                    @if($transaction->receipt_token)
+                                        <a href="{{ route('receipts.public.show', $transaction->receipt_token) }}" target="_blank" style="display:inline-flex;align-items:center;border-radius:9999px;background:#ecfdf5;color:#047857;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">Validar</a>
+                                    @endif
+                                </div>
                             </div>
                         @empty
-                            <div class="border border-dashed rounded-xl p-6 text-center text-gray-500">No hay documentos cargados para este evento.</div>
+                            <div class="border border-dashed rounded-xl p-6 text-center text-gray-500">No hay recibos generados para este evento.</div>
                         @endforelse
                     </div>
+                </div>
+            </div>
+
+            <div class="bg-white shadow rounded p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold">Documentos</h3>
+                    <a href="{{ route('documents.create', ['event_id' => $event->id]) }}" class="px-3 py-2 bg-black text-white rounded text-sm">+ Documento</a>
+                </div>
+                <div class="space-y-3">
+                    @forelse($event->documents as $document)
+                        <div class="border rounded-xl p-4 flex items-start justify-between gap-4">
+                            <div class="min-w-0"><div class="font-semibold truncate">{{ $document->original_name }}</div><div class="text-sm text-gray-500">{{ $document->category }} · {{ number_format(($document->file_size ?? 0) / 1024, 1) }} KB</div>@if($document->notes)<div class="text-sm text-gray-600 mt-1">{{ $document->notes }}</div>@endif</div>
+                            <div class="flex items-center gap-2 shrink-0"><a href="{{ asset('storage/' . $document->file_path) }}" target="_blank" class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white transition" title="Ver">👁</a><form action="{{ route('documents.destroy', $document) }}" method="POST" onsubmit="return confirm('¿Eliminar este documento?')">@csrf @method('DELETE')<button type="submit" class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-red-50 text-red-700 hover:bg-red-600 hover:text-white transition" title="Eliminar">🗑</button></form></div>
+                        </div>
+                    @empty
+                        <div class="border border-dashed rounded-xl p-6 text-center text-gray-500">No hay documentos cargados para este evento.</div>
+                    @endforelse
                 </div>
             </div>
 
