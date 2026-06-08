@@ -6,7 +6,10 @@ use App\Models\Client;
 use App\Models\Event;
 use App\Models\Quotation;
 use App\Models\Transaction;
+use App\Support\SpanishMoney;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class TransactionController extends Controller
 {
@@ -96,7 +99,20 @@ class TransactionController extends Controller
     public function show(Transaction $transaction)
     {
         $transaction->load(['client', 'event', 'quotation']);
-        return view('transactions.show', compact('transaction'));
+
+        return view('transactions.show', $this->receiptViewData($transaction));
+    }
+
+    public function pdf(Transaction $transaction)
+    {
+        $transaction->load(['client', 'event', 'quotation']);
+
+        $pdf = Pdf::loadView('transactions.receipt-pdf', $this->receiptViewData($transaction))
+            ->setPaper('letter');
+
+        $filename = 'recibo-' . $transaction->id . '-' . Str::slug($transaction->client?->full_name ?? 'movimiento') . '.pdf';
+
+        return $pdf->download($filename);
     }
 
     public function edit(Transaction $transaction)
@@ -145,5 +161,16 @@ class TransactionController extends Controller
         }
 
         return redirect()->route('transactions.index')->with('success', 'Movimiento eliminado correctamente.');
+    }
+
+    private function receiptViewData(Transaction $transaction): array
+    {
+        return [
+            'transaction' => $transaction,
+            'receiptTitle' => $transaction->type === Transaction::TYPE_INCOME ? 'RECIBO DE ANTICIPO' : 'RECIBO PAGO TRABAJOS',
+            'amountInWords' => SpanishMoney::toWords((float) $transaction->amount),
+            'logoPath' => public_path('images/hacienda-cinco-logo.png'),
+            'brandGreen' => '#243834',
+        ];
     }
 }
