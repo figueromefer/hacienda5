@@ -23,6 +23,7 @@ class Transaction extends Model
         'method',
         'category',
         'reference',
+        'receipt_token',
         'status',
         'notes',
     ];
