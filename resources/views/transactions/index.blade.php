@@ -105,24 +105,24 @@
                                 <td class="py-2 whitespace-nowrap">{{ $transaction->status }}</td>
                                 <td class="py-2">
                                     <div class="flex flex-wrap gap-2">
-                                        <a href="{{ route('transactions.show', $transaction) }}" class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100">
+                                        <a href="{{ route('transactions.show', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:9999px;background:#eff6ff;color:#1d4ed8;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">
                                             Ver recibo
                                         </a>
-                                        <a href="{{ route('transactions.pdf', $transaction) }}" class="inline-flex items-center rounded-full bg-[#243834] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#1b2b28]">
+                                        <a href="{{ route('transactions.pdf', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:9999px;background:#243834;color:#ffffff !important;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">
                                             PDF
                                         </a>
                                         @if($transaction->receipt_token)
-                                            <a href="{{ route('receipts.public.show', $transaction->receipt_token) }}" target="_blank" class="inline-flex items-center rounded-full bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700 hover:bg-green-100">
+                                            <a href="{{ route('receipts.public.show', $transaction->receipt_token) }}" target="_blank" style="display:inline-flex;align-items:center;border-radius:9999px;background:#ecfdf5;color:#047857;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">
                                                 Validar
                                             </a>
                                         @endif
-                                        <a href="{{ route('transactions.edit', $transaction) }}" class="inline-flex items-center rounded-full bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100">
+                                        <a href="{{ route('transactions.edit', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:9999px;background:#fffbeb;color:#b45309;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">
                                             Editar
                                         </a>
                                         <form action="{{ route('transactions.destroy', $transaction) }}" method="POST" onsubmit="return confirm('¿Eliminar este movimiento?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="inline-flex items-center rounded-full bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100">Eliminar</button>
+                                            <button type="submit" style="display:inline-flex;align-items:center;border-radius:9999px;background:#fef2f2;color:#b91c1c;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;border:none;">Eliminar</button>
                                         </form>
                                     </div>
                                 </td>
