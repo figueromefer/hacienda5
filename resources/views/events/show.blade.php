@@ -4,9 +4,14 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ $event->title }}
             </h2>
-            <a href="{{ route('events.edit', $event) }}" class="px-4 py-2 bg-black text-white rounded">
-                Editar evento
-            </a>
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ route('events.contracts.create', $event) }}" style="display:inline-flex;align-items:center;border-radius:10px;background:#243834;color:#ffffff !important;padding:10px 16px;font-weight:700;text-decoration:none;">
+                    Generar contrato
+                </a>
+                <a href="{{ route('events.edit', $event) }}" class="px-4 py-2 bg-black text-white rounded">
+                    Editar evento
+                </a>
+            </div>
         </div>
     </x-slot>
 
