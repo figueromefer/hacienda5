@@ -5,6 +5,7 @@ use App\Http\Controllers\ClientPortalController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\EventContractController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventNoteController;
 use App\Http\Controllers\EventTaskController;
@@ -38,6 +39,14 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('services', ServiceController::class)
         ->middleware('permission:manage services');
+
+    Route::get('/events/{event}/contract/create', [EventContractController::class, 'create'])
+        ->middleware('permission:manage events')
+        ->name('events.contracts.create');
+
+    Route::post('/events/{event}/contract', [EventContractController::class, 'store'])
+        ->middleware('permission:manage events')
+        ->name('events.contracts.store');
 
     Route::resource('events', EventController::class)
         ->middleware('permission:manage events');
