@@ -76,7 +76,7 @@ class EventContractGenerator
             'client_id' => $event->client_id,
             'event_id' => $event->id,
             'uploaded_by' => auth()->id(),
-            'category' => 'Contrato',
+            'category' => 'contract',
             'original_name' => 'Contrato de arrendamiento - ' . ($event->client?->full_name ?? 'Cliente') . '.docx',
             'file_path' => $relativePath,
             'mime_type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
