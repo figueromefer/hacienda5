@@ -51,6 +51,10 @@ class EventContractController extends Controller
             'notas_contrato' => ['nullable', 'string'],
             'clausulas_extra' => ['nullable', 'string'],
             'fecha_firma' => ['nullable', 'string', 'max:255'],
+            'arrendador_firma_nombre' => ['nullable', 'string', 'max:500'],
+            'arrendatario_firma_nombre' => ['required', 'string', 'max:255'],
+            'testigo_1_nombre' => ['nullable', 'string', 'max:255'],
+            'testigo_2_nombre' => ['nullable', 'string', 'max:255'],
         ]);
 
         $document = $generator->generate($event, $data);
