@@ -2,14 +2,15 @@
     'show' => null,
     'edit' => null,
     'delete' => null,
-    'confirm' => '¿Eliminar este registro?',
+    'confirm' => 'Esta acción no se puede deshacer. Para confirmar, escribe ELIMINAR.',
+    'confirmationWord' => 'ELIMINAR',
 ])
 
 @php
     $modalId = 'delete-modal-' . uniqid();
 @endphp
 
-<div x-data="{ confirmDelete: false }" class="flex items-center gap-2">
+<div x-data="{ confirmDelete: false, typedConfirmation: '' }" class="flex items-center gap-2">
     @if($show)
         <a href="{{ $show }}" title="Ver" class="group relative inline-flex items-center justify-center w-9 h-9 rounded-xl border border-blue-100 bg-blue-50 text-blue-700 shadow-sm hover:bg-blue-600 hover:text-white hover:shadow-md transition">
             <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
@@ -31,7 +32,7 @@
     @endif
 
     @if($delete)
-        <button type="button" @click="confirmDelete = true" title="Eliminar" class="group relative inline-flex items-center justify-center w-9 h-9 rounded-xl border border-red-100 bg-red-50 text-red-700 shadow-sm hover:bg-red-600 hover:text-white hover:shadow-md transition">
+        <button type="button" @click="confirmDelete = true; typedConfirmation = ''" title="Eliminar" class="group relative inline-flex items-center justify-center w-9 h-9 rounded-xl border border-red-100 bg-red-50 text-red-700 shadow-sm hover:bg-red-600 hover:text-white hover:shadow-md transition">
             <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166M18.16 19.673A2.25 2.25 0 0115.916 21H8.084a2.25 2.25 0 01-2.244-1.327L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .563c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
             </svg>
@@ -52,12 +53,32 @@
                     </div>
                 </div>
 
+                <div class="mt-5 rounded-xl border border-red-100 bg-red-50 p-4">
+                    <label class="block text-sm font-semibold text-red-800">
+                        Escribe <span class="font-black">{{ $confirmationWord }}</span> para continuar
+                    </label>
+                    <input
+                        type="text"
+                        x-model="typedConfirmation"
+                        class="mt-2 w-full rounded-lg border-red-200 focus:border-red-500 focus:ring-red-500"
+                        autocomplete="off"
+                        placeholder="{{ $confirmationWord }}"
+                    >
+                </div>
+
                 <div class="mt-6 flex justify-end gap-3">
                     <button type="button" @click="confirmDelete = false" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">Cancelar</button>
                     <form action="{{ $delete }}" method="POST">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 transition">Sí, eliminar</button>
+                        <button
+                            type="submit"
+                            :disabled="typedConfirmation !== '{{ $confirmationWord }}'"
+                            :class="typedConfirmation === '{{ $confirmationWord }}' ? 'bg-red-600 hover:bg-red-700 cursor-pointer' : 'bg-red-300 cursor-not-allowed'"
+                            class="rounded-lg px-4 py-2 text-sm font-semibold text-white transition"
+                        >
+                            Sí, eliminar definitivamente
+                        </button>
                     </form>
                 </div>
             </div>
