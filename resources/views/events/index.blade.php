@@ -28,14 +28,13 @@
                                 <td class="py-2">{{ $event->event_type }}</td>
                                 <td class="py-2">{{ $event->event_date->format('d/m/Y') }}</td>
                                 <td class="py-2">{{ $event->status }}</td>
-                                <td class="py-2 flex gap-2">
-                                    <a href="{{ route('events.show', $event) }}" class="text-blue-600">Ver</a>
-                                    <a href="{{ route('events.edit', $event) }}" class="text-yellow-600">Editar</a>
-                                    <form action="{{ route('events.destroy', $event) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600">Eliminar</button>
-                                    </form>
+                                <td class="py-2">
+                                    <x-action-buttons
+                                        :show="route('events.show', $event)"
+                                        :edit="route('events.edit', $event)"
+                                        :delete="route('events.destroy', $event)"
+                                        confirm="Esta acción eliminará el evento y su información relacionada. Para confirmar, escribe ELIMINAR."
+                                    />
                                 </td>
                             </tr>
                         @empty
