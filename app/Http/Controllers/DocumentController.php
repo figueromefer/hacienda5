@@ -32,8 +32,11 @@ class DocumentController extends Controller
             'client_id' => ['nullable', 'exists:clients,id'],
             'event_id' => ['required', 'exists:events,id'],
             'category' => ['required', 'in:contract,receipt,identification,voucher,other'],
-            'file' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png,webp,doc,docx,xls,xlsx'],
+            'file' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png,webp,doc,docx,xls,xlsx', 'max:20480'],
             'notes' => ['nullable', 'string'],
+        ], [
+            'file.max' => 'El archivo no debe pesar más de 20 MB.',
+            'file.mimes' => 'El archivo debe ser PDF, imagen, Word o Excel.',
         ]);
 
         $event = Event::with('client')->findOrFail($data['event_id']);
