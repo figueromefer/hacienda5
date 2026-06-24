@@ -30,8 +30,10 @@ class EventContractGenerator
         $deposito = (float) ($data['deposito_monto'] ?? 0);
         $horaExtra = (float) ($data['costo_hora_extra'] ?? 0);
 
+        $arrendatarioNombre = $data['arrendatario_nombre'] ?? $event->client?->full_name ?? '';
+
         $values = [
-            'arrendatario_nombre' => $data['arrendatario_nombre'] ?? $event->client?->full_name ?? '',
+            'arrendatario_nombre' => $arrendatarioNombre,
             'arrendatario_rfc' => $data['arrendatario_rfc'] ?? '',
             'arrendatario_domicilio' => $data['arrendatario_domicilio'] ?? '',
             'evento_tipo' => $data['evento_tipo'] ?? $event->event_type ?? '',
@@ -57,6 +59,10 @@ class EventContractGenerator
             'notas_contrato' => $data['notas_contrato'] ?? '',
             'clausulas_extra' => $this->formatExtraClauses($data['clausulas_extra'] ?? ''),
             'fecha_firma' => $data['fecha_firma'] ?? now()->translatedFormat('d \d\e F \d\e Y'),
+            'arrendador_firma_nombre' => $data['arrendador_firma_nombre'] ?? 'AGUILAR GANDARA INMOBILIARIA SA DE CV REP POR EL SR. JESUS MANUEL AGUILAR GANDARA.',
+            'arrendatario_firma_nombre' => $data['arrendatario_firma_nombre'] ?? $arrendatarioNombre,
+            'testigo_1_nombre' => $data['testigo_1_nombre'] ?? '',
+            'testigo_2_nombre' => $data['testigo_2_nombre'] ?? '',
         ];
 
         foreach ($values as $key => $value) {
