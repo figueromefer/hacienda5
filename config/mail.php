@@ -115,4 +115,6 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    'receipt_copy' => env('MAIL_RECEIPT_COPY', 'info@haciendacinco.mx'),
+
 ];

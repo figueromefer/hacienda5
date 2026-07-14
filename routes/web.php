@@ -1,19 +1,20 @@
 <?php
 
 use App\Http\Controllers\CalendarController;
-use App\Http\Controllers\ClientPortalController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ClientPortalController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EventContractController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventNoteController;
 use App\Http\Controllers\EventTaskController;
-use App\Http\Controllers\PublicReceiptController;
-use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicReceiptController;
 use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\ReceiptEmailController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -57,6 +58,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/transactions/{transaction}/pdf', [TransactionController::class, 'pdf'])
         ->middleware('permission:manage payments')
         ->name('transactions.pdf');
+
+    Route::get('/transactions/{transaction}/email', [ReceiptEmailController::class, 'create'])
+        ->middleware('permission:manage payments')
+        ->name('transactions.email.create');
+
+    Route::post('/transactions/{transaction}/email', [ReceiptEmailController::class, 'store'])
+        ->middleware('permission:manage payments')
+        ->name('transactions.email.store');
 
     Route::resource('transactions', TransactionController::class)
         ->middleware('permission:manage payments');

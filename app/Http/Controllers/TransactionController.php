@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\IncomeReceiptMail;
 use App\Models\Client;
 use App\Models\Event;
 use App\Models\Quotation;
+use App\Models\ReceiptEmailLog;
 use App\Models\Transaction;
+use App\Rules\EmailList;
+use App\Services\ReceiptEmailSender;
 use App\Services\TransactionReferenceGenerator;
 use App\Support\SpanishMoney;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -61,19 +61,35 @@ class TransactionController extends Controller
 
     public function create(Request $request)
     {
-        $event = $request->filled('event_id') ? Event::with('client')->find($request->event_id) : null;
+        $event = $request->filled('event_id') ? Event::with('client.user')->find($request->event_id) : null;
+        $clients = Client::with('user')->orderBy('full_name')->get();
+        $events = Event::with('client.user')->orderBy('event_date')->get();
+        $suggestedRecipients = collect([
+            $event?->client?->email,
+            $event?->client?->user?->email,
+        ])->filter()->unique(fn (string $email) => strtolower($email))->values();
 
         return view('transactions.create', [
-            'clients' => Client::orderBy('full_name')->get(),
-            'events' => Event::with('client')->orderBy('event_date')->get(),
+            'clients' => $clients,
+            'events' => $events,
             'quotations' => Quotation::latest()->get(),
             'selectedType' => $request->get('type', Transaction::TYPE_INCOME),
             'selectedEvent' => $event,
+            'suggestedRecipients' => $suggestedRecipients,
+            'clientRecipientMap' => $clients->mapWithKeys(fn (Client $client) => [
+                $client->id => collect([$client->email, $client->user?->email])->filter()->unique()->values(),
+            ]),
+            'eventRecipientMap' => $events->mapWithKeys(fn (Event $event) => [
+                $event->id => collect([$event->client?->email, $event->client?->user?->email])->filter()->unique()->values(),
+            ]),
         ]);
     }
 
-    public function store(Request $request, TransactionReferenceGenerator $referenceGenerator)
-    {
+    public function store(
+        Request $request,
+        TransactionReferenceGenerator $referenceGenerator,
+        ReceiptEmailSender $emailSender,
+    ) {
         $data = $request->validate([
             'client_id' => ['required', 'exists:clients,id'],
             'event_id' => ['nullable', 'exists:events,id'],
@@ -87,6 +103,8 @@ class TransactionController extends Controller
             'reference' => ['nullable', 'string', 'max:255', Rule::unique('transactions', 'reference')],
             'status' => ['required', 'in:pending,paid,cancelled'],
             'notes' => ['nullable', 'string'],
+            'receipt_to' => ['nullable', 'string', 'max:4000', 'required_with:receipt_cc', new EmailList],
+            'receipt_cc' => ['nullable', 'string', 'max:4000', new EmailList],
         ]);
 
         if ($data['scope'] === 'event' && empty($data['event_id'])) {
@@ -104,42 +122,37 @@ class TransactionController extends Controller
         }, 5);
         $transaction->load(['client', 'event', 'quotation']);
 
-        $emailSent = false;
+        $message = 'Movimiento registrado correctamente.';
+        $messageType = 'success';
 
-        if ($transaction->type === Transaction::TYPE_INCOME && $transaction->status === 'paid' && $transaction->client?->email) {
-            try {
-                Mail::to($transaction->client->email)
-                    ->cc(config('mail.from.address', 'info@haciendacinco.mx'))
-                    ->send(new IncomeReceiptMail($transaction));
+        if ($transaction->type === Transaction::TYPE_INCOME && $transaction->status === 'paid') {
+            $emailLog = $emailSender->send(
+                $transaction,
+                $request->user(),
+                $data['receipt_to'] ?? null,
+                $data['receipt_cc'] ?? null,
+            );
 
-                $emailSent = true;
-            } catch (\Throwable $exception) {
-                Log::error('No se pudo enviar el recibo de ingreso.', [
-                    'transaction_id' => $transaction->id,
-                    'client_email' => $transaction->client?->email,
-                    'error' => $exception->getMessage(),
-                ]);
+            if ($emailLog === null) {
+                $message .= ' No se seleccionaron destinatarios; el recibo no se envió.';
+            } elseif ($emailLog->status === ReceiptEmailLog::STATUS_SENT) {
+                $message .= ' Se envió el recibo por correo.';
+            } else {
+                $message .= ' El correo no pudo enviarse, pero el movimiento se conservó. Puedes reintentarlo desde el recibo.';
+                $messageType = 'warning';
             }
         }
 
-        $message = 'Movimiento registrado correctamente.';
-
-        if ($transaction->type === Transaction::TYPE_INCOME && $transaction->status === 'paid') {
-            $message .= $emailSent
-                ? ' Se envió el recibo por correo al cliente.'
-                : ' No se pudo enviar el recibo por correo; revisa que el cliente tenga email y la configuración SMTP.';
-        }
-
         if (! empty($data['event_id'])) {
-            return redirect()->route('events.show', $data['event_id'])->with('success', $message);
+            return redirect()->route('events.show', $data['event_id'])->with($messageType, $message);
         }
 
-        return redirect()->route('transactions.index')->with('success', $message);
+        return redirect()->route('transactions.index')->with($messageType, $message);
     }
 
     public function show(Transaction $transaction)
     {
-        $transaction->load(['client', 'event', 'quotation']);
+        $transaction->load(['client', 'event', 'quotation', 'receiptEmailLogs.sender']);
 
         return view('transactions.show', $this->receiptViewData($transaction));
     }

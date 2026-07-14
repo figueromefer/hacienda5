@@ -68,6 +68,11 @@ class Transaction extends Model
         return $this->belongsTo(Quotation::class);
     }
 
+    public function receiptEmailLogs()
+    {
+        return $this->hasMany(ReceiptEmailLog::class)->latest();
+    }
+
     public function getSignedAmountAttribute(): float
     {
         return $this->type === self::TYPE_EXPENSE

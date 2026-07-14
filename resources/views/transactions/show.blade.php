@@ -12,6 +12,11 @@
                     <a href="{{ route('receipts.public.show', $transaction->receipt_token) }}" target="_blank" style="display:inline-flex;align-items:center;border-radius:10px;background:#ecfdf5;color:#047857;padding:10px 16px;font-weight:600;text-decoration:none;">Validar</a>
                 @endif
                 <a href="{{ route('transactions.pdf', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:10px;background:#243834;color:#fff !important;padding:10px 16px;font-weight:600;text-decoration:none;">Descargar PDF</a>
+                @if($transaction->type === \App\Models\Transaction::TYPE_INCOME && $transaction->status === 'paid')
+                    <a href="{{ route('transactions.email.create', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:10px;background:#2563eb;color:#fff !important;padding:10px 16px;font-weight:600;text-decoration:none;">
+                        {{ $transaction->receiptEmailLogs->isEmpty() ? 'Enviar recibo' : 'Reenviar recibo' }}
+                    </a>
+                @endif
             </div>
         </div>
     </x-slot>
@@ -109,6 +114,43 @@
                     <a href="{{ route('receipts.public.show', $transaction->receipt_token) }}" target="_blank" style="display:inline-flex;white-space:nowrap;border-radius:10px;background:#ecfdf5;color:#047857;padding:10px 16px;font-weight:700;text-decoration:none;">Abrir validación</a>
                 </div>
             @endif
+
+            <section style="background:#fff;border-radius:20px;box-shadow:0 12px 30px rgba(0,0,0,.06);padding:24px;margin-top:24px;">
+                <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;">
+                    <div>
+                        <h3 style="font-weight:800;color:#111827;margin:0;">Historial de envío</h3>
+                        @if($transaction->receiptEmailLogs->isNotEmpty())
+                            @php($lastEmailLog = $transaction->receiptEmailLogs->first())
+                            <p style="font-size:14px;color:#4b5563;margin:6px 0 0;">
+                                Último intento: {{ $lastEmailLog->created_at?->format('d/m/Y H:i') }} ·
+                                {{ $lastEmailLog->status === 'sent' ? 'Enviado' : 'Fallido' }}
+                            </p>
+                        @else
+                            <p style="font-size:14px;color:#4b5563;margin:6px 0 0;">Este recibo todavía no tiene envíos registrados.</p>
+                        @endif
+                    </div>
+                </div>
+
+                @if($transaction->receiptEmailLogs->isNotEmpty())
+                    <div style="display:grid;gap:12px;margin-top:18px;">
+                        @foreach($transaction->receiptEmailLogs as $emailLog)
+                            <article style="border:1px solid #e5e7eb;border-radius:14px;padding:16px;">
+                                <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;">
+                                    <strong style="color:{{ $emailLog->status === 'sent' ? '#047857' : '#b91c1c' }};">
+                                        {{ $emailLog->status === 'sent' ? 'Enviado' : 'Fallido' }}
+                                    </strong>
+                                    <span style="font-size:13px;color:#6b7280;">{{ $emailLog->created_at?->format('d/m/Y H:i') }} · {{ $emailLog->sender?->name ?? 'Usuario eliminado' }}</span>
+                                </div>
+                                <div style="margin-top:8px;font-size:14px;color:#374151;word-break:break-word;"><strong>Para:</strong> {{ implode(', ', $emailLog->to_recipients) }}</div>
+                                <div style="margin-top:4px;font-size:14px;color:#374151;word-break:break-word;"><strong>CC:</strong> {{ implode(', ', $emailLog->cc_recipients) ?: '-' }}</div>
+                                @if($emailLog->error_message)
+                                    <div style="margin-top:8px;border-radius:8px;background:#fef2f2;padding:10px;font-size:13px;color:#991b1b;">{{ $emailLog->error_message }}</div>
+                                @endif
+                            </article>
+                        @endforeach
+                    </div>
+                @endif
+            </section>
         </div>
     </div>
 </x-app-layout>
