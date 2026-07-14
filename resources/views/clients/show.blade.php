@@ -1,12 +1,17 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Detalle del cliente
             </h2>
-            <a href="{{ route('clients.edit', $client) }}" class="px-4 py-2 bg-black text-white rounded">
-                Editar cliente
-            </a>
+            <div class="flex flex-col sm:flex-row gap-2">
+                <a href="{{ route('clients.balance.export', $client) }}" style="display:inline-flex;justify-content:center;align-items:center;border-radius:10px;background:#166534;color:#ffffff !important;padding:10px 16px;font-weight:700;text-decoration:none;">
+                    Exportar balance
+                </a>
+                <a href="{{ route('clients.edit', $client) }}" class="px-4 py-2 bg-black text-white rounded text-center">
+                    Editar cliente
+                </a>
+            </div>
         </div>
     </x-slot>
 

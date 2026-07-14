@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Models\Event;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Services\FinancialBalanceCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -49,7 +50,7 @@ class EventController extends Controller
         return redirect()->route('events.index')->with('success', 'Evento creado correctamente.');
     }
 
-    public function show(Event $event)
+    public function show(Event $event, FinancialBalanceCalculator $balanceCalculator)
     {
         $event->load([
             'client',
@@ -60,15 +61,11 @@ class EventController extends Controller
             'quotations',
         ]);
 
-        $paidTransactions = $event->transactions->where('status', 'paid');
-        $income = $paidTransactions->where('type', Transaction::TYPE_INCOME)->sum('amount');
-        $expenses = $paidTransactions->where('type', Transaction::TYPE_EXPENSE)->sum('amount');
-        $balance = $income - $expenses;
-
-        $pendingIncome = $event->transactions
-            ->where('status', 'pending')
-            ->where('type', Transaction::TYPE_INCOME)
-            ->sum('amount');
+        $financialBalance = $balanceCalculator->forEvent($event);
+        $income = $financialBalance['paid_income'];
+        $expenses = $financialBalance['expenses'];
+        $balance = $financialBalance['balance'];
+        $pendingIncome = $financialBalance['pending_income'];
 
         $timeline = collect()
             ->merge($event->transactions->map(fn ($transaction) => [

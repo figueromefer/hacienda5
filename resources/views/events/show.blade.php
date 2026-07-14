@@ -1,10 +1,13 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ $event->title }}
             </h2>
             <div class="flex flex-wrap gap-2">
+                <a href="{{ route('events.balance.export', $event) }}" style="display:inline-flex;align-items:center;border-radius:10px;background:#166534;color:#ffffff !important;padding:10px 16px;font-weight:700;text-decoration:none;">
+                    Exportar balance
+                </a>
                 <a href="{{ route('events.contracts.create', $event) }}" style="display:inline-flex;align-items:center;border-radius:10px;background:#243834;color:#ffffff !important;padding:10px 16px;font-weight:700;text-decoration:none;">
                     Generar contrato
                 </a>

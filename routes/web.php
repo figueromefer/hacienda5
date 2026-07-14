@@ -9,6 +9,7 @@ use App\Http\Controllers\EventContractController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventNoteController;
 use App\Http\Controllers\EventTaskController;
+use App\Http\Controllers\FinancialBalanceExportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicReceiptController;
 use App\Http\Controllers\QuotationController;
@@ -38,6 +39,10 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('clients', ClientController::class)
         ->middleware('permission:manage clients');
 
+    Route::get('/clients/{client}/balance.xlsx', [FinancialBalanceExportController::class, 'client'])
+        ->middleware('permission:manage clients')
+        ->name('clients.balance.export');
+
     Route::resource('services', ServiceController::class)
         ->middleware('permission:manage services');
 
@@ -51,6 +56,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('events', EventController::class)
         ->middleware('permission:manage events');
+
+    Route::get('/events/{event}/balance.xlsx', [FinancialBalanceExportController::class, 'event'])
+        ->middleware('permission:manage events')
+        ->name('events.balance.export');
 
     Route::resource('quotations', QuotationController::class)
         ->middleware('permission:manage quotations');
