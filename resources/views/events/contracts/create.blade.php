@@ -46,7 +46,7 @@
                     <h3 class="text-lg font-semibold mb-4">Datos del evento</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div><label class="block text-sm mb-1">Tipo de evento</label><input name="evento_tipo" class="w-full border rounded" value="{{ old('evento_tipo', $event->event_type) }}" required></div>
-                        <div><label class="block text-sm mb-1">Fecha del evento</label><input name="evento_fecha" class="w-full border rounded" value="{{ old('evento_fecha', $event->event_date?->translatedFormat('d F Y')) }}" required></div>
+                        <div><label class="block text-sm mb-1">Fecha del evento</label><input type="date" name="evento_fecha" class="w-full border rounded" value="{{ old('evento_fecha', $event->event_date?->format('Y-m-d')) }}" required></div>
                         <div><label class="block text-sm mb-1">No. personas</label><input name="evento_personas" class="w-full border rounded" value="{{ old('evento_personas', $event->guest_count) }}"></div>
                         <div><label class="block text-sm mb-1">Hora inicio</label><input name="evento_hora_inicio" class="w-full border rounded" value="{{ old('evento_hora_inicio') }}" placeholder="Ej. 8:00 PM"></div>
                         <div><label class="block text-sm mb-1">Hora fin</label><input name="evento_hora_fin" class="w-full border rounded" value="{{ old('evento_hora_fin') }}" placeholder="Ej. 1:00 AM"></div>
@@ -83,7 +83,7 @@
                     <div class="space-y-4">
                         <div><label class="block text-sm mb-1">Notas del contrato / paquete / promoción</label><textarea name="notas_contrato" rows="3" class="w-full border rounded">{{ old('notas_contrato') }}</textarea></div>
                         <div><label class="block text-sm mb-1">Cláusulas extras</label><textarea name="clausulas_extra" rows="6" class="w-full border rounded" placeholder="Se insertarán después de la cláusula DÉCIMA SEXTA.">{{ old('clausulas_extra') }}</textarea></div>
-                        <div><label class="block text-sm mb-1">Fecha de firma</label><input name="fecha_firma" class="w-full border rounded" value="{{ old('fecha_firma', now()->translatedFormat('d \\d\\e F \\d\\e Y')) }}"></div>
+                        <div><label class="block text-sm mb-1">Fecha de firma</label><input type="date" name="fecha_firma" class="w-full border rounded" value="{{ old('fecha_firma', now()->format('Y-m-d')) }}"></div>
                     </div>
                 </section>
 

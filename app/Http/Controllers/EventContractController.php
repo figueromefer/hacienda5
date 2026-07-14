@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Services\EventContractGenerator;
 use Illuminate\Http\Request;
+use RuntimeException;
+use Throwable;
 
 class EventContractController extends Controller
 {
@@ -35,7 +37,7 @@ class EventContractController extends Controller
             'arrendatario_rfc' => ['nullable', 'string', 'max:50'],
             'arrendatario_domicilio' => ['nullable', 'string', 'max:1000'],
             'evento_tipo' => ['required', 'string', 'max:255'],
-            'evento_fecha' => ['required', 'string', 'max:255'],
+            'evento_fecha' => ['required', 'date_format:Y-m-d'],
             'evento_personas' => ['nullable', 'string', 'max:255'],
             'evento_hora_inicio' => ['nullable', 'string', 'max:255'],
             'evento_hora_fin' => ['nullable', 'string', 'max:255'],
@@ -50,17 +52,29 @@ class EventContractController extends Controller
             'costo_hora_extra' => ['nullable', 'numeric', 'min:0'],
             'notas_contrato' => ['nullable', 'string'],
             'clausulas_extra' => ['nullable', 'string'],
-            'fecha_firma' => ['nullable', 'string', 'max:255'],
+            'fecha_firma' => ['nullable', 'date_format:Y-m-d'],
             'arrendador_firma_nombre' => ['nullable', 'string', 'max:500'],
             'arrendatario_firma_nombre' => ['required', 'string', 'max:255'],
             'testigo_1_nombre' => ['nullable', 'string', 'max:255'],
             'testigo_2_nombre' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $document = $generator->generate($event, $data);
+        try {
+            $document = $generator->generate($event, $data);
+        } catch (RuntimeException $exception) {
+            return back()
+                ->withInput()
+                ->withErrors(['contract' => $exception->getMessage()]);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return back()
+                ->withInput()
+                ->withErrors(['contract' => 'No fue posible generar un contrato válido. No se registró ningún documento.']);
+        }
 
         return redirect()
             ->route('events.show', $event)
-            ->with('success', 'Contrato generado correctamente y agregado a documentos del evento: ' . $document->original_name);
+            ->with('success', 'Contrato generado correctamente y agregado a documentos del evento: '.$document->original_name);
     }
 }
