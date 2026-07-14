@@ -48,6 +48,10 @@
                         <div class="mt-1 text-lg font-semibold">{{ $transaction->type_label }}</div>
                     </div>
                     <div class="rounded-2xl border p-5 md:col-span-2">
+                        <div class="text-sm text-gray-500">Referencia</div>
+                        <div class="mt-1 text-lg font-semibold">{{ $transaction->reference ?: '-' }}</div>
+                    </div>
+                    <div class="rounded-2xl border p-5 md:col-span-2">
                         <div class="text-sm text-gray-500">Concepto</div>
                         <div class="mt-1 text-lg font-semibold">{{ $transaction->category ?: 'Movimiento registrado' }}</div>
                         @if($transaction->notes)

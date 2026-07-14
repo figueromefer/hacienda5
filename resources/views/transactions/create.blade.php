@@ -20,7 +20,7 @@
                 <form action="{{ route('transactions.store') }}" method="POST" class="space-y-4">
                     @csrf
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label>Tipo</label>
                             <select name="type" class="w-full border rounded">
@@ -57,7 +57,7 @@
                         </select>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label>Fecha</label>
                             <input type="date" name="transaction_date" class="w-full border rounded" value="{{ old('transaction_date', now()->format('Y-m-d')) }}">
@@ -68,7 +68,7 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label>Método</label>
                             <select name="method" class="w-full border rounded">
@@ -93,9 +93,8 @@
                         <input type="text" name="category" class="w-full border rounded" value="{{ old('category') }}">
                     </div>
 
-                    <div>
-                        <label>Referencia</label>
-                        <input type="text" name="reference" class="w-full border rounded" value="{{ old('reference') }}">
+                    <div class="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
+                        La referencia se generará automáticamente al guardar, según el tipo y año del movimiento.
                     </div>
 
                     <div>
@@ -103,7 +102,7 @@
                         <textarea name="notes" class="w-full border rounded">{{ old('notes') }}</textarea>
                     </div>
 
-                    <button class="px-4 py-2 bg-black text-white rounded">Guardar</button>
+                    <button class="w-full md:w-auto px-4 py-3 md:py-2 bg-black text-white rounded">Guardar</button>
                 </form>
             </div>
         </div>

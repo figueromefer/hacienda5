@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use LogicException;
 
 class Transaction extends Model
 {
     use HasFactory;
 
     public const TYPE_INCOME = 'income';
+
     public const TYPE_EXPENSE = 'expense';
 
     protected $fillable = [
@@ -32,6 +34,24 @@ class Transaction extends Model
         'transaction_date' => 'date',
         'amount' => 'decimal:2',
     ];
+
+    protected static function booted(): void
+    {
+        static::updating(function (Transaction $transaction): void {
+            if ($transaction->isDirty('reference')) {
+                throw new LogicException('La referencia de un movimiento no se puede modificar.');
+            }
+        });
+    }
+
+    public static function referencePrefix(string $type): string
+    {
+        return match ($type) {
+            self::TYPE_INCOME => 'ING',
+            self::TYPE_EXPENSE => 'GAS',
+            default => throw new LogicException('Tipo de movimiento no válido para generar una referencia.'),
+        };
+    }
 
     public function client()
     {

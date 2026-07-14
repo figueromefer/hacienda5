@@ -12,7 +12,7 @@
         $clientName = $transaction->client?->full_name ?? 'CLIENTE NO ASIGNADO';
         $event = $transaction->event;
         $concept = $transaction->category ?: ($transaction->notes ?: 'Movimiento registrado');
-        $signer = $isIncome ? 'ALEJANDRO AGUILAR GANDARA' : ($transaction->reference ?: 'RECIBI DE CONFORMIDAD');
+        $signer = $isIncome ? 'ALEJANDRO AGUILAR GANDARA' : 'RECIBI DE CONFORMIDAD';
         $qrSvg = !empty($publicUrl) ? base64_encode(QrCode::format('svg')->size(150)->margin(1)->generate($publicUrl)) : null;
     @endphp
 

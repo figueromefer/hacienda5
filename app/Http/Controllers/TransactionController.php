@@ -7,12 +7,15 @@ use App\Models\Client;
 use App\Models\Event;
 use App\Models\Quotation;
 use App\Models\Transaction;
+use App\Services\TransactionReferenceGenerator;
 use App\Support\SpanishMoney;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class TransactionController extends Controller
 {
@@ -69,7 +72,7 @@ class TransactionController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, TransactionReferenceGenerator $referenceGenerator)
     {
         $data = $request->validate([
             'client_id' => ['required', 'exists:clients,id'],
@@ -81,7 +84,7 @@ class TransactionController extends Controller
             'amount' => ['required', 'numeric', 'min:0.01'],
             'method' => ['nullable', 'string', 'max:255'],
             'category' => ['nullable', 'string', 'max:255'],
-            'reference' => ['nullable', 'string', 'max:255'],
+            'reference' => ['nullable', 'string', 'max:255', Rule::unique('transactions', 'reference')],
             'status' => ['required', 'in:pending,paid,cancelled'],
             'notes' => ['nullable', 'string'],
         ]);
@@ -90,11 +93,15 @@ class TransactionController extends Controller
             return back()->withErrors(['event_id' => 'Selecciona un evento para movimientos de evento.'])->withInput();
         }
 
-        if (empty($data['receipt_token'])) {
-            $data['receipt_token'] = (string) Str::uuid();
-        }
+        $transaction = DB::transaction(function () use ($data, $referenceGenerator): Transaction {
+            if (blank($data['reference'] ?? null)) {
+                $data['reference'] = $referenceGenerator->next($data['type'], $data['transaction_date']);
+            }
 
-        $transaction = Transaction::create($data);
+            $data['receipt_token'] = (string) Str::uuid();
+
+            return Transaction::create($data);
+        }, 5);
         $transaction->load(['client', 'event', 'quotation']);
 
         $emailSent = false;
@@ -123,7 +130,7 @@ class TransactionController extends Controller
                 : ' No se pudo enviar el recibo por correo; revisa que el cliente tenga email y la configuración SMTP.';
         }
 
-        if (!empty($data['event_id'])) {
+        if (! empty($data['event_id'])) {
             return redirect()->route('events.show', $data['event_id'])->with('success', $message);
         }
 
@@ -144,7 +151,7 @@ class TransactionController extends Controller
         $pdf = Pdf::loadView('transactions.receipt-pdf', $this->receiptViewData($transaction))
             ->setPaper('letter');
 
-        $filename = 'recibo-' . $transaction->id . '-' . Str::slug($transaction->client?->full_name ?? 'movimiento') . '.pdf';
+        $filename = 'recibo-'.$transaction->id.'-'.Str::slug($transaction->client?->full_name ?? 'movimiento').'.pdf';
 
         return $pdf->download($filename);
     }
@@ -171,7 +178,6 @@ class TransactionController extends Controller
             'amount' => ['required', 'numeric', 'min:0.01'],
             'method' => ['nullable', 'string', 'max:255'],
             'category' => ['nullable', 'string', 'max:255'],
-            'reference' => ['nullable', 'string', 'max:255'],
             'status' => ['required', 'in:pending,paid,cancelled'],
             'notes' => ['nullable', 'string'],
         ]);

@@ -38,6 +38,10 @@
                                     <td style="padding:4px 0;font-weight:700;">#{{ $transaction->id }}</td>
                                 </tr>
                                 <tr>
+                                    <td style="padding:4px 0;color:#6b7280;">Referencia</td>
+                                    <td style="padding:4px 0;font-weight:700;">{{ $transaction->reference ?: '-' }}</td>
+                                </tr>
+                                <tr>
                                     <td style="padding:4px 0;color:#6b7280;">Fecha</td>
                                     <td style="padding:4px 0;">{{ $transaction->transaction_date?->format('d/m/Y') }}</td>
                                 </tr>

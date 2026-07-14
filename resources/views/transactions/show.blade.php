@@ -21,7 +21,7 @@
         $clientName = $transaction->client?->full_name ?? 'SIN CLIENTE';
         $event = $transaction->event;
         $concept = $transaction->category ?: ($transaction->notes ?: 'Movimiento registrado');
-        $signer = $isIncome ? 'ALEJANDRO AGUILAR GANDARA' : ($transaction->reference ?: 'RECIBI DE CONFORMIDAD');
+        $signer = $isIncome ? 'ALEJANDRO AGUILAR GANDARA' : 'RECIBI DE CONFORMIDAD';
     @endphp
 
     <div style="padding:32px 16px;">
@@ -36,7 +36,7 @@
                 </div>
 
                 <div class="receipt-body" style="padding:32px;">
-                    <div class="receipt-summary-grid" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:28px;">
+                    <div class="receipt-summary-grid" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:28px;">
                         <div style="border:1px solid #e5e7eb;background:#f9fafb;border-radius:16px;padding:16px;">
                             <div style="font-size:12px;text-transform:uppercase;color:#6b7280;">Fecha</div>
                             <div style="font-weight:700;margin-top:4px;color:#374151;">{{ $transaction->transaction_date?->format('d/m/Y') }}</div>
@@ -48,6 +48,10 @@
                         <div style="border:1px solid #e5e7eb;background:#f9fafb;border-radius:16px;padding:16px;">
                             <div style="font-size:12px;text-transform:uppercase;color:#6b7280;">Estatus</div>
                             <div style="font-weight:700;margin-top:4px;color:#374151;">{{ $transaction->status }}</div>
+                        </div>
+                        <div style="border:1px solid #e5e7eb;background:#f9fafb;border-radius:16px;padding:16px;">
+                            <div style="font-size:12px;text-transform:uppercase;color:#6b7280;">Referencia</div>
+                            <div style="font-weight:700;margin-top:4px;color:#374151;word-break:break-word;">{{ $transaction->reference ?: '-' }}</div>
                         </div>
                     </div>
 

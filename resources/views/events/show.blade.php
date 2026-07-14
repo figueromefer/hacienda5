@@ -74,6 +74,7 @@
                                     <div class="text-sm text-gray-600">
                                         {{ $transaction->transaction_date?->format('d/m/Y') }} · {{ $transaction->category ?? 'Sin categoría' }} · {{ $transaction->status }}
                                     </div>
+                                    <div class="mt-1 text-sm font-medium text-gray-700">Referencia: {{ $transaction->reference ?: '-' }}</div>
                                 </div>
                                 <div class="flex flex-wrap gap-2">
                                     <a href="{{ route('transactions.show', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:9999px;background:#eff6ff;color:#1d4ed8;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">Ver recibo</a>

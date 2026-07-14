@@ -72,10 +72,11 @@
             </div>
 
             <div class="bg-white shadow rounded p-6 overflow-x-auto">
-                <table class="responsive-table w-full min-w-[1150px] text-left border-collapse">
+                <table class="responsive-table w-full min-w-[1250px] text-left border-collapse">
                     <thead>
                         <tr class="border-b">
                             <th class="py-2">Fecha</th>
+                            <th class="py-2">Referencia</th>
                             <th class="py-2">Tipo</th>
                             <th class="py-2">Alcance</th>
                             <th class="py-2">Cliente</th>
@@ -90,6 +91,7 @@
                         @forelse($transactions as $transaction)
                             <tr class="border-b">
                                 <td data-label="Fecha" class="py-2 whitespace-nowrap">{{ $transaction->transaction_date->format('d/m/Y') }}</td>
+                                <td data-label="Referencia" class="py-2 whitespace-nowrap font-medium">{{ $transaction->reference ?: '-' }}</td>
                                 <td data-label="Tipo" class="py-2 whitespace-nowrap">
                                     <span class="px-2 py-1 rounded text-xs {{ $transaction->type === 'income' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
                                         {{ $transaction->type_label }}
@@ -129,7 +131,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="py-4">No hay movimientos registrados.</td>
+                                <td colspan="10" class="py-4">No hay movimientos registrados.</td>
                             </tr>
                         @endforelse
                     </tbody>
