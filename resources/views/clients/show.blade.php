@@ -86,7 +86,7 @@
                                     {{ $event->event_type }} · {{ $event->event_date->format('d/m/Y') }}
                                 </div>
                                 <div class="text-sm text-gray-600">
-                                    Estatus: {{ $event->status }}
+                                    Estatus: {{ $event->status_label }}
                                 </div>
                                 <a href="{{ route('events.show', $event) }}" class="text-blue-600 text-sm">
                                     Ver evento

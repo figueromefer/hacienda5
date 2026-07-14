@@ -45,7 +45,8 @@
                     <div>
                         <label class="block mb-1">Estatus</label>
                         <select name="status" class="w-full border rounded">
-                            <option value="tentative" @selected(old('status') === 'tentative')>Tentativo</option>
+                            <option value="reserved" @selected(old('status') === 'reserved')>Apartado</option>
+                            <option value="tentative" @selected(old('status', 'tentative') === 'tentative')>Por confirmar</option>
                             <option value="confirmed" @selected(old('status') === 'confirmed')>Confirmado</option>
                             <option value="completed" @selected(old('status') === 'completed')>Completado</option>
                             <option value="cancelled" @selected(old('status') === 'cancelled')>Cancelado</option>

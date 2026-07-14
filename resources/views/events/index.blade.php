@@ -27,7 +27,7 @@
                                 <td data-label="Cliente" class="py-2">{{ $event->client->full_name }}</td>
                                 <td data-label="Tipo" class="py-2">{{ $event->event_type }}</td>
                                 <td data-label="Fecha" class="py-2">{{ $event->event_date->format('d/m/Y') }}</td>
-                                <td data-label="Estatus" class="py-2">{{ $event->status }}</td>
+                                <td data-label="Estatus" class="py-2">{{ $event->status_label }}</td>
                                 <td data-label="Acciones" class="py-2">
                                     <x-action-buttons
                                         :show="route('events.show', $event)"

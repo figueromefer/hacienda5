@@ -22,7 +22,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div><strong>Cliente:</strong> {{ $event->client->full_name }}</div>
                     <div><strong>Tipo:</strong> {{ $event->event_type }}</div>
-                    <div><strong>Estatus:</strong> {{ $event->status }}</div>
+                    <div><strong>Estatus:</strong> {{ $event->status_label }}</div>
                     <div><strong>Fecha:</strong> {{ $event->event_date->format('d/m/Y') }}</div>
                     <div><strong>Invitados:</strong> {{ $event->guest_count ?? '-' }}</div>
                     <div><strong>Total:</strong> ${{ number_format($event->total_amount, 2) }}</div>

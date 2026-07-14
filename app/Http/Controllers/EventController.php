@@ -5,13 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\Event;
 use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class EventController extends Controller
 {
     public function index()
     {
         $events = Event::with('client')->orderBy('event_date')->paginate(15);
+
         return view('events.index', compact('events'));
     }
 
@@ -28,7 +31,7 @@ class EventController extends Controller
             'client_id' => ['required', 'exists:clients,id'],
             'title' => ['required', 'string', 'max:255'],
             'event_type' => ['required', 'string', 'max:255'],
-            'status' => ['required', 'in:tentative,confirmed,completed,cancelled'],
+            'status' => ['required', Rule::in(Event::STATUSES)],
             'event_date' => ['required', 'date'],
             'start_time' => ['nullable'],
             'end_time' => ['nullable'],
@@ -72,7 +75,7 @@ class EventController extends Controller
                 'date' => $transaction->created_at,
                 'type' => $transaction->type === Transaction::TYPE_INCOME ? 'Ingreso' : 'Gasto',
                 'title' => ($transaction->type === Transaction::TYPE_INCOME ? 'Ingreso registrado' : 'Gasto registrado'),
-                'description' => '$' . number_format($transaction->amount, 2) . ' · ' . ($transaction->category ?? 'Sin categoría'),
+                'description' => '$'.number_format($transaction->amount, 2).' · '.($transaction->category ?? 'Sin categoría'),
                 'color' => $transaction->type === Transaction::TYPE_INCOME ? 'green' : 'red',
             ]))
             ->merge($event->documents->map(fn ($document) => [
@@ -92,7 +95,7 @@ class EventController extends Controller
             ->sortByDesc('date')
             ->values();
 
-        $users = \App\Models\User::orderBy('name')->get();
+        $users = User::orderBy('name')->get();
 
         return view('events.show', compact('event', 'users', 'income', 'expenses', 'balance', 'pendingIncome', 'timeline'));
     }
@@ -111,7 +114,7 @@ class EventController extends Controller
             'client_id' => ['required', 'exists:clients,id'],
             'title' => ['required', 'string', 'max:255'],
             'event_type' => ['required', 'string', 'max:255'],
-            'status' => ['required', 'in:tentative,confirmed,completed,cancelled'],
+            'status' => ['required', Rule::in(Event::STATUSES)],
             'event_date' => ['required', 'date'],
             'start_time' => ['nullable'],
             'end_time' => ['nullable'],

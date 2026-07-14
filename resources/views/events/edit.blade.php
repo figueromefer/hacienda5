@@ -34,10 +34,11 @@
                     <div>
                         <label class="block mb-1">Estatus</label>
                         <select name="status" class="w-full border rounded">
-                            <option value="tentative" @selected($event->status === 'tentative')>Tentativo</option>
-                            <option value="confirmed" @selected($event->status === 'confirmed')>Confirmado</option>
-                            <option value="completed" @selected($event->status === 'completed')>Completado</option>
-                            <option value="cancelled" @selected($event->status === 'cancelled')>Cancelado</option>
+                            <option value="reserved" @selected(old('status', $event->status) === 'reserved')>Apartado</option>
+                            <option value="tentative" @selected(old('status', $event->status) === 'tentative')>Por confirmar</option>
+                            <option value="confirmed" @selected(old('status', $event->status) === 'confirmed')>Confirmado</option>
+                            <option value="completed" @selected(old('status', $event->status) === 'completed')>Completado</option>
+                            <option value="cancelled" @selected(old('status', $event->status) === 'cancelled')>Cancelado</option>
                         </select>
                     </div>
 

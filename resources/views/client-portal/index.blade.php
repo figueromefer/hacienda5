@@ -40,7 +40,7 @@
                                     {{ $event->event_type }} · {{ $event->event_date->format('d/m/Y') }}
                                 </div>
                                 <div class="text-sm text-gray-600">
-                                    Estatus: {{ $event->status }}
+                                    Estatus: {{ $event->status_label }}
                                 </div>
                                 <div class="text-sm text-gray-600">
                                     Horario: {{ $event->start_time ?: '-' }} a {{ $event->end_time ?: '-' }}

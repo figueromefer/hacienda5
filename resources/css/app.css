@@ -88,6 +88,11 @@
         -webkit-overflow-scrolling: touch;
     }
 
+    .calendar-event-cancelled {
+        opacity: 0.72;
+        text-decoration: line-through;
+    }
+
     .brand-card,
     .bg-white.shadow,
     .bg-white.shadow-sm,
