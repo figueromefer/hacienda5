@@ -5,7 +5,7 @@
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow rounded p-6">
+            <div class="bg-white shadow rounded p-3 sm:p-6 overflow-x-auto">
                 <div id="calendar"></div>
             </div>
         </div>

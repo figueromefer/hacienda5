@@ -67,8 +67,8 @@
                             </button>
                         </div>
 
-                        <div class="overflow-x-auto">
-                            <table class="w-full border" id="items-table">
+                        <div>
+                            <table class="responsive-table w-full border" id="items-table">
                                 <thead>
                                     <tr class="bg-gray-100">
                                         <th class="p-2 border">Servicio</th>
@@ -81,7 +81,7 @@
                                 </thead>
                                 <tbody id="items-body">
                                     <tr>
-                                        <td class="p-2 border">
+                                        <td data-label="Servicio" class="p-2 border">
                                             <select name="items[0][service_id]" class="w-full border rounded service-select">
                                                 <option value="">Manual</option>
                                                 @foreach($services as $service)
@@ -91,19 +91,19 @@
                                                 @endforeach
                                             </select>
                                         </td>
-                                        <td class="p-2 border">
+                                        <td data-label="Descripción" class="p-2 border">
                                             <input type="text" name="items[0][description]" class="w-full border rounded description-input">
                                         </td>
-                                        <td class="p-2 border">
+                                        <td data-label="Cantidad" class="p-2 border">
                                             <input type="number" name="items[0][quantity]" min="1" value="1" class="w-full border rounded quantity-input">
                                         </td>
-                                        <td class="p-2 border">
+                                        <td data-label="Precio unitario" class="p-2 border">
                                             <input type="number" step="0.01" min="0" name="items[0][unit_price]" value="0" class="w-full border rounded price-input">
                                         </td>
-                                        <td class="p-2 border">
+                                        <td data-label="Total" class="p-2 border">
                                             <input type="text" class="w-full border rounded item-total bg-gray-50" value="0.00" readonly>
                                         </td>
-                                        <td class="p-2 border text-center">
+                                        <td data-label="Acciones" class="p-2 border text-center">
                                             <button type="button" class="remove-item text-red-600">Eliminar</button>
                                         </td>
                                     </tr>
@@ -194,7 +194,7 @@
                 const row = document.createElement('tr');
 
                 row.innerHTML = `
-                    <td class="p-2 border">
+                    <td data-label="Servicio" class="p-2 border">
                         <select name="items[${index}][service_id]" class="w-full border rounded service-select">
                             <option value="">Manual</option>
                             @foreach($services as $service)
@@ -204,19 +204,19 @@
                             @endforeach
                         </select>
                     </td>
-                    <td class="p-2 border">
+                    <td data-label="Descripción" class="p-2 border">
                         <input type="text" name="items[${index}][description]" class="w-full border rounded description-input">
                     </td>
-                    <td class="p-2 border">
+                    <td data-label="Cantidad" class="p-2 border">
                         <input type="number" name="items[${index}][quantity]" min="1" value="1" class="w-full border rounded quantity-input">
                     </td>
-                    <td class="p-2 border">
+                    <td data-label="Precio unitario" class="p-2 border">
                         <input type="number" step="0.01" min="0" name="items[${index}][unit_price]" value="0" class="w-full border rounded price-input">
                     </td>
-                    <td class="p-2 border">
+                    <td data-label="Total" class="p-2 border">
                         <input type="text" class="w-full border rounded item-total bg-gray-50" value="0.00" readonly>
                     </td>
-                    <td class="p-2 border text-center">
+                    <td data-label="Acciones" class="p-2 border text-center">
                         <button type="button" class="remove-item text-red-600">Eliminar</button>
                     </td>
                 `;

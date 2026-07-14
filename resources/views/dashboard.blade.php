@@ -15,7 +15,7 @@
 
     <div class="py-6 space-y-6">
 
-        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="bg-white p-5 shadow rounded">
                 <div class="text-sm text-gray-500">Ingresos</div>
                 <div class="text-2xl font-bold text-green-700">${{ number_format($income, 2) }}</div>
@@ -34,9 +34,11 @@
             </div>
         </div>
 
-        <div class="max-w-7xl mx-auto bg-white p-6 shadow rounded">
+        <div class="max-w-7xl mx-auto bg-white p-4 sm:p-6 shadow rounded overflow-x-auto">
             <h3 class="text-lg font-semibold mb-4">Flujo financiero</h3>
-            <canvas id="financeChart" height="120"></canvas>
+            <div class="min-w-[36rem] sm:min-w-0">
+                <canvas id="financeChart" height="120"></canvas>
+            </div>
         </div>
 
     </div>

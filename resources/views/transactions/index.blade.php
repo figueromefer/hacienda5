@@ -72,7 +72,7 @@
             </div>
 
             <div class="bg-white shadow rounded p-6 overflow-x-auto">
-                <table class="w-full min-w-[1150px] text-left border-collapse">
+                <table class="responsive-table w-full min-w-[1150px] text-left border-collapse">
                     <thead>
                         <tr class="border-b">
                             <th class="py-2">Fecha</th>
@@ -89,21 +89,21 @@
                     <tbody>
                         @forelse($transactions as $transaction)
                             <tr class="border-b">
-                                <td class="py-2 whitespace-nowrap">{{ $transaction->transaction_date->format('d/m/Y') }}</td>
-                                <td class="py-2 whitespace-nowrap">
+                                <td data-label="Fecha" class="py-2 whitespace-nowrap">{{ $transaction->transaction_date->format('d/m/Y') }}</td>
+                                <td data-label="Tipo" class="py-2 whitespace-nowrap">
                                     <span class="px-2 py-1 rounded text-xs {{ $transaction->type === 'income' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
                                         {{ $transaction->type_label }}
                                     </span>
                                 </td>
-                                <td class="py-2 whitespace-nowrap">{{ $transaction->scope_label }}</td>
-                                <td class="py-2">{{ $transaction->client->full_name }}</td>
-                                <td class="py-2">{{ $transaction->event?->title ?? '-' }}</td>
-                                <td class="py-2">{{ $transaction->category ?? '-' }}</td>
-                                <td class="py-2 text-right whitespace-nowrap {{ $transaction->type === 'income' ? 'text-green-700' : 'text-red-700' }}">
+                                <td data-label="Alcance" class="py-2 whitespace-nowrap">{{ $transaction->scope_label }}</td>
+                                <td data-label="Cliente" class="py-2">{{ $transaction->client->full_name }}</td>
+                                <td data-label="Evento" class="py-2">{{ $transaction->event?->title ?? '-' }}</td>
+                                <td data-label="Categoría" class="py-2">{{ $transaction->category ?? '-' }}</td>
+                                <td data-label="Monto" class="py-2 text-right whitespace-nowrap {{ $transaction->type === 'income' ? 'text-green-700' : 'text-red-700' }}">
                                     {{ $transaction->type === 'expense' ? '-' : '' }}${{ number_format($transaction->amount, 2) }}
                                 </td>
-                                <td class="py-2 whitespace-nowrap">{{ $transaction->status }}</td>
-                                <td class="py-2">
+                                <td data-label="Estatus" class="py-2 whitespace-nowrap">{{ $transaction->status }}</td>
+                                <td data-label="Acciones" class="py-2">
                                     <div class="flex flex-wrap gap-2">
                                         <a href="{{ route('transactions.show', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:9999px;background:#eff6ff;color:#1d4ed8;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">
                                             Ver recibo

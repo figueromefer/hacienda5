@@ -8,12 +8,12 @@
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow rounded p-6">
+            <div class="bg-white shadow rounded p-4 sm:p-6">
                 @if(session('success'))
                     <div class="mb-4 text-green-700">{{ session('success') }}</div>
                 @endif
 
-                <table class="w-full text-left border-collapse">
+                <table class="responsive-table w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b">
                             <th class="py-2">Nombre</th>
@@ -26,11 +26,11 @@
                     <tbody>
                         @forelse($clients as $client)
                             <tr class="border-b">
-                                <td class="py-2">{{ $client->full_name }}</td>
-                                <td class="py-2">{{ $client->type }}</td>
-                                <td class="py-2">{{ $client->email }}</td>
-                                <td class="py-2">{{ $client->phone }}</td>
-                                <td class="py-2">
+                                <td data-label="Nombre" class="py-2">{{ $client->full_name }}</td>
+                                <td data-label="Tipo" class="py-2">{{ $client->type }}</td>
+                                <td data-label="Email" class="py-2 break-all">{{ $client->email }}</td>
+                                <td data-label="Teléfono" class="py-2">{{ $client->phone }}</td>
+                                <td data-label="Acciones" class="py-2">
                                     <x-action-buttons
                                         :show="route('clients.show', $client)"
                                         :edit="route('clients.edit', $client)"

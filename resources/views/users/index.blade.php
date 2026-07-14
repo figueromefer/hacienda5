@@ -10,8 +10,8 @@
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow rounded p-6 overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+            <div class="bg-white shadow rounded p-6">
+                <table class="responsive-table w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b">
                             <th class="py-2">Nombre</th>
@@ -25,18 +25,16 @@
                     <tbody>
                         @forelse($users as $user)
                             <tr class="border-b">
-                                <td class="py-2">{{ $user->name }}</td>
-                                <td class="py-2">{{ $user->email }}</td>
-                                <td class="py-2">{{ $user->phone ?? '-' }}</td>
-                                <td class="py-2">{{ $user->roles->pluck('name')->join(', ') ?: '-' }}</td>
-                                <td class="py-2">{{ $user->is_active ? 'Sí' : 'No' }}</td>
-                                <td class="py-2 flex gap-2">
-                                    <a href="{{ route('users.edit', $user) }}" class="text-yellow-600">Editar</a>
-                                    <form action="{{ route('users.destroy', $user) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600">Eliminar</button>
-                                    </form>
+                                <td data-label="Nombre" class="py-2">{{ $user->name }}</td>
+                                <td data-label="Email" class="py-2 break-all">{{ $user->email }}</td>
+                                <td data-label="Teléfono" class="py-2">{{ $user->phone ?? '-' }}</td>
+                                <td data-label="Rol" class="py-2">{{ $user->roles->pluck('name')->join(', ') ?: '-' }}</td>
+                                <td data-label="Activo" class="py-2">{{ $user->is_active ? 'Sí' : 'No' }}</td>
+                                <td data-label="Acciones" class="py-2">
+                                    <x-action-buttons
+                                        :edit="route('users.edit', $user)"
+                                        :delete="route('users.destroy', $user)"
+                                    />
                                 </td>
                             </tr>
                         @empty

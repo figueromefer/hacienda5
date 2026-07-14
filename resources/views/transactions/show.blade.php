@@ -27,7 +27,7 @@
     <div style="padding:32px 16px;">
         <div style="max-width:920px;margin:0 auto;">
             <div style="background:#fff;border-radius:24px;box-shadow:0 20px 45px rgba(0,0,0,.08);overflow:hidden;">
-                <div style="background:#243834;padding:24px 32px;display:flex;align-items:center;gap:22px;">
+                <div class="receipt-brand-header" style="background:#243834;padding:24px 32px;display:flex;align-items:center;gap:22px;">
                     <img src="{{ asset('images/hacienda-cinco-logo.png') }}" alt="Hacienda Cinco" style="width:96px !important;max-width:96px !important;height:auto !important;display:block !important;flex:0 0 96px !important;object-fit:contain !important;">
                     <div style="color:#fff;line-height:1.3;">
                         <div style="letter-spacing:.32em;font-size:18px;font-weight:600;">HACIENDA CINCO</div>
@@ -35,8 +35,8 @@
                     </div>
                 </div>
 
-                <div style="padding:32px;">
-                    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:28px;">
+                <div class="receipt-body" style="padding:32px;">
+                    <div class="receipt-summary-grid" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:28px;">
                         <div style="border:1px solid #e5e7eb;background:#f9fafb;border-radius:16px;padding:16px;">
                             <div style="font-size:12px;text-transform:uppercase;color:#6b7280;">Fecha</div>
                             <div style="font-weight:700;margin-top:4px;color:#374151;">{{ $transaction->transaction_date?->format('d/m/Y') }}</div>
@@ -53,7 +53,7 @@
 
                     <h1 style="font-size:26px;font-weight:800;text-align:center;margin:0 0 28px;color:#243834;">{{ $receiptTitle }}</h1>
 
-                    <div style="border:1px solid #e5e7eb;border-radius:20px;padding:28px;">
+                    <div class="receipt-content" style="border:1px solid #e5e7eb;border-radius:20px;padding:28px;">
                         <p style="font-size:18px;line-height:1.9;text-align:justify;margin:0;color:#374151;">
                             @if($isIncome)
                                 Recibí la cantidad de <strong>${{ number_format($transaction->amount, 2) }}</strong>
@@ -96,7 +96,7 @@
             </div>
 
             @if($transaction->receipt_token)
-                <div style="background:#fff;border-radius:20px;box-shadow:0 12px 30px rgba(0,0,0,.06);padding:24px;margin-top:24px;display:flex;gap:18px;align-items:center;justify-content:space-between;">
+                <div class="receipt-verification" style="background:#fff;border-radius:20px;box-shadow:0 12px 30px rgba(0,0,0,.06);padding:24px;margin-top:24px;display:flex;gap:18px;align-items:center;justify-content:space-between;">
                     <div>
                         <h3 style="font-weight:800;color:#111827;margin:0;">Verificación pública</h3>
                         <p style="font-size:14px;color:#4b5563;margin:6px 0 0;">Esta URL es la fuente oficial para validar que el recibo no fue alterado.</p>

@@ -28,8 +28,8 @@
                 @endif
             </div>
 
-            <div class="bg-white shadow rounded p-6 overflow-x-auto">
-                <table class="w-full border-collapse">
+            <div class="bg-white shadow rounded p-6">
+                <table class="responsive-table w-full border-collapse">
                     <thead>
                         <tr class="border-b">
                             <th class="py-2 text-left">Descripción</th>
@@ -41,10 +41,10 @@
                     <tbody>
                         @foreach($quotation->items as $item)
                             <tr class="border-b">
-                                <td class="py-2">{{ $item->description }}</td>
-                                <td class="py-2">{{ $item->quantity }}</td>
-                                <td class="py-2">${{ number_format($item->unit_price, 2) }}</td>
-                                <td class="py-2">${{ number_format($item->total, 2) }}</td>
+                                <td data-label="Descripción" class="py-2">{{ $item->description }}</td>
+                                <td data-label="Cantidad" class="py-2">{{ $item->quantity }}</td>
+                                <td data-label="Precio unitario" class="py-2">${{ number_format($item->unit_price, 2) }}</td>
+                                <td data-label="Total" class="py-2">${{ number_format($item->total, 2) }}</td>
                             </tr>
                         @endforeach
                     </tbody>

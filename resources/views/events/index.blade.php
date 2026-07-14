@@ -8,8 +8,8 @@
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow rounded p-6 overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+            <div class="bg-white shadow rounded p-6">
+                <table class="responsive-table w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b">
                             <th class="py-2">Título</th>
@@ -23,12 +23,12 @@
                     <tbody>
                         @forelse($events as $event)
                             <tr class="border-b">
-                                <td class="py-2">{{ $event->title }}</td>
-                                <td class="py-2">{{ $event->client->full_name }}</td>
-                                <td class="py-2">{{ $event->event_type }}</td>
-                                <td class="py-2">{{ $event->event_date->format('d/m/Y') }}</td>
-                                <td class="py-2">{{ $event->status }}</td>
-                                <td class="py-2">
+                                <td data-label="Título" class="py-2">{{ $event->title }}</td>
+                                <td data-label="Cliente" class="py-2">{{ $event->client->full_name }}</td>
+                                <td data-label="Tipo" class="py-2">{{ $event->event_type }}</td>
+                                <td data-label="Fecha" class="py-2">{{ $event->event_date->format('d/m/Y') }}</td>
+                                <td data-label="Estatus" class="py-2">{{ $event->status }}</td>
+                                <td data-label="Acciones" class="py-2">
                                     <x-action-buttons
                                         :show="route('events.show', $event)"
                                         :edit="route('events.edit', $event)"

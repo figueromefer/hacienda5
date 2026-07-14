@@ -8,8 +8,8 @@
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow rounded p-6 overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+            <div class="bg-white shadow rounded p-6">
+                <table class="responsive-table w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b">
                             <th class="py-2">Nombre</th>
@@ -21,17 +21,15 @@
                     <tbody>
                         @forelse($services as $service)
                             <tr class="border-b">
-                                <td class="py-2">{{ $service->name }}</td>
-                                <td class="py-2">${{ number_format($service->base_price, 2) }}</td>
-                                <td class="py-2">{{ $service->is_active ? 'Sí' : 'No' }}</td>
-                                <td class="py-2 flex gap-2">
-                                    <a href="{{ route('services.show', $service) }}" class="text-blue-600">Ver</a>
-                                    <a href="{{ route('services.edit', $service) }}" class="text-yellow-600">Editar</a>
-                                    <form action="{{ route('services.destroy', $service) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600">Eliminar</button>
-                                    </form>
+                                <td data-label="Nombre" class="py-2">{{ $service->name }}</td>
+                                <td data-label="Precio base" class="py-2">${{ number_format($service->base_price, 2) }}</td>
+                                <td data-label="Activo" class="py-2">{{ $service->is_active ? 'Sí' : 'No' }}</td>
+                                <td data-label="Acciones" class="py-2">
+                                    <x-action-buttons
+                                        :show="route('services.show', $service)"
+                                        :edit="route('services.edit', $service)"
+                                        :delete="route('services.destroy', $service)"
+                                    />
                                 </td>
                             </tr>
                         @empty

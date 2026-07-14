@@ -10,8 +10,8 @@
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow rounded p-6 overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+            <div class="bg-white shadow rounded p-6">
+                <table class="responsive-table w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b">
                             <th class="py-2">Archivo</th>
@@ -24,17 +24,15 @@
                     <tbody>
                         @forelse($documents as $document)
                             <tr class="border-b">
-                                <td class="py-2">{{ $document->original_name }}</td>
-                                <td class="py-2">{{ $document->client?->full_name ?? '-' }}</td>
-                                <td class="py-2">{{ $document->event?->title ?? '-' }}</td>
-                                <td class="py-2">{{ $document->category }}</td>
-                                <td class="py-2 flex gap-2">
-                                    <a href="{{ route('documents.show', $document) }}" class="text-blue-600">Ver</a>
-                                    <form action="{{ route('documents.destroy', $document) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600">Eliminar</button>
-                                    </form>
+                                <td data-label="Archivo" class="py-2 break-all">{{ $document->original_name }}</td>
+                                <td data-label="Cliente" class="py-2">{{ $document->client?->full_name ?? '-' }}</td>
+                                <td data-label="Evento" class="py-2">{{ $document->event?->title ?? '-' }}</td>
+                                <td data-label="Categoría" class="py-2">{{ $document->category }}</td>
+                                <td data-label="Acciones" class="py-2">
+                                    <x-action-buttons
+                                        :show="route('documents.show', $document)"
+                                        :delete="route('documents.destroy', $document)"
+                                    />
                                 </td>
                             </tr>
                         @empty
