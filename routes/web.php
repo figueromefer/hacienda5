@@ -15,6 +15,7 @@ use App\Http\Controllers\PublicReceiptController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\ReceiptEmailController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
@@ -45,6 +46,13 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('services', ServiceController::class)
         ->middleware('permission:manage services');
+
+    Route::patch('/suppliers/{supplier}/restore', [SupplierController::class, 'restore'])
+        ->middleware('permission:manage suppliers')
+        ->name('suppliers.restore');
+
+    Route::resource('suppliers', SupplierController::class)
+        ->middleware('permission:manage suppliers');
 
     Route::get('/events/{event}/contract/create', [EventContractController::class, 'create'])
         ->middleware('permission:manage events')
