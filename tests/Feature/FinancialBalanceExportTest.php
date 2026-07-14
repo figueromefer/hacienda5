@@ -6,7 +6,11 @@ use App\Models\Client;
 use App\Models\Event;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Services\FinancialBalanceCalculator;
+use App\Services\FinancialBalanceWorkbook;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
@@ -45,6 +49,7 @@ class FinancialBalanceExportTest extends TestCase
         );
 
         $response->assertOk()->assertDownload('balance-evento-'.$event->id.'-diego-chavez.xlsx');
+        $response->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         $this->assertSame(['Resumen', 'Movimientos'], $spreadsheet->getSheetNames());
 
         $summary = $spreadsheet->getSheetByName('Resumen');
@@ -86,12 +91,19 @@ class FinancialBalanceExportTest extends TestCase
         );
 
         $response->assertOk()->assertDownload('balance-cliente-diego-chavez.xlsx');
+        $response->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         $this->assertSame([
             'Resumen cliente',
             'Evento '.$firstEvent->id,
             'Evento '.$secondEvent->id,
             'Movimientos',
         ], $spreadsheet->getSheetNames());
+        $this->assertSame($spreadsheet->getSheetCount(), count(array_unique($spreadsheet->getSheetNames())));
+
+        foreach ($spreadsheet->getSheetNames() as $sheetName) {
+            $this->assertLessThanOrEqual(31, mb_strlen($sheetName));
+            $this->assertFalse(strpbrk($sheetName, '\\/?*[]:'));
+        }
 
         $summary = $spreadsheet->getSheetByName('Resumen cliente');
         $this->assertSame('Boda Diego', $summary->getCell('A6')->getValue());
@@ -110,6 +122,110 @@ class FinancialBalanceExportTest extends TestCase
         $this->assertStringNotContainsString('Evento secreto', $serialized);
 
         $spreadsheet->disconnectWorksheets();
+    }
+
+    public function test_external_content_is_stored_as_text_and_never_as_a_formula(): void
+    {
+        $user = $this->authorizedUser('manage events');
+        $formula = '=HYPERLINK("https://example.com","test")';
+        $client = $this->client('-Cliente accidental');
+        $event = $this->event($client, [
+            'title' => '@Evento accidental',
+            'event_type' => '+Tipo accidental',
+        ]);
+        $this->transaction($client, $event, 'income', 'paid', 100, $formula, '2026-07-01', '+Concepto accidental');
+
+        [$response, $spreadsheet] = $this->download(
+            $this->actingAs($user)->get(route('events.balance.export', $event)),
+        );
+
+        $response->assertDownload('balance-evento-'.$event->id.'-cliente-accidental.xlsx');
+
+        $cells = [
+            ['Resumen', 'B4', '-Cliente accidental'],
+            ['Resumen', 'B5', '@Evento accidental'],
+            ['Resumen', 'B6', '+Tipo accidental'],
+            ['Movimientos', 'B6', $formula],
+            ['Movimientos', 'D6', '+Concepto accidental'],
+        ];
+
+        foreach ($cells as [$sheetName, $coordinate, $expected]) {
+            $cell = $spreadsheet->getSheetByName($sheetName)->getCell($coordinate);
+            $this->assertSame($expected, $cell->getValue());
+            $this->assertSame(DataType::TYPE_STRING, $cell->getDataType());
+            $this->assertFalse($cell->isFormula());
+        }
+
+        $spreadsheet->disconnectWorksheets();
+    }
+
+    public function test_financial_calculator_preserves_current_edge_case_behavior(): void
+    {
+        $event = new Event(['total_amount' => null]);
+        $event->setRelation('transactions', collect([
+            $this->unsavedTransaction('income', 'paid', 100, '2026-07-01'),
+            $this->unsavedTransaction('income', 'pending', 30, '2026-07-02'),
+            $this->unsavedTransaction('expense', 'paid', 20, '2026-07-03'),
+            $this->unsavedTransaction('income', 'cancelled', 50, '2026-07-04'),
+            $this->unsavedTransaction('expense', 'paid', -5, '2026-07-05'),
+        ]));
+
+        $balance = app(FinancialBalanceCalculator::class)->forEvent($event);
+
+        $this->assertSame(0.0, $balance['total']);
+        $this->assertSame(100.0, $balance['paid_income']);
+        $this->assertSame(30.0, $balance['pending_income']);
+        $this->assertSame(15.0, $balance['expenses']);
+        $this->assertSame(-100.0, $balance['pending_balance']);
+        $this->assertSame(85.0, $balance['balance']);
+        $this->assertSame([100.0, 100.0, 80.0, 80.0, 85.0], $balance['transactions']->pluck('running_balance')->all());
+    }
+
+    public function test_client_export_query_count_does_not_grow_with_each_event(): void
+    {
+        $user = $this->authorizedUser('manage clients');
+        $user->getAllPermissions();
+        $smallClient = $this->client('Cliente pequeño');
+        $smallEvent = $this->event($smallClient);
+        $this->transaction($smallClient, $smallEvent, 'income', 'paid', 100, 'ING-2026-100001', '2026-07-01');
+
+        $largeClient = $this->client('Cliente grande');
+
+        foreach (range(1, 8) as $eventNumber) {
+            $event = $this->event($largeClient, ['title' => 'Evento '.$eventNumber]);
+
+            foreach (range(1, 4) as $movementNumber) {
+                $this->transaction(
+                    $largeClient,
+                    $event,
+                    $movementNumber % 2 === 0 ? 'expense' : 'income',
+                    'paid',
+                    100,
+                    sprintf('QA-%02d-%02d', $eventNumber, $movementNumber),
+                    '2026-07-'.str_pad((string) $movementNumber, 2, '0', STR_PAD_LEFT),
+                );
+            }
+        }
+
+        $smallQueries = $this->exportQueryCount($user, $smallClient);
+        $largeQueries = $this->exportQueryCount($user, $largeClient);
+
+        $this->assertLessThanOrEqual($smallQueries + 1, $largeQueries);
+    }
+
+    public function test_saving_releases_worksheet_memory(): void
+    {
+        $client = $this->client('Cliente memoria');
+        $event = $this->event($client);
+        $event->load(['client', 'transactions']);
+        $service = app(FinancialBalanceWorkbook::class);
+        $spreadsheet = $service->event($event);
+        $path = $service->save($spreadsheet);
+        $this->temporaryFiles[] = $path;
+
+        $this->assertSame(0, $spreadsheet->getSheetCount());
+        $this->assertFileExists($path);
+        $this->assertGreaterThan(0, filesize($path));
     }
 
     public function test_exports_are_protected_by_existing_permissions(): void
@@ -151,6 +267,24 @@ class FinancialBalanceExportTest extends TestCase
         return [$response, IOFactory::load($path)];
     }
 
+    private function exportQueryCount(User $user, Client $client): int
+    {
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+
+        $response = $this->actingAs($user)->get(route('clients.balance.export', $client));
+        $response->assertOk();
+        $this->temporaryFiles[] = $response->baseResponse->getFile()->getPathname();
+
+        $queries = collect(DB::getQueryLog())
+            ->filter(fn (array $query) => str_starts_with(strtolower(ltrim($query['query'])), 'select'))
+            ->count();
+
+        DB::disableQueryLog();
+
+        return $queries;
+    }
+
     private function authorizedUser(string $permission): User
     {
         $user = User::factory()->create();
@@ -188,6 +322,7 @@ class FinancialBalanceExportTest extends TestCase
         float $amount,
         string $reference,
         string $date,
+        string $category = 'Movimiento de prueba',
     ): Transaction {
         return Transaction::create([
             'client_id' => $client->id,
@@ -197,8 +332,19 @@ class FinancialBalanceExportTest extends TestCase
             'transaction_date' => $date,
             'amount' => $amount,
             'method' => 'transfer',
-            'category' => 'Movimiento de prueba',
+            'category' => $category,
             'reference' => $reference,
+            'status' => $status,
+        ]);
+    }
+
+    private function unsavedTransaction(string $type, string $status, float $amount, string $date): Transaction
+    {
+        return new Transaction([
+            'type' => $type,
+            'scope' => 'event',
+            'transaction_date' => $date,
+            'amount' => $amount,
             'status' => $status,
         ]);
     }
