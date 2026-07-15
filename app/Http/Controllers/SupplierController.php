@@ -50,7 +50,14 @@ class SupplierController extends Controller
 
     public function show(Supplier $supplier)
     {
-        return view('suppliers.show', compact('supplier'));
+        $payables = $supplier->payables()->withPaidAmount()->get();
+        $payableSummary = [
+            'pending' => $payables->where('status', 'pending')->count(),
+            'partially_paid' => $payables->where('status', 'partially_paid')->count(),
+            'balance' => $payables->whereNotIn('status', ['cancelled', 'paid'])->sum->balance,
+        ];
+
+        return view('suppliers.show', compact('supplier', 'payableSummary'));
     }
 
     public function edit(Supplier $supplier)

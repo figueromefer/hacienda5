@@ -20,6 +20,7 @@ class Transaction extends Model
         'quotation_id',
         'supplier_id',
         'expense_concept_id',
+        'supplier_payable_id',
         'type',
         'scope',
         'transaction_date',
@@ -42,6 +43,17 @@ class Transaction extends Model
         static::updating(function (Transaction $transaction): void {
             if ($transaction->isDirty('reference')) {
                 throw new LogicException('La referencia de un movimiento no se puede modificar.');
+            }
+        });
+
+        static::saved(function (Transaction $transaction): void {
+            collect([$transaction->supplier_payable_id, $transaction->getOriginal('supplier_payable_id')])
+                ->filter()->unique()->each(fn ($id) => SupplierPayable::find($id)?->refreshAutomaticStatus());
+        });
+
+        static::deleted(function (Transaction $transaction): void {
+            if ($transaction->supplier_payable_id) {
+                SupplierPayable::find($transaction->supplier_payable_id)?->refreshAutomaticStatus();
             }
         });
     }
@@ -78,6 +90,11 @@ class Transaction extends Model
     public function expenseConcept()
     {
         return $this->belongsTo(ExpenseConcept::class);
+    }
+
+    public function supplierPayable()
+    {
+        return $this->belongsTo(SupplierPayable::class);
     }
 
     public function receiptEmailLogs()

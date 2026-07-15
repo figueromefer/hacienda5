@@ -26,4 +26,9 @@ class Supplier extends Model
             'is_active' => 'boolean',
         ];
     }
+
+    public function payables()
+    {
+        return $this->hasMany(SupplierPayable::class);
+    }
 }

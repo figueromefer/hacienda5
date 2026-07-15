@@ -17,6 +17,7 @@ use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\ReceiptEmailController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\SupplierPayableController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
@@ -54,6 +55,13 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('suppliers', SupplierController::class)
         ->middleware('permission:manage suppliers');
+
+    Route::middleware('permission:manage payments')->group(function () {
+        Route::patch('/supplier-payables/{supplier_payable}/cancel', [SupplierPayableController::class, 'cancel'])->name('supplier-payables.cancel');
+        Route::get('/supplier-payables/{supplier_payable}/payment', [SupplierPayableController::class, 'paymentForm'])->name('supplier-payables.payment');
+        Route::post('/supplier-payables/{supplier_payable}/payment', [SupplierPayableController::class, 'pay'])->name('supplier-payables.pay');
+        Route::resource('supplier-payables', SupplierPayableController::class)->except(['destroy']);
+    });
 
     Route::get('/expense-concepts/archived', [ExpenseConceptController::class, 'archived'])
         ->middleware('permission:manage expense concepts')

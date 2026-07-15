@@ -24,5 +24,9 @@
                 <div class="md:col-span-2"><dt class="text-sm font-medium text-gray-500">Notas</dt><dd class="mt-1 whitespace-pre-line">{{ $supplier->notes ?: '-' }}</dd></div>
             </dl>
         </div>
+        <div class="mx-auto mt-5 max-w-4xl rounded bg-white p-6 shadow">
+            <div class="flex flex-wrap items-center justify-between gap-3"><h3 class="font-semibold">Cuentas por pagar</h3><a class="text-blue-700" href="{{ route('supplier-payables.index', ['supplier_id' => $supplier->id]) }}">Ver todas</a></div>
+            <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3"><div>Pendientes<br><strong>{{ $payableSummary['pending'] }}</strong></div><div>Pago parcial<br><strong>{{ $payableSummary['partially_paid'] }}</strong></div><div>Total pendiente<br><strong>${{ number_format($payableSummary['balance'], 2) }}</strong></div></div>
+        </div>
     </div>
 </x-app-layout>

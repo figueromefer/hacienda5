@@ -12,6 +12,7 @@
             ['label' => 'Eventos', 'route' => 'events.index', 'active' => 'events.*', 'permission' => 'manage events'],
             ['label' => 'Cotizaciones', 'route' => 'quotations.index', 'active' => 'quotations.*', 'permission' => 'manage quotations'],
             ['label' => 'Gastos', 'route' => 'expenses.index', 'active' => 'expenses.*', 'permission' => 'manage payments'],
+            ['label' => 'Cuentas por pagar', 'route' => 'supplier-payables.index', 'active' => 'supplier-payables.*', 'permission' => 'manage payments'],
             ['label' => 'Movimientos', 'route' => 'transactions.index', 'active' => 'transactions.*', 'permission' => 'manage payments'],
             ['label' => 'Calendario', 'route' => 'calendar.index', 'active' => 'calendar.*', 'permission' => 'view calendar'],
         ])->filter(fn (array $item) => Auth::user()->can($item['permission']));

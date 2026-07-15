@@ -1,0 +1,1 @@
+<x-app-layout><x-slot name="header"><h2 class="text-xl font-semibold">Nueva cuenta por pagar</h2></x-slot><div class="p-4 sm:p-6"><form method="POST" action="{{ route('supplier-payables.store') }}" class="mx-auto max-w-3xl rounded bg-white p-6 shadow">@include('supplier-payables._form')</form></div></x-app-layout>
