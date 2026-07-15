@@ -3,21 +3,38 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Services\GoogleCalendarService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Throwable;
 
 class ProfileController extends Controller
 {
     /**
      * Display the user's profile form.
      */
-    public function edit(Request $request): View
+    public function edit(Request $request, GoogleCalendarService $google): View
     {
+        $connection = $request->user()->googleCalendarConnection;
+        $calendars = [];
+        $calendarError = null;
+        if ($connection) {
+            try {
+                $calendars = $google->calendars($connection);
+            } catch (Throwable $exception) {
+                report($exception);
+                $calendarError = 'No fue posible consultar los calendarios de Google en este momento.';
+            }
+        }
+
         return view('profile.edit', [
             'user' => $request->user(),
+            'googleConnection' => $connection,
+            'googleCalendars' => $calendars,
+            'googleCalendarError' => $calendarError,
         ]);
     }
 

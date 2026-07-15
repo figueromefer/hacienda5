@@ -1,4 +1,5 @@
 <x-app-layout>
+    @php $googleConnection = auth()->user()->googleCalendarConnection; @endphp
     <x-slot name="header">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -29,6 +30,49 @@
                     <div><strong>Fecha:</strong> {{ $event->event_date->format('d/m/Y') }}</div>
                     <div><strong>Invitados:</strong> {{ $event->guest_count ?? '-' }}</div>
                     <div><strong>Total:</strong> ${{ number_format($event->total_amount, 2) }}</div>
+                </div>
+            </div>
+
+            <div class="bg-white shadow rounded p-6">
+                <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold">Google Calendar</h3>
+                        @if($event->google_event_id && $event->google_calendar_connection_id === $googleConnection?->id)
+                            <p class="mt-1 text-sm text-gray-600">Vinculado a {{ $googleConnection->calendar_name ?? 'Google Calendar' }}.</p>
+                            <dl class="mt-3 space-y-1 text-sm">
+                                <div><strong>Estado:</strong> {{ $event->google_sync_status === 'failed' ? 'Error' : 'Sincronizado' }}</div>
+                                <div><strong>Última sincronización:</strong> {{ $event->google_synced_at?->format('d/m/Y H:i') ?? '-' }}</div>
+                                @if($event->google_sync_error)<div class="text-red-600"><strong>Error reciente:</strong> {{ $event->google_sync_error }}</div>@endif
+                            </dl>
+                        @elseif($event->google_event_id)
+                            <p class="mt-1 text-sm text-gray-600">Este evento está vinculado desde otra cuenta. Sólo quien creó el vínculo puede administrarlo.</p>
+                        @elseif($googleConnection)
+                            <p class="mt-1 text-sm text-gray-600">Este evento todavía no está vinculado.</p>
+                        @else
+                            <p class="mt-1 text-sm text-gray-600">Conecta tu cuenta desde <a class="text-blue-600 underline" href="{{ route('profile.edit') }}">tu perfil</a>.</p>
+                        @endif
+                        @if($event->status === \App\Models\Event::STATUS_CANCELLED && $event->google_event_id && $event->google_calendar_connection_id === $googleConnection?->id)
+                            <p class="mt-3 text-sm text-amber-700">El evento está cancelado. “Actualizar” reflejará ese estado en la descripción; no se eliminará automáticamente.</p>
+                        @endif
+                    </div>
+                    @if($googleConnection && (! $event->google_event_id || $event->google_calendar_connection_id === $googleConnection->id))
+                        <div class="flex flex-wrap gap-2">
+                            <form method="POST" action="{{ route('events.google-calendar.sync', $event) }}">
+                                @csrf
+                                <button class="rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white">{{ $event->google_event_id ? 'Actualizar en Google Calendar' : 'Enviar a Google Calendar' }}</button>
+                            </form>
+                            @if($event->google_event_id)
+                                <form method="POST" action="{{ route('events.google-calendar.unlink', $event) }}" onsubmit="return confirm('¿Desvincular? El evento remoto se conservará.')">
+                                    @csrf @method('DELETE')
+                                    <button class="rounded border px-4 py-2 text-sm font-semibold">Desvincular de Google Calendar</button>
+                                </form>
+                                <form method="POST" action="{{ route('events.google-calendar.delete', $event) }}" onsubmit="return confirm('¿Eliminar definitivamente este evento de Google Calendar?')">
+                                    @csrf @method('DELETE')
+                                    <button class="rounded bg-red-600 px-4 py-2 text-sm font-semibold text-white">Eliminar de Google Calendar</button>
+                                </form>
+                            @endif
+                        </div>
+                    @endif
                 </div>
             </div>
 

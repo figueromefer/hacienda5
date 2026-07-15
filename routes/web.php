@@ -11,6 +11,7 @@ use App\Http\Controllers\EventNoteController;
 use App\Http\Controllers\EventTaskController;
 use App\Http\Controllers\ExpenseConceptController;
 use App\Http\Controllers\FinancialBalanceExportController;
+use App\Http\Controllers\GoogleCalendarController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicReceiptController;
 use App\Http\Controllers\QuotationController;
@@ -31,6 +32,16 @@ Route::get('/r/{token}', [PublicReceiptController::class, 'show'])
     ->name('receipts.public.show');
 
 Route::middleware(['auth'])->group(function () {
+    Route::middleware('permission:manage events')->group(function () {
+        Route::get('/google-calendar/connect', [GoogleCalendarController::class, 'connect'])->name('google-calendar.connect');
+        Route::get('/google-calendar/callback', [GoogleCalendarController::class, 'callback'])->name('google-calendar.callback');
+        Route::put('/google-calendar/calendar', [GoogleCalendarController::class, 'selectCalendar'])->name('google-calendar.calendar');
+        Route::delete('/google-calendar/disconnect', [GoogleCalendarController::class, 'disconnect'])->name('google-calendar.disconnect');
+        Route::post('/events/{event}/google-calendar', [GoogleCalendarController::class, 'sync'])->name('events.google-calendar.sync');
+        Route::delete('/events/{event}/google-calendar/link', [GoogleCalendarController::class, 'unlink'])->name('events.google-calendar.unlink');
+        Route::delete('/events/{event}/google-calendar', [GoogleCalendarController::class, 'deleteRemote'])->name('events.google-calendar.delete');
+    });
+
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->middleware('permission:view dashboard')
         ->name('dashboard');

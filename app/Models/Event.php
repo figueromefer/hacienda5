@@ -39,10 +39,16 @@ class Event extends Model
         'budget_estimate',
         'total_amount',
         'notes',
+        'google_event_id',
+        'google_calendar_connection_id',
+        'google_synced_at',
+        'google_sync_status',
+        'google_sync_error',
     ];
 
     protected $casts = [
         'event_date' => 'date',
+        'google_synced_at' => 'datetime',
     ];
 
     public function getStatusLabelAttribute(): string
@@ -102,5 +108,10 @@ class Event extends Model
     public function quotations()
     {
         return $this->hasMany(Quotation::class);
+    }
+
+    public function googleCalendarConnection()
+    {
+        return $this->belongsTo(GoogleCalendarConnection::class);
     }
 }

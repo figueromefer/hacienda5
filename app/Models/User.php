@@ -9,7 +9,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, HasRoles, Notifiable;
 
     protected $fillable = [
         'name',
@@ -36,5 +36,10 @@ class User extends Authenticatable
     public function client()
     {
         return $this->hasOne(Client::class);
+    }
+
+    public function googleCalendarConnection()
+    {
+        return $this->hasOne(GoogleCalendarConnection::class);
     }
 }
