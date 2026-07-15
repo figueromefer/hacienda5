@@ -137,57 +137,57 @@ Para clientes nuevos, el acceso al portal deja de ser opcional.
 
 Archivo principal esperado: `resources/views/layouts/navigation.blade.php`.
 
-- [ ] Retirar del nivel principal: Usuarios, Clientes, Servicios, Conceptos de gasto y Gastos.
-- [ ] Agregar como último elemento un menú **Catálogos** con: Usuarios, Clientes, Servicios y Conceptos de gasto.
-- [ ] Respetar permisos individualmente; Catálogos solo aparece si el usuario puede ver al menos una opción.
-- [ ] Implementar dropdown en escritorio y sección desplegable/accesible en móvil.
-- [ ] Mantener Proveedores como opción principal porque no fue solicitado dentro de Catálogos.
-- [ ] Gastos e Ingresos se accederán desde Movimientos, no desde la navegación principal.
+- [x] Retirar del nivel principal: Usuarios, Clientes, Servicios, Conceptos de gasto y Gastos.
+- [x] Agregar como último elemento un menú **Catálogos** con: Usuarios, Clientes, Servicios y Conceptos de gasto.
+- [x] Respetar permisos individualmente; Catálogos solo aparece si el usuario puede ver al menos una opción.
+- [x] Implementar dropdown en escritorio y sección desplegable/accesible en móvil.
+- [x] Mantener Proveedores como opción principal porque no fue solicitado dentro de Catálogos.
+- [x] Gastos e Ingresos se accederán desde Movimientos, no desde la navegación principal.
 
 ### 4.2 Dashboard
 
-- [ ] En el encabezado de Dashboard agregar accesos rápidos a: Nuevo cliente, Nuevo evento, Nueva cotización y Nuevo movimiento.
-- [ ] Mostrar cada acceso solo si el usuario tiene su permiso correspondiente.
-- [ ] Mantener diseño responsivo.
+- [x] En el encabezado de Dashboard agregar accesos rápidos a: Nuevo cliente, Nuevo evento, Nueva cotización y Nuevo movimiento.
+- [x] Mostrar cada acceso solo si el usuario tiene su permiso correspondiente.
+- [x] Mantener diseño responsivo.
 
 ### 4.3 Usuarios
 
 Archivos esperados: `UserController`, vistas `users/*` y pruebas Feature.
 
-- [ ] Teléfono: permitir únicamente dígitos en interfaz y servidor. Usar `inputmode="numeric"` y patrón/sanitización; no usar `type="number"` porque puede alterar ceros iniciales.
-- [ ] Mostrar nombres de roles con primera letra mayúscula.
-- [ ] Mostrar errores de validación junto a contraseña y confirmación. La regla `confirmed` debe producir un mensaje visible en alta y edición.
-- [ ] Excluir del índice a usuarios con rol `cliente`.
-- [ ] Excluir el rol `cliente` de los dropdowns de alta y edición.
-- [ ] Impedir acceso directo por URL a edición/eliminación de un usuario con rol `cliente`.
-- [ ] No alterar los nombres internos de roles.
+- [x] Teléfono: permitir únicamente dígitos en interfaz y servidor. Usar `inputmode="numeric"` y patrón/sanitización; no usar `type="number"` porque puede alterar ceros iniciales.
+- [x] Mostrar nombres de roles con primera letra mayúscula.
+- [x] Mostrar errores de validación junto a contraseña y confirmación. La regla `confirmed` debe producir un mensaje visible en alta y edición.
+- [x] Excluir del índice a usuarios con rol `cliente`.
+- [x] Excluir el rol `cliente` de los dropdowns de alta y edición.
+- [x] Impedir acceso directo por URL a edición/eliminación de un usuario con rol `cliente`.
+- [x] No alterar los nombres internos de roles.
 
 ### 4.4 Clientes y acceso obligatorio
 
-- [ ] Tipo predeterminado en alta: `prospect` / Prospecto, incluyendo después de un error de validación.
-- [ ] Mostrar el tipo en español en la tabla.
-- [ ] Eliminar el checkbox de acceso al portal.
-- [ ] Hacer obligatorio el correo para nuevos clientes.
-- [ ] Crear siempre usuario relacionado con rol `cliente` dentro de la misma transacción.
-- [ ] Agregar confirmación de contraseña y errores visibles.
-- [ ] Mantener sincronizados nombre, correo, teléfono y estado relevante entre cliente y usuario.
-- [ ] En edición, contraseña opcional para clientes que ya tienen usuario; si se captura, exigir confirmación.
-- [ ] Evitar correos duplicados con validación que ignore al usuario relacionado.
-- [ ] Definir comportamiento seguro para clientes históricos sin usuario; no crear contraseñas desconocidas sin informar.
+- [x] Tipo predeterminado en alta: `prospect` / Prospecto, incluyendo después de un error de validación.
+- [x] Mostrar el tipo en español en la tabla.
+- [x] Eliminar el checkbox de acceso al portal.
+- [x] Hacer obligatorio el correo para nuevos clientes.
+- [x] Crear siempre usuario relacionado con rol `cliente` dentro de la misma transacción.
+- [x] Agregar confirmación de contraseña y errores visibles.
+- [x] Mantener sincronizados nombre, correo, teléfono y estado relevante entre cliente y usuario.
+- [x] En edición, contraseña opcional para clientes que ya tienen usuario; si se captura, exigir confirmación.
+- [x] Evitar correos duplicados con validación que ignore al usuario relacionado.
+- [x] Definir comportamiento seguro para clientes históricos sin usuario; no crear contraseñas desconocidas sin informar.
 
 ### 4.5 Recuperación de contraseña
 
-- [ ] Confirmar que el enlace “Olvidé mi contraseña” está disponible en login.
-- [ ] Crear prueba Feature que solicite recuperación para un usuario con rol `cliente` y verifique el envío de la notificación.
-- [ ] Crear prueba del restablecimiento mediante token válido.
-- [ ] Verificar que un usuario inactivo no obtenga acceso después de cambiar contraseña, si el login ya aplica esa regla.
-- [ ] Documentar variables de correo necesarias para prueba manual; no modificar secretos.
+- [x] Confirmar que el enlace “Olvidé mi contraseña” está disponible en login.
+- [x] Crear prueba Feature que solicite recuperación para un usuario con rol `cliente` y verifique el envío de la notificación.
+- [x] Crear prueba del restablecimiento mediante token válido.
+- [x] Verificar que un usuario inactivo no obtenga acceso después de cambiar contraseña, si el login ya aplica esa regla.
+- [x] Documentar variables de correo necesarias para prueba manual; no modificar secretos.
 
 ### 4.6 Profile en español
 
-- [ ] Traducir todos los textos visibles de `profile` y parciales relacionados.
-- [ ] Traducir mensajes de ayuda, botones, confirmaciones y modal de eliminación.
-- [ ] No modificar nombres de campos ni rutas.
+- [x] Traducir todos los textos visibles de `profile` y parciales relacionados.
+- [x] Traducir mensajes de ayuda, botones, confirmaciones y modal de eliminación.
+- [x] No modificar nombres de campos ni rutas.
 
 ### Criterios de aceptación
 

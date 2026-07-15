@@ -1,6 +1,8 @@
 <?php
+
 namespace App\Models;
 
+use App\Support\DomainLabels;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,6 +21,11 @@ class Client extends Model
         'source',
         'notes',
     ];
+
+    public function getTypeLabelAttribute(): string
+    {
+        return DomainLabels::clientType($this->type);
+    }
 
     public function user()
     {

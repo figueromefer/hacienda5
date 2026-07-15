@@ -27,7 +27,7 @@
                         @forelse($clients as $client)
                             <tr class="border-b">
                                 <td data-label="Nombre" class="py-2">{{ $client->full_name }}</td>
-                                <td data-label="Tipo" class="py-2">{{ $client->type }}</td>
+                                <td data-label="Tipo" class="py-2">{{ $client->type_label }}</td>
                                 <td data-label="Email" class="py-2 break-all">{{ $client->email }}</td>
                                 <td data-label="Teléfono" class="py-2">{{ $client->phone }}</td>
                                 <td data-label="Acciones" class="py-2">

@@ -1,7 +1,15 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>
+                <div class="mt-3 flex flex-wrap gap-2">
+                    @can("manage clients")<a href="{{ route("clients.create") }}" class="rounded bg-black px-3 py-2 text-sm text-white">Nuevo cliente</a>@endcan
+                    @can("manage events")<a href="{{ route("events.create") }}" class="rounded bg-black px-3 py-2 text-sm text-white">Nuevo evento</a>@endcan
+                    @can("manage quotations")<a href="{{ route("quotations.create") }}" class="rounded bg-black px-3 py-2 text-sm text-white">Nueva cotización</a>@endcan
+                    @can("manage payments")<a href="{{ route("transactions.create") }}" class="rounded bg-black px-3 py-2 text-sm text-white">Nuevo movimiento</a>@endcan
+                </div>
+            </div>
 
             <form method="GET">
                 <select name="period" onchange="this.form.submit()" class="border rounded px-3 py-2">
