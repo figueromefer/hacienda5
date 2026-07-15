@@ -103,22 +103,22 @@ Para clientes nuevos, el acceso al portal deja de ser opcional.
 
 ### 3.1 Componente monetario reutilizable
 
-- [ ] Crear una solución común para inputs monetarios que soporte `old()`, valores de edición, símbolo `$`, separadores y dos decimales.
-- [ ] Crear normalización del lado servidor reutilizable para retirar `$`, espacios y comas antes de validar.
-- [ ] Aplicar atributos accesibles y teclado móvil adecuado.
-- [ ] Agregar pruebas unitarias de normalización: vacío, enteros, decimales, valores con comas y valores con símbolo.
+- [x] Crear una solución común para inputs monetarios que soporte `old()`, valores de edición, símbolo `$`, separadores y dos decimales.
+- [x] Crear normalización del lado servidor reutilizable para retirar `$`, espacios y comas antes de validar.
+- [x] Aplicar atributos accesibles y teclado móvil adecuado.
+- [x] Agregar pruebas unitarias de normalización: vacío, enteros, decimales, valores con comas y valores con símbolo.
 
 ### 3.2 Etiquetas comunes
 
-- [ ] Centralizar etiquetas en español de estados de cotizaciones.
-- [ ] Centralizar etiquetas y clases visuales de estados de eventos.
-- [ ] Centralizar traducción de tipo de cliente: `prospect` → `Prospecto`, `active` → `Activo`, `past` → `Anterior` o la etiqueta española ya usada por el formulario.
-- [ ] Mostrar roles con primera letra mayúscula sin modificar el valor interno.
+- [x] Centralizar etiquetas en español de estados de cotizaciones.
+- [x] Centralizar etiquetas y clases visuales de estados de eventos.
+- [x] Centralizar traducción de tipo de cliente: `prospect` → `Prospecto`, `active` → `Activo`, `past` → `Anterior` o la etiqueta española ya usada por el formulario.
+- [x] Mostrar roles con primera letra mayúscula sin modificar el valor interno.
 
 ### 3.3 Búsqueda reutilizable
 
-- [ ] Definir patrón de búsquedas mediante parámetro `search`, consultas agrupadas y `withQueryString()`.
-- [ ] Evitar consultas N+1 y escapar correctamente términos.
+- [x] Definir patrón de búsquedas mediante parámetro `search`, consultas agrupadas y `withQueryString()`.
+- [x] Evitar consultas N+1 y escapar correctamente términos.
 
 ### Criterios de aceptación
 
