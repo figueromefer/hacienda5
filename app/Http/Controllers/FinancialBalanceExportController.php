@@ -14,7 +14,7 @@ class FinancialBalanceExportController extends Controller
     {
         $event->load([
             'client',
-            'transactions' => fn ($query) => $query->orderBy('transaction_date')->orderBy('id'),
+            'transactions' => fn ($query) => $query->with(['supplier', 'expenseConcept'])->orderBy('transaction_date')->orderBy('id'),
         ]);
 
         $path = $workbook->save($workbook->event($event));
@@ -33,7 +33,7 @@ class FinancialBalanceExportController extends Controller
     {
         $client->load([
             'events' => fn ($query) => $query->orderBy('event_date')->orderBy('id'),
-            'transactions' => fn ($query) => $query->orderBy('transaction_date')->orderBy('id'),
+            'transactions' => fn ($query) => $query->with(['supplier', 'expenseConcept'])->orderBy('transaction_date')->orderBy('id'),
         ]);
 
         $eventsById = $client->events->keyBy('id');

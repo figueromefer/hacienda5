@@ -82,6 +82,7 @@
                             <th class="py-2">Cliente</th>
                             <th class="py-2">Evento</th>
                             <th class="py-2">Categoría</th>
+                            <th class="py-2">Proveedor / concepto</th>
                             <th class="py-2 text-right">Monto</th>
                             <th class="py-2">Estatus</th>
                             <th class="py-2 w-[360px]">Acciones</th>
@@ -101,6 +102,13 @@
                                 <td data-label="Cliente" class="py-2">{{ $transaction->client->full_name }}</td>
                                 <td data-label="Evento" class="py-2">{{ $transaction->event?->title ?? '-' }}</td>
                                 <td data-label="Categoría" class="py-2">{{ $transaction->category ?? '-' }}</td>
+                                <td data-label="Proveedor / concepto" class="py-2">
+                                    @if($transaction->type === 'expense')
+                                        {{ $transaction->supplier?->name ?? '-' }}<br><span class="text-xs text-gray-500">{{ $transaction->expenseConcept?->name ?? '-' }}</span>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
                                 <td data-label="Monto" class="py-2 text-right whitespace-nowrap {{ $transaction->type === 'income' ? 'text-green-700' : 'text-red-700' }}">
                                     {{ $transaction->type === 'expense' ? '-' : '' }}${{ number_format($transaction->amount, 2) }}
                                 </td>
@@ -131,7 +139,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="10" class="py-4">No hay movimientos registrados.</td>
+                                <td colspan="11" class="py-4">No hay movimientos registrados.</td>
                             </tr>
                         @endforelse
                     </tbody>

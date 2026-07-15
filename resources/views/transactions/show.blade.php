@@ -63,6 +63,12 @@
                     <h1 style="font-size:26px;font-weight:800;text-align:center;margin:0 0 28px;color:#243834;">{{ $receiptTitle }}</h1>
 
                     <div class="receipt-content" style="border:1px solid #e5e7eb;border-radius:20px;padding:28px;">
+                        @if(! $isIncome)
+                            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:24px;">
+                                <div style="background:#f9fafb;border-radius:12px;padding:14px;"><strong>Proveedor:</strong> {{ $transaction->supplier?->name ?? 'Sin proveedor' }}</div>
+                                <div style="background:#f9fafb;border-radius:12px;padding:14px;"><strong>Concepto de gasto:</strong> {{ $transaction->expenseConcept?->name ?? 'Sin concepto' }}</div>
+                            </div>
+                        @endif
                         <p style="font-size:18px;line-height:1.9;text-align:justify;margin:0;color:#374151;">
                             @if($isIncome)
                                 Recibí la cantidad de <strong>${{ number_format($transaction->amount, 2) }}</strong>

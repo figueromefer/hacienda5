@@ -229,7 +229,7 @@ class FinancialBalanceWorkbook
             $headers[] = 'Evento';
         }
 
-        $headers = [...$headers, 'Tipo', 'Concepto / categoría', 'Método', 'Estatus', 'Monto', 'Saldo acumulado'];
+        $headers = [...$headers, 'Tipo', 'Concepto / categoría', 'Proveedor', 'Concepto de gasto', 'Método', 'Estatus', 'Monto', 'Saldo acumulado'];
         $lastColumn = Coordinate::stringFromColumnIndex(count($headers));
 
         if ($withTitle) {
@@ -244,9 +244,9 @@ class FinancialBalanceWorkbook
         $firstRow = $headerRow + 1;
         $row = $firstRow;
         $typeIndex = $includeEvent ? 4 : 3;
-        $statusIndex = $includeEvent ? 7 : 6;
-        $amountIndex = $includeEvent ? 8 : 7;
-        $balanceIndex = $includeEvent ? 9 : 8;
+        $statusIndex = $includeEvent ? 9 : 8;
+        $amountIndex = $includeEvent ? 10 : 9;
+        $balanceIndex = $includeEvent ? 11 : 10;
 
         foreach ($transactions as $item) {
             /** @var Transaction $transaction */
@@ -261,6 +261,8 @@ class FinancialBalanceWorkbook
 
             $this->setText($sheet, Coordinate::stringFromColumnIndex($column++).$row, $transaction->type_label);
             $this->setText($sheet, Coordinate::stringFromColumnIndex($column++).$row, $transaction->category ?: 'Sin categoría');
+            $this->setText($sheet, Coordinate::stringFromColumnIndex($column++).$row, $transaction->supplier?->name);
+            $this->setText($sheet, Coordinate::stringFromColumnIndex($column++).$row, $transaction->expenseConcept?->name);
             $this->setText($sheet, Coordinate::stringFromColumnIndex($column++).$row, $this->methodLabel($transaction->method));
             $this->setText($sheet, Coordinate::stringFromColumnIndex($column++).$row, $this->statusLabel($transaction->status));
             $sheet->setCellValue(Coordinate::stringFromColumnIndex($column).$row, (float) $transaction->amount);
@@ -291,8 +293,8 @@ class FinancialBalanceWorkbook
         $this->setColumnWidths(
             $sheet,
             $includeEvent
-                ? [14, 22, 28, 12, 30, 18, 14, 16, 18]
-                : [14, 22, 12, 30, 18, 14, 16, 18],
+                ? [14, 22, 28, 12, 30, 28, 28, 18, 14, 16, 18]
+                : [14, 22, 12, 30, 28, 28, 18, 14, 16, 18],
         );
         $sheet->setShowGridlines(false);
 

@@ -18,6 +18,8 @@ class Transaction extends Model
         'client_id',
         'event_id',
         'quotation_id',
+        'supplier_id',
+        'expense_concept_id',
         'type',
         'scope',
         'transaction_date',
@@ -66,6 +68,16 @@ class Transaction extends Model
     public function quotation()
     {
         return $this->belongsTo(Quotation::class);
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
+
+    public function expenseConcept()
+    {
+        return $this->belongsTo(ExpenseConcept::class);
     }
 
     public function receiptEmailLogs()

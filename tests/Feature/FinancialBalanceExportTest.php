@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\Client;
 use App\Models\Event;
+use App\Models\ExpenseConcept;
+use App\Models\Supplier;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Services\FinancialBalanceCalculator;
@@ -64,8 +66,8 @@ class FinancialBalanceExportTest extends TestCase
         $movements = $spreadsheet->getSheetByName('Movimientos');
         $this->assertSame('ING-2026-000001', $movements->getCell('B6')->getValue());
         $this->assertSame('GAS-2026-000001', $movements->getCell('B9')->getValue());
-        $this->assertSame(4500.0, (float) $movements->getCell('H9')->getCalculatedValue());
-        $this->assertSame(4500.0, (float) $movements->getCell('H10')->getCalculatedValue());
+        $this->assertSame(4500.0, (float) $movements->getCell('J9')->getCalculatedValue());
+        $this->assertSame(4500.0, (float) $movements->getCell('J10')->getCalculatedValue());
         $this->assertSame('dd/mm/yyyy', $movements->getStyle('A6')->getNumberFormat()->getFormatCode());
         $this->assertNotNull($movements->getAutoFilter()->getRange());
 
@@ -114,7 +116,7 @@ class FinancialBalanceExportTest extends TestCase
         $this->assertSame(7000.0, (float) $summary->getCell('I8')->getCalculatedValue());
 
         $movements = $spreadsheet->getSheetByName('Movimientos');
-        $values = $movements->rangeToArray('A1:I20');
+        $values = $movements->rangeToArray('A1:K20');
         $serialized = json_encode($values, JSON_THROW_ON_ERROR);
         $this->assertStringContainsString('ING-2026-000010', $serialized);
         $this->assertStringContainsString('GAS-2026-000010', $serialized);
@@ -151,6 +153,30 @@ class FinancialBalanceExportTest extends TestCase
 
         foreach ($cells as [$sheetName, $coordinate, $expected]) {
             $cell = $spreadsheet->getSheetByName($sheetName)->getCell($coordinate);
+            $this->assertSame($expected, $cell->getValue());
+            $this->assertSame(DataType::TYPE_STRING, $cell->getDataType());
+            $this->assertFalse($cell->isFormula());
+        }
+
+        $spreadsheet->disconnectWorksheets();
+    }
+
+    public function test_expense_supplier_and_concept_are_exported_as_safe_text_without_n_plus_one_queries(): void
+    {
+        $user = $this->authorizedUser('manage events');
+        $client = $this->client('Cliente exportación');
+        $event = $this->event($client);
+        $supplier = Supplier::create(['name' => '=PROVEEDOR()']);
+        $concept = ExpenseConcept::create(['name' => '+Concepto']);
+        $transaction = $this->transaction($client, $event, 'expense', 'paid', 100, 'GAS-2026-009999', '2026-07-15');
+        $transaction->update(['supplier_id' => $supplier->id, 'expense_concept_id' => $concept->id]);
+
+        [, $spreadsheet] = $this->download(
+            $this->actingAs($user)->get(route('events.balance.export', $event)),
+        );
+
+        foreach ([['E6', '=PROVEEDOR()'], ['F6', '+Concepto']] as [$coordinate, $expected]) {
+            $cell = $spreadsheet->getSheetByName('Movimientos')->getCell($coordinate);
             $this->assertSame($expected, $cell->getValue());
             $this->assertSame(DataType::TYPE_STRING, $cell->getDataType());
             $this->assertFalse($cell->isFormula());

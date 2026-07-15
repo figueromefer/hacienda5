@@ -105,6 +105,27 @@
                         <input type="text" name="category" class="w-full border rounded" value="{{ old('category') }}">
                     </div>
 
+                    <div x-cloak x-show="type === 'expense'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label>Proveedor (opcional)</label>
+                            <select name="supplier_id" class="w-full border rounded">
+                                <option value="">Sin proveedor</option>
+                                @foreach($suppliers as $supplier)
+                                    <option value="{{ $supplier->id }}" @selected((string) old('supplier_id') === (string) $supplier->id)>{{ $supplier->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label>Concepto de gasto (opcional)</label>
+                            <select name="expense_concept_id" class="w-full border rounded">
+                                <option value="">Sin concepto</option>
+                                @foreach($expenseConcepts as $expenseConcept)
+                                    <option value="{{ $expenseConcept->id }}" @selected((string) old('expense_concept_id') === (string) $expenseConcept->id)>{{ $expenseConcept->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
                         La referencia se generará automáticamente al guardar, según el tipo y año del movimiento.
                     </div>

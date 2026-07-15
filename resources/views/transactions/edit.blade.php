@@ -17,7 +17,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('transactions.update', $transaction) }}" method="POST" class="space-y-4">
+                <form action="{{ route('transactions.update', $transaction) }}" method="POST" class="space-y-4" x-data="{ type: @js(old('type', $transaction->type)) }">
                     @csrf
                     @method('PUT')
 
@@ -29,7 +29,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label>Tipo</label>
-                            <select name="type" class="w-full border rounded">
+                            <select name="type" class="w-full border rounded" x-model="type">
                                 <option value="income" @selected(old('type', $transaction->type) === 'income')>Ingreso</option>
                                 <option value="expense" @selected(old('type', $transaction->type) === 'expense')>Gasto</option>
                             </select>
@@ -95,6 +95,33 @@
                     <div>
                         <label>Categoría</label>
                         <input type="text" name="category" class="w-full border rounded" value="{{ old('category', $transaction->category) }}">
+                    </div>
+
+                    <div x-cloak x-show="type === 'expense'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label>Proveedor (opcional)</label>
+                            <select name="supplier_id" class="w-full border rounded">
+                                <option value="">Sin proveedor</option>
+                                @if($transaction->supplier && ! $transaction->supplier->is_active)
+                                    <option value="{{ $transaction->supplier->id }}" @selected((string) old('supplier_id', $transaction->supplier_id) === (string) $transaction->supplier->id)>{{ $transaction->supplier->name }} (archivado)</option>
+                                @endif
+                                @foreach($suppliers as $supplier)
+                                    <option value="{{ $supplier->id }}" @selected((string) old('supplier_id', $transaction->supplier_id) === (string) $supplier->id)>{{ $supplier->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label>Concepto de gasto (opcional)</label>
+                            <select name="expense_concept_id" class="w-full border rounded">
+                                <option value="">Sin concepto</option>
+                                @if($transaction->expenseConcept && ! $transaction->expenseConcept->is_active)
+                                    <option value="{{ $transaction->expenseConcept->id }}" @selected((string) old('expense_concept_id', $transaction->expense_concept_id) === (string) $transaction->expenseConcept->id)>{{ $transaction->expenseConcept->name }} (archivado)</option>
+                                @endif
+                                @foreach($expenseConcepts as $expenseConcept)
+                                    <option value="{{ $expenseConcept->id }}" @selected((string) old('expense_concept_id', $transaction->expense_concept_id) === (string) $expenseConcept->id)>{{ $expenseConcept->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
 
                     <div>

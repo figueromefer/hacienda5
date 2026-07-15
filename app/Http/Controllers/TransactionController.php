@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\Event;
+use App\Models\ExpenseConcept;
 use App\Models\Quotation;
 use App\Models\ReceiptEmailLog;
+use App\Models\Supplier;
 use App\Models\Transaction;
 use App\Rules\EmailList;
 use App\Services\ReceiptEmailSender;
@@ -21,7 +23,7 @@ class TransactionController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Transaction::with(['client', 'event', 'quotation'])
+        $query = Transaction::with(['client', 'event', 'quotation', 'supplier', 'expenseConcept'])
             ->latest('transaction_date');
 
         if ($request->filled('type')) {
@@ -73,6 +75,8 @@ class TransactionController extends Controller
             'clients' => $clients,
             'events' => $events,
             'quotations' => Quotation::latest()->get(),
+            'suppliers' => Supplier::where('is_active', true)->orderBy('name')->get(),
+            'expenseConcepts' => ExpenseConcept::where('is_active', true)->orderBy('name')->get(),
             'selectedType' => $request->get('type', Transaction::TYPE_INCOME),
             'selectedEvent' => $event,
             'suggestedRecipients' => $suggestedRecipients,
@@ -94,6 +98,8 @@ class TransactionController extends Controller
             'client_id' => ['required', 'exists:clients,id'],
             'event_id' => ['nullable', 'exists:events,id'],
             'quotation_id' => ['nullable', 'exists:quotations,id'],
+            'supplier_id' => [Rule::excludeIf($request->input('type') !== Transaction::TYPE_EXPENSE), 'nullable', Rule::exists('suppliers', 'id')->where('is_active', true)],
+            'expense_concept_id' => [Rule::excludeIf($request->input('type') !== Transaction::TYPE_EXPENSE), 'nullable', Rule::exists('expense_concepts', 'id')->where('is_active', true)],
             'type' => ['required', 'in:income,expense'],
             'scope' => ['required', 'in:event,operation'],
             'transaction_date' => ['required', 'date'],
@@ -109,6 +115,11 @@ class TransactionController extends Controller
 
         if ($data['scope'] === 'event' && empty($data['event_id'])) {
             return back()->withErrors(['event_id' => 'Selecciona un evento para movimientos de evento.'])->withInput();
+        }
+
+        if ($data['type'] !== Transaction::TYPE_EXPENSE) {
+            $data['supplier_id'] = null;
+            $data['expense_concept_id'] = null;
         }
 
         $transaction = DB::transaction(function () use ($data, $referenceGenerator): Transaction {
@@ -152,14 +163,14 @@ class TransactionController extends Controller
 
     public function show(Transaction $transaction)
     {
-        $transaction->load(['client', 'event', 'quotation', 'receiptEmailLogs.sender']);
+        $transaction->load(['client', 'event', 'quotation', 'supplier', 'expenseConcept', 'receiptEmailLogs.sender']);
 
         return view('transactions.show', $this->receiptViewData($transaction));
     }
 
     public function pdf(Transaction $transaction)
     {
-        $transaction->load(['client', 'event', 'quotation']);
+        $transaction->load(['client', 'event', 'quotation', 'supplier', 'expenseConcept']);
 
         $pdf = Pdf::loadView('transactions.receipt-pdf', $this->receiptViewData($transaction))
             ->setPaper('letter');
@@ -171,11 +182,15 @@ class TransactionController extends Controller
 
     public function edit(Transaction $transaction)
     {
+        $transaction->load(['supplier', 'expenseConcept']);
+
         return view('transactions.edit', [
             'transaction' => $transaction,
             'clients' => Client::orderBy('full_name')->get(),
             'events' => Event::with('client')->orderBy('event_date')->get(),
             'quotations' => Quotation::latest()->get(),
+            'suppliers' => Supplier::where('is_active', true)->orderBy('name')->get(),
+            'expenseConcepts' => ExpenseConcept::where('is_active', true)->orderBy('name')->get(),
         ]);
     }
 
@@ -185,6 +200,12 @@ class TransactionController extends Controller
             'client_id' => ['required', 'exists:clients,id'],
             'event_id' => ['nullable', 'exists:events,id'],
             'quotation_id' => ['nullable', 'exists:quotations,id'],
+            'supplier_id' => [Rule::excludeIf($request->input('type') !== Transaction::TYPE_EXPENSE), 'nullable', Rule::exists('suppliers', 'id')->where(function ($query) use ($transaction) {
+                $query->where('is_active', true)->orWhere('id', $transaction->supplier_id);
+            })],
+            'expense_concept_id' => [Rule::excludeIf($request->input('type') !== Transaction::TYPE_EXPENSE), 'nullable', Rule::exists('expense_concepts', 'id')->where(function ($query) use ($transaction) {
+                $query->where('is_active', true)->orWhere('id', $transaction->expense_concept_id);
+            })],
             'type' => ['required', 'in:income,expense'],
             'scope' => ['required', 'in:event,operation'],
             'transaction_date' => ['required', 'date'],
@@ -197,6 +218,11 @@ class TransactionController extends Controller
 
         if ($data['scope'] === 'event' && empty($data['event_id'])) {
             return back()->withErrors(['event_id' => 'Selecciona un evento para movimientos de evento.'])->withInput();
+        }
+
+        if ($data['type'] !== Transaction::TYPE_EXPENSE) {
+            $data['supplier_id'] = null;
+            $data['expense_concept_id'] = null;
         }
 
         $transaction->update($data);
