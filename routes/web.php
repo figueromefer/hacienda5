@@ -9,6 +9,7 @@ use App\Http\Controllers\EventContractController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventNoteController;
 use App\Http\Controllers\EventTaskController;
+use App\Http\Controllers\ExpenseConceptController;
 use App\Http\Controllers\FinancialBalanceExportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicReceiptController;
@@ -53,6 +54,15 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('suppliers', SupplierController::class)
         ->middleware('permission:manage suppliers');
+
+    Route::get('/expense-concepts/archived', [ExpenseConceptController::class, 'archived'])
+        ->middleware('permission:manage expense concepts')
+        ->name('expense-concepts.archived');
+    Route::patch('/expense-concepts/{expense_concept}/restore', [ExpenseConceptController::class, 'restore'])
+        ->middleware('permission:manage expense concepts')
+        ->name('expense-concepts.restore');
+    Route::resource('expense-concepts', ExpenseConceptController::class)
+        ->middleware('permission:manage expense concepts');
 
     Route::get('/events/{event}/contract/create', [EventContractController::class, 'create'])
         ->middleware('permission:manage events')

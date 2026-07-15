@@ -8,6 +8,7 @@
             ['label' => 'Clientes', 'route' => 'clients.index', 'active' => 'clients.*', 'permission' => 'manage clients'],
             ['label' => 'Servicios', 'route' => 'services.index', 'active' => 'services.*', 'permission' => 'manage services'],
             ['label' => 'Proveedores', 'route' => 'suppliers.index', 'active' => 'suppliers.*', 'permission' => 'manage suppliers'],
+            ['label' => 'Conceptos de gasto', 'route' => 'expense-concepts.index', 'active' => 'expense-concepts.*', 'permission' => 'manage expense concepts'],
             ['label' => 'Eventos', 'route' => 'events.index', 'active' => 'events.*', 'permission' => 'manage events'],
             ['label' => 'Cotizaciones', 'route' => 'quotations.index', 'active' => 'quotations.*', 'permission' => 'manage quotations'],
             ['label' => 'Movimientos', 'route' => 'transactions.index', 'active' => 'transactions.*', 'permission' => 'manage payments'],

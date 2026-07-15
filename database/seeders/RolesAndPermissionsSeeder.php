@@ -16,6 +16,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'manage clients',
             'manage services',
             'manage suppliers',
+            'manage expense concepts',
             'manage events',
             'manage quotations',
             'manage payments',
