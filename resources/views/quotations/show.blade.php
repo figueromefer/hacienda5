@@ -1,12 +1,17 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Cotización {{ $quotation->folio }}
             </h2>
-            <a href="{{ route('quotations.edit', $quotation) }}" class="px-4 py-2 bg-black text-white rounded">
-                Editar
-            </a>
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ route('quotations.pdf', $quotation) }}" class="rounded bg-emerald-700 px-4 py-2 text-white hover:bg-emerald-800">
+                    Descargar PDF
+                </a>
+                <a href="{{ route('quotations.edit', $quotation) }}" class="rounded bg-black px-4 py-2 text-white">
+                    Editar
+                </a>
+            </div>
         </div>
     </x-slot>
 

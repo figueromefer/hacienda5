@@ -6,8 +6,10 @@ use App\Models\Client;
 use App\Models\Event;
 use App\Models\Quotation;
 use App\Models\Service;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class QuotationController extends Controller
 {
@@ -56,7 +58,7 @@ class QuotationController extends Controller
             $quotation = Quotation::create([
                 'client_id' => $data['client_id'],
                 'event_id' => $data['event_id'] ?? null,
-                'folio' => 'COT-' . now()->format('YmdHis'),
+                'folio' => 'COT-'.now()->format('YmdHis'),
                 'status' => $data['status'],
                 'subtotal' => $subtotal,
                 'discount' => $discount,
@@ -82,7 +84,20 @@ class QuotationController extends Controller
     public function show(Quotation $quotation)
     {
         $quotation->load(['client', 'event', 'items.service']);
+
         return view('quotations.show', compact('quotation'));
+    }
+
+    public function pdf(Quotation $quotation)
+    {
+        $quotation->load(['client', 'event', 'items.service']);
+
+        $pdf = Pdf::loadView('quotations.pdf', compact('quotation'))
+            ->setPaper('letter');
+
+        $reference = Str::slug($quotation->folio ?: (string) $quotation->id);
+
+        return $pdf->download("cotizacion-{$reference}.pdf");
     }
 
     public function edit(Quotation $quotation)

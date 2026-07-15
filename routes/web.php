@@ -98,8 +98,10 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('permission:manage events')
         ->name('events.balance.export');
 
-    Route::resource('quotations', QuotationController::class)
-        ->middleware('permission:manage quotations');
+    Route::middleware('permission:manage quotations')->group(function () {
+        Route::get('/quotations/{quotation}/pdf', [QuotationController::class, 'pdf'])->name('quotations.pdf');
+        Route::resource('quotations', QuotationController::class);
+    });
 
     Route::get('/transactions/{transaction}/pdf', [TransactionController::class, 'pdf'])
         ->middleware('permission:manage payments')

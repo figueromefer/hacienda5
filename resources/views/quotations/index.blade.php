@@ -39,6 +39,7 @@
                                 <td data-label="Acciones" class="py-2">
                                     <x-action-buttons
                                         :show="route('quotations.show', $quotation)"
+                                        :download="route('quotations.pdf', $quotation)"
                                         :edit="route('quotations.edit', $quotation)"
                                         :delete="route('quotations.destroy', $quotation)"
                                     />

@@ -1,5 +1,6 @@
 @props([
     'show' => null,
+    'download' => null,
     'edit' => null,
     'delete' => null,
     'confirm' => 'Esta acción no se puede deshacer. Para confirmar, escribe ELIMINAR.',
@@ -20,6 +21,15 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
             <span>Ver</span>
+        </a>
+    @endif
+
+    @if($download)
+        <a href="{{ $download }}" class="flex min-h-11 items-center gap-3 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50">
+            <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M7.5 10.5L12 15m0 0l4.5-4.5M12 15V3" />
+            </svg>
+            <span>Descargar PDF</span>
         </a>
     @endif
 
