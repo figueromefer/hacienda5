@@ -66,6 +66,10 @@ class EventContractGeneratorTest extends TestCase
         $this->assertStringContainsString('14 DE JULIO DE 2026', $xml);
         $this->assertStringNotContainsString('July', $xml);
         $this->assertStringNotContainsString('${', $xml);
+        $this->assertStringContainsString('se rentará por 6 horas', $xml);
+        $this->assertStringNotContainsString('se rentará por 6,', $xml);
+        $this->assertStringContainsString('iniciando a las 18:00:00', $xml);
+        $this->assertStringContainsString('terminará a las 01:00:00', $xml);
         $datePosition = strpos($xml, '09 DE JULIO DE 2026');
         $runStart = strrpos(substr($xml, 0, $datePosition), '<w:r>');
         $runEnd = strpos($xml, '</w:r>', $datePosition);
@@ -117,6 +121,12 @@ class EventContractGeneratorTest extends TestCase
                 continue;
             }
 
+            if ($placeholder === 'evento_duracion') {
+                $section->addText('se rentará por ${evento_duracion} horas, iniciando a las ${evento_hora_inicio} y terminará a las ${evento_hora_fin}');
+
+                continue;
+            }
+
             $textRun = $section->addTextRun();
             $textRun->addText('${'.$placeholder.'}', [
                 'name' => 'Arial',
@@ -146,6 +156,8 @@ class EventContractGeneratorTest extends TestCase
             'status' => Event::STATUS_RESERVED,
             'event_date' => '2026-07-09',
             'guest_count' => 150,
+            'start_time' => '18:00:00',
+            'end_time' => '01:00:00',
             'total_amount' => 100000,
         ]);
     }
@@ -157,6 +169,7 @@ class EventContractGeneratorTest extends TestCase
             'evento_tipo' => 'Boda',
             'evento_fecha' => '2026-07-09',
             'renta_total' => 100000,
+            'evento_duracion' => '6',
             'fecha_firma' => '2026-07-14',
             'arrendatario_firma_nombre' => 'María López',
         ];

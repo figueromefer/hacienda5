@@ -48,9 +48,9 @@
                         <div><label class="block text-sm mb-1">Tipo de evento</label><input name="evento_tipo" class="w-full border rounded" value="{{ old('evento_tipo', $event->event_type) }}" required></div>
                         <div><label class="block text-sm mb-1">Fecha del evento</label><input type="date" name="evento_fecha" class="w-full border rounded" value="{{ old('evento_fecha', $event->event_date?->format('Y-m-d')) }}" required></div>
                         <div><label class="block text-sm mb-1">No. personas</label><input name="evento_personas" class="w-full border rounded" value="{{ old('evento_personas', $event->guest_count) }}"></div>
-                        <div><label class="block text-sm mb-1">Hora inicio</label><input name="evento_hora_inicio" class="w-full border rounded" value="{{ old('evento_hora_inicio') }}" placeholder="Ej. 8:00 PM"></div>
-                        <div><label class="block text-sm mb-1">Hora fin</label><input name="evento_hora_fin" class="w-full border rounded" value="{{ old('evento_hora_fin') }}" placeholder="Ej. 1:00 AM"></div>
-                        <div><label class="block text-sm mb-1">Duración</label><input name="evento_duracion" class="w-full border rounded" value="{{ old('evento_duracion', '5 horas') }}"></div>
+                        <div><label class="block text-sm mb-1">Hora inicio</label><input name="evento_hora_inicio" class="w-full border rounded" value="{{ old('evento_hora_inicio', $event->start_time) }}" placeholder="Ej. 8:00 PM"></div>
+                        <div><label class="block text-sm mb-1">Hora fin</label><input name="evento_hora_fin" class="w-full border rounded" value="{{ old('evento_hora_fin', $event->end_time) }}" placeholder="Ej. 1:00 AM"></div>
+                        <div><label class="block text-sm mb-1">Duración (horas)</label><input type="number" min="0" step="0.5" name="evento_duracion" class="w-full border rounded" value="{{ old('evento_duracion', '5') }}"></div>
                         <div class="md:col-span-3"><label class="block text-sm mb-1">Horario de montaje</label><input name="montaje_horario" class="w-full border rounded" value="{{ old('montaje_horario') }}"></div>
                         <div class="md:col-span-3"><label class="block text-sm mb-1">Horario de desmontaje</label><input name="desmontaje_horario" class="w-full border rounded" value="{{ old('desmontaje_horario') }}"></div>
                     </div>

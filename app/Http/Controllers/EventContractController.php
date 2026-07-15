@@ -41,7 +41,7 @@ class EventContractController extends Controller
             'evento_personas' => ['nullable', 'string', 'max:255'],
             'evento_hora_inicio' => ['nullable', 'string', 'max:255'],
             'evento_hora_fin' => ['nullable', 'string', 'max:255'],
-            'evento_duracion' => ['nullable', 'string', 'max:255'],
+            'evento_duracion' => ['nullable', 'numeric', 'min:0'],
             'montaje_horario' => ['nullable', 'string', 'max:1000'],
             'desmontaje_horario' => ['nullable', 'string', 'max:1000'],
             'renta_total' => ['required', 'numeric', 'min:0'],
