@@ -4,34 +4,39 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Services\EventContractGenerator;
+use App\Services\FinancialBalanceCalculator;
+use App\Support\MoneyNormalizer;
 use Illuminate\Http\Request;
 use RuntimeException;
 use Throwable;
 
 class EventContractController extends Controller
 {
-    public function create(Event $event)
+    public function create(Event $event, FinancialBalanceCalculator $balanceCalculator)
     {
-        $event->load(['client', 'transactions']);
-
-        $paidIncome = $event->transactions
-            ->where('type', 'income')
-            ->where('status', 'paid')
-            ->sum('amount');
-
-        $total = (float) ($event->total_amount ?? 0);
-        $saldo = max($total - (float) $paidIncome, 0);
+        $event->load(['client', 'transactions', 'quotations']);
+        $financialBalance = $balanceCalculator->forEvent($event);
 
         return view('events.contracts.create', [
             'event' => $event,
             'client' => $event->client,
-            'paidIncome' => $paidIncome,
-            'saldo' => $saldo,
+            'paidIncome' => $financialBalance['paid_income'],
+            'eventCost' => $financialBalance['approved_quotation_total'],
+            'saldo' => $financialBalance['pending_receivable'],
         ]);
     }
 
     public function store(Request $request, Event $event, EventContractGenerator $generator)
     {
+        $request->merge(MoneyNormalizer::normalizeArray($request->all(), [
+            'renta_total',
+            'anticipo_monto',
+            'segundo_pago_monto',
+            'saldo_monto',
+            'deposito_monto',
+            'costo_hora_extra',
+        ]));
+
         $data = $request->validate([
             'arrendatario_nombre' => ['required', 'string', 'max:255'],
             'arrendatario_rfc' => ['nullable', 'string', 'max:50'],

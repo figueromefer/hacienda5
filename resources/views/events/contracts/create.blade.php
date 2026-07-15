@@ -59,12 +59,12 @@
                 <section>
                     <h3 class="text-lg font-semibold mb-4">Importes</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div><label class="block text-sm mb-1">Renta total</label><input type="number" step="0.01" name="renta_total" class="w-full border rounded" value="{{ old('renta_total', $event->total_amount) }}" required></div>
-                        <div><label class="block text-sm mb-1">Anticipo / apartado</label><input type="number" step="0.01" name="anticipo_monto" class="w-full border rounded" value="{{ old('anticipo_monto', $paidIncome) }}"></div>
-                        <div><label class="block text-sm mb-1">Segundo pago</label><input type="number" step="0.01" name="segundo_pago_monto" class="w-full border rounded" value="{{ old('segundo_pago_monto') }}"></div>
-                        <div><label class="block text-sm mb-1">Saldo restante</label><input type="number" step="0.01" name="saldo_monto" class="w-full border rounded" value="{{ old('saldo_monto', $saldo) }}"></div>
-                        <div><label class="block text-sm mb-1">Depósito por daños</label><input type="number" step="0.01" name="deposito_monto" class="w-full border rounded" value="{{ old('deposito_monto', 7000) }}"></div>
-                        <div><label class="block text-sm mb-1">Costo hora extra</label><input type="number" step="0.01" name="costo_hora_extra" class="w-full border rounded" value="{{ old('costo_hora_extra', 11000) }}"></div>
+                        <div><label class="block text-sm mb-1">Renta total</label><x-money-input name="renta_total" :value="old('renta_total', $eventCost)" required /></div>
+                        <div><label class="block text-sm mb-1">Anticipo / apartado</label><x-money-input name="anticipo_monto" :value="old('anticipo_monto', $paidIncome)" /></div>
+                        <div><label class="block text-sm mb-1">Segundo pago</label><x-money-input name="segundo_pago_monto" :value="old('segundo_pago_monto')" /></div>
+                        <div><label class="block text-sm mb-1">Saldo restante</label><x-money-input name="saldo_monto" :value="old('saldo_monto', $saldo)" /></div>
+                        <div><label class="block text-sm mb-1">Depósito por daños</label><x-money-input name="deposito_monto" :value="old('deposito_monto', 7000)" /></div>
+                        <div><label class="block text-sm mb-1">Costo hora extra</label><x-money-input name="costo_hora_extra" :value="old('costo_hora_extra', 11000)" /></div>
                     </div>
                 </section>
 

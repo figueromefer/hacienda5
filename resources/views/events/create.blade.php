@@ -6,91 +6,83 @@
     <div class="py-6">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white shadow rounded p-6">
-                @if ($errors->any())
-                    <div class="mb-6 rounded border border-red-200 bg-red-50 p-4 text-red-700">
-                        <div class="font-semibold mb-2">Corrige los siguientes errores:</div>
-                        <ul class="list-disc pl-5 space-y-1">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
                 <form action="{{ route('events.store') }}" method="POST" class="space-y-4">
                     @csrf
 
                     <div>
-                        <label class="block mb-1">Cliente</label>
-                        <select name="client_id" class="w-full border rounded">
+                        <label for="client_id" class="block mb-1">Cliente</label>
+                        <select id="client_id" name="client_id" class="w-full border rounded" required>
                             <option value="">Selecciona</option>
                             @foreach($clients as $client)
-                                <option value="{{ $client->id }}" @selected(old('client_id') == $client->id)>
-                                    {{ $client->full_name }}
-                                </option>
+                                <option value="{{ $client->id }}" @selected((string) old('client_id') === (string) $client->id)>{{ $client->full_name }}</option>
                             @endforeach
                         </select>
+                        <x-input-error :messages="$errors->get('client_id')" class="mt-2" />
                     </div>
 
                     <div>
-                        <label class="block mb-1">Título</label>
-                        <input type="text" name="title" class="w-full border rounded" value="{{ old('title') }}">
+                        <label for="title" class="block mb-1">Título</label>
+                        <input id="title" type="text" name="title" class="w-full border rounded" value="{{ old('title') }}" required>
+                        <x-input-error :messages="$errors->get('title')" class="mt-2" />
                     </div>
 
                     <div>
-                        <label class="block mb-1">Tipo de evento</label>
-                        <input type="text" name="event_type" class="w-full border rounded" value="{{ old('event_type') }}">
+                        <label for="event_type" class="block mb-1">Tipo de evento</label>
+                        <input id="event_type" type="text" name="event_type" class="w-full border rounded" value="{{ old('event_type') }}" required>
+                        <x-input-error :messages="$errors->get('event_type')" class="mt-2" />
                     </div>
 
                     <div>
-                        <label class="block mb-1">Estatus</label>
-                        <select name="status" class="w-full border rounded">
-                            <option value="reserved" @selected(old('status') === 'reserved')>Apartado</option>
-                            <option value="tentative" @selected(old('status', 'tentative') === 'tentative')>Por confirmar</option>
-                            <option value="confirmed" @selected(old('status') === 'confirmed')>Confirmado</option>
-                            <option value="completed" @selected(old('status') === 'completed')>Completado</option>
-                            <option value="cancelled" @selected(old('status') === 'cancelled')>Cancelado</option>
+                        <label for="status" class="block mb-1">Estatus</label>
+                        <select id="status" name="status" class="w-full border rounded" required>
+                            @foreach(\App\Models\Event::STATUSES as $status)
+                                @php $label = (new \App\Models\Event(['status' => $status]))->status_label; @endphp
+                                <option value="{{ $status }}" @selected(old('status', \App\Models\Event::STATUS_TENTATIVE) === $status)>{{ $label }}</option>
+                            @endforeach
                         </select>
+                        <x-input-error :messages="$errors->get('status')" class="mt-2" />
                     </div>
 
                     <div>
-                        <label class="block mb-1">Fecha</label>
-                        <input type="date" name="event_date" class="w-full border rounded" value="{{ old('event_date') }}">
+                        <label for="event_date" class="block mb-1">Fecha</label>
+                        <input id="event_date" type="date" name="event_date" class="w-full border rounded" value="{{ old('event_date') }}" required>
+                        <x-input-error :messages="$errors->get('event_date')" class="mt-2" />
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block mb-1">Hora inicio</label>
-                            <input type="time" name="start_time" class="w-full border rounded" value="{{ old('start_time') }}">
-                        </div>
-                        <div>
-                            <label class="block mb-1">Hora fin</label>
-                            <input type="time" name="end_time" class="w-full border rounded" value="{{ old('end_time') }}">
-                        </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div><label for="start_time" class="block mb-1">Hora inicio</label><input id="start_time" type="time" name="start_time" class="w-full border rounded" value="{{ old('start_time') }}"></div>
+                        <div><label for="end_time" class="block mb-1">Hora fin</label><input id="end_time" type="time" name="end_time" class="w-full border rounded" value="{{ old('end_time') }}"></div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block mb-1">Invitados</label>
-                            <input type="number" name="guest_count" class="w-full border rounded" value="{{ old('guest_count') }}">
+                            <label for="guest_count" class="block mb-1">Invitados</label>
+                            <input id="guest_count" type="number" min="0" name="guest_count" class="w-full border rounded" value="{{ old('guest_count') }}">
+                            <x-input-error :messages="$errors->get('guest_count')" class="mt-2" />
                         </div>
                         <div>
-                            <label class="block mb-1">Presupuesto estimado</label>
-                            <input type="number" step="0.01" name="budget_estimate" class="w-full border rounded" value="{{ old('budget_estimate') }}">
+                            <label for="budget_estimate" class="block mb-1">Presupuesto estimado total</label>
+                            <x-money-input id="budget_estimate" name="budget_estimate" :value="old('budget_estimate')" />
+                            <x-input-error :messages="$errors->get('budget_estimate')" class="mt-2" />
                         </div>
                     </div>
 
                     <div>
-                        <label class="block mb-1">Monto total</label>
-                        <input type="number" step="0.01" name="total_amount" class="w-full border rounded" value="{{ old('total_amount', 0) }}">
+                        <label for="address" class="block mb-1">Dirección</label>
+                        <input id="address" type="text" name="address" class="w-full border rounded" value="{{ old('address') }}">
+                        <x-input-error :messages="$errors->get('address')" class="mt-2" />
                     </div>
 
                     <div>
-                        <label class="block mb-1">Notas</label>
-                        <textarea name="notes" class="w-full border rounded">{{ old('notes') }}</textarea>
+                        <label for="notes" class="block mb-1">Notas</label>
+                        <textarea id="notes" name="notes" class="w-full border rounded">{{ old('notes') }}</textarea>
+                        <x-input-error :messages="$errors->get('notes')" class="mt-2" />
                     </div>
 
-                    <button class="px-4 py-2 bg-black text-white rounded">Guardar evento</button>
+                    <div class="flex gap-3">
+                        <button class="px-4 py-2 bg-black text-white rounded">Guardar evento</button>
+                        <a href="{{ route('events.index') }}" class="px-4 py-2 bg-gray-200 text-gray-800 rounded">Cancelar</a>
+                    </div>
                 </form>
             </div>
         </div>

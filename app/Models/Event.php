@@ -48,6 +48,8 @@ class Event extends Model
 
     protected $casts = [
         'event_date' => 'date',
+        'budget_estimate' => 'decimal:2',
+        'total_amount' => 'decimal:2',
         'google_synced_at' => 'datetime',
     ];
 

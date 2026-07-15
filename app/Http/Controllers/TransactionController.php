@@ -284,6 +284,17 @@ class TransactionController extends Controller
         return redirect()->route('transactions.index')->with('success', 'Movimiento actualizado correctamente.');
     }
 
+    public function cancel(Transaction $transaction)
+    {
+        if ($transaction->status === 'cancelled') {
+            return back()->with('warning', 'El movimiento ya estaba cancelado.');
+        }
+
+        $transaction->update(['status' => 'cancelled']);
+
+        return back()->with('success', 'Movimiento cancelado correctamente.');
+    }
+
     public function destroy(Transaction $transaction)
     {
         $eventId = $transaction->event_id;

@@ -206,39 +206,39 @@ Archivos esperados: `UserController`, vistas `users/*` y pruebas Feature.
 
 ### 5.1 Alta y edición de evento
 
-- [ ] Cambiar etiqueta a **Presupuesto estimado total**.
-- [ ] Aplicar componente monetario.
-- [ ] Quitar el campo **Monto total** de alta y edición.
-- [ ] Retirar `total_amount` de validación y asignación en controladores.
-- [ ] Mantener temporalmente la columna existente para compatibilidad si otras partes aún la requieren; no eliminarla hasta completar el reemplazo financiero y comprobar referencias.
+- [x] Cambiar etiqueta a **Presupuesto estimado total**.
+- [x] Aplicar componente monetario.
+- [x] Quitar el campo **Monto total** de alta y edición.
+- [x] Retirar `total_amount` de validación y asignación en controladores.
+- [x] Mantener temporalmente la columna existente para compatibilidad si otras partes aún la requieren; no eliminarla hasta completar el reemplazo financiero y comprobar referencias.
 
 ### 5.2 Listado de eventos
 
-- [ ] Agregar buscador por título, cliente, tipo de evento y, cuando sea razonable, fecha.
-- [ ] Conservar paginación y filtros en query string.
-- [ ] Mostrar cada estado con etiqueta española y color consistente.
-- [ ] Asegurar contraste accesible y no depender solo del color.
+- [x] Agregar buscador por título, cliente, tipo de evento y, cuando sea razonable, fecha.
+- [x] Conservar paginación y filtros en query string.
+- [x] Mostrar cada estado con etiqueta española y color consistente.
+- [x] Asegurar contraste accesible y no depender solo del color.
 
 ### 5.3 Perfil del evento
 
-- [ ] Agregar acceso rápido a cotizaciones del evento, usando filtro `event_id` en el índice de cotizaciones.
-- [ ] Agregar campo/tarjeta **Costo evento** con la suma de cotizaciones aprobadas.
-- [ ] Mostrar **Pendiente por cobrar** con la nueva regla financiera.
-- [ ] Los botones `+ Ingreso` y `+ Gasto` deben abrir el formulario de movimiento con `event_id` y `type` correctos.
-- [ ] La lista de movimientos debe ofrecer Cancelar para movimientos no cancelados y mostrar claramente los cancelados.
-- [ ] No ofrecer eliminación como sustituto de cancelación.
+- [x] Agregar acceso rápido a cotizaciones del evento, usando filtro `event_id` en el índice de cotizaciones.
+- [x] Agregar campo/tarjeta **Costo evento** con la suma de cotizaciones aprobadas.
+- [x] Mostrar **Pendiente por cobrar** con la nueva regla financiera.
+- [x] Los botones `+ Ingreso` y `+ Gasto` deben abrir el formulario de movimiento con `event_id` y `type` correctos.
+- [x] La lista de movimientos debe ofrecer Cancelar para movimientos no cancelados y mostrar claramente los cancelados.
+- [x] No ofrecer eliminación como sustituto de cancelación.
 
 ### 5.4 Carga de documentos desde evento
 
-- [ ] Al entrar desde el evento, precargar y mostrar cliente y evento.
-- [ ] El servidor debe derivar el cliente desde el evento y rechazar una combinación distinta manipulada.
-- [ ] Mantener la posibilidad de cambiar de evento únicamente cuando el flujo general de documentos lo requiera.
+- [x] Al entrar desde el evento, precargar y mostrar cliente y evento.
+- [x] El servidor debe derivar el cliente desde el evento y rechazar una combinación distinta manipulada.
+- [x] Mantener la posibilidad de cambiar de evento únicamente cuando el flujo general de documentos lo requiera.
 
 ### 5.5 Contratos
 
-- [ ] Aplicar el componente monetario a renta total, anticipo, segundo pago, depósito por daños y costo de hora extra.
-- [ ] Normalizar en servidor antes de validar.
-- [ ] Conservar cálculos y generación de contrato existentes.
+- [x] Aplicar el componente monetario a renta total, anticipo, segundo pago, depósito por daños y costo de hora extra.
+- [x] Normalizar en servidor antes de validar.
+- [x] Conservar cálculos y generación de contrato existentes.
 
 ### Criterios de aceptación
 

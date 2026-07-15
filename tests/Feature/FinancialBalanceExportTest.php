@@ -188,6 +188,7 @@ class FinancialBalanceExportTest extends TestCase
     public function test_financial_calculator_preserves_current_edge_case_behavior(): void
     {
         $event = new Event(['total_amount' => null]);
+        $event->setRelation('quotations', collect());
         $event->setRelation('transactions', collect([
             $this->unsavedTransaction('income', 'paid', 100, '2026-07-01'),
             $this->unsavedTransaction('income', 'pending', 30, '2026-07-02'),
@@ -198,13 +199,13 @@ class FinancialBalanceExportTest extends TestCase
 
         $balance = app(FinancialBalanceCalculator::class)->forEvent($event);
 
-        $this->assertSame(0.0, $balance['total']);
-        $this->assertSame(100.0, $balance['paid_income']);
-        $this->assertSame(30.0, $balance['pending_income']);
-        $this->assertSame(15.0, $balance['expenses']);
-        $this->assertSame(-100.0, $balance['pending_balance']);
-        $this->assertSame(85.0, $balance['balance']);
-        $this->assertSame([100.0, 100.0, 80.0, 80.0, 85.0], $balance['transactions']->pluck('running_balance')->all());
+        $this->assertSame('0.00', $balance['approved_quotation_total']);
+        $this->assertSame('100.00', $balance['paid_income']);
+        $this->assertSame('15.00', $balance['paid_expenses']);
+        $this->assertSame('0.00', $balance['pending_receivable']);
+        $this->assertSame('100.00', $balance['overpayment']);
+        $this->assertSame('85.00', $balance['cash_balance']);
+        $this->assertSame(['100.00', '100.00', '80.00', '80.00', '85.00'], $balance['transactions']->pluck('running_balance')->all());
     }
 
     public function test_client_export_query_count_does_not_grow_with_each_event(): void

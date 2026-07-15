@@ -9,6 +9,7 @@
                 <a href="{{ route('events.balance.export', $event) }}" style="display:inline-flex;align-items:center;border-radius:10px;background:#166534;color:#ffffff !important;padding:10px 16px;font-weight:700;text-decoration:none;">
                     Exportar balance
                 </a>
+                <a href="{{ route('quotations.index', ['event_id' => $event->id]) }}" style="display:inline-flex;align-items:center;border-radius:10px;background:#1d4ed8;color:#ffffff !important;padding:10px 16px;font-weight:700;text-decoration:none;">Cotizaciones</a>
                 <a href="{{ route('events.contracts.create', $event) }}" style="display:inline-flex;align-items:center;border-radius:10px;background:#243834;color:#ffffff !important;padding:10px 16px;font-weight:700;text-decoration:none;">
                     Generar contrato
                 </a>
@@ -29,7 +30,8 @@
                     <div><strong>Estatus:</strong> {{ $event->status_label }}</div>
                     <div><strong>Fecha:</strong> {{ $event->event_date->format('d/m/Y') }}</div>
                     <div><strong>Invitados:</strong> {{ $event->guest_count ?? '-' }}</div>
-                    <div><strong>Total:</strong> ${{ number_format($event->total_amount, 2) }}</div>
+                    <div><strong>Presupuesto estimado total:</strong> $ {{ number_format($event->budget_estimate, 2) }}</div>
+                    <div><strong>Costo evento:</strong> $ {{ number_format($approvedQuotationTotal, 2) }}</div>
                 </div>
             </div>
 
@@ -76,7 +78,8 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
+                <div class="bg-white shadow rounded p-5"><div class="text-sm text-gray-500">Costo evento</div><div class="text-xl font-bold text-blue-700">$ {{ number_format($approvedQuotationTotal, 2) }}</div></div>
                 <div class="bg-white shadow rounded p-5"><div class="text-sm text-gray-500">Ingresos</div><div class="text-xl font-bold text-green-700">${{ number_format($income, 2) }}</div></div>
                 <div class="bg-white shadow rounded p-5"><div class="text-sm text-gray-500">Gastos</div><div class="text-xl font-bold text-red-700">${{ number_format($expenses, 2) }}</div></div>
                 <div class="bg-white shadow rounded p-5"><div class="text-sm text-gray-500">Pendiente por cobrar</div><div class="text-xl font-bold text-yellow-600">${{ number_format($pendingIncome, 2) }}</div></div>
@@ -99,7 +102,16 @@
                                     <div class="font-semibold">{{ $transaction->type === 'income' ? 'Ingreso' : 'Gasto' }} - ${{ number_format($transaction->amount, 2) }}</div>
                                     <div class="text-sm text-gray-600">{{ $transaction->transaction_date->format('d/m/Y') }} · {{ $transaction->category ?? 'Sin categoría' }}</div>
                                 </div>
-                                <div class="text-sm {{ $transaction->type === 'income' ? 'text-green-600' : 'text-red-600' }}">{{ $transaction->status }}</div>
+                                <div class="flex items-center gap-2">
+                                    @if($transaction->status === 'cancelled')
+                                        <span class="rounded-full bg-gray-200 px-2 py-1 text-xs font-semibold text-gray-700">Cancelado</span>
+                                    @else
+                                        <form method="POST" action="{{ route('transactions.cancel', $transaction) }}" onsubmit="return confirm('¿Cancelar este movimiento? Se conservará para auditoría y dejará de afectar las cifras.')">
+                                            @csrf @method('PATCH')
+                                            <button class="rounded bg-red-600 px-3 py-2 text-xs font-semibold text-white">Cancelar</button>
+                                        </form>
+                                    @endif
+                                </div>
                             </div>
                         @empty
                             <p class="text-gray-500">No hay movimientos registrados.</p>

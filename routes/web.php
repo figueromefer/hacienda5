@@ -119,6 +119,10 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('permission:manage payments')
         ->name('expenses.index');
 
+    Route::patch('/transactions/{transaction}/cancel', [TransactionController::class, 'cancel'])
+        ->middleware('permission:manage payments')
+        ->name('transactions.cancel');
+
     Route::resource('transactions', TransactionController::class)
         ->middleware('permission:manage payments');
 

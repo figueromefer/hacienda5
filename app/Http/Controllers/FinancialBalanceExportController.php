@@ -13,6 +13,7 @@ class FinancialBalanceExportController extends Controller
     public function event(Event $event, FinancialBalanceWorkbook $workbook): BinaryFileResponse
     {
         $event->load([
+            'quotations',
             'client',
             'transactions' => fn ($query) => $query->with(['supplier', 'expenseConcept'])->orderBy('transaction_date')->orderBy('id'),
         ]);
@@ -32,7 +33,7 @@ class FinancialBalanceExportController extends Controller
     public function client(Client $client, FinancialBalanceWorkbook $workbook): BinaryFileResponse
     {
         $client->load([
-            'events' => fn ($query) => $query->orderBy('event_date')->orderBy('id'),
+            'events' => fn ($query) => $query->with('quotations')->orderBy('event_date')->orderBy('id'),
             'transactions' => fn ($query) => $query->with(['supplier', 'expenseConcept'])->orderBy('transaction_date')->orderBy('id'),
         ]);
 
