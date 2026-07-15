@@ -79,14 +79,14 @@ Para clientes nuevos, el acceso al portal deja de ser opcional.
 
 ### Tareas
 
-- [ ] Crear rama de implementación desde el `main` más reciente.
-- [ ] Ejecutar la suite actual y registrar fallos preexistentes.
-- [ ] Ejecutar `npm run build` antes de cambios.
-- [ ] Identificar migraciones y columnas actuales de `events`, `quotations`, `transactions`, `documents`, `clients` y `users`.
-- [ ] Localizar todos los usos de `events.total_amount`, `transactions.category`, estados de movimientos y generación de folios.
-- [ ] Localizar el activo oficial del logotipo usado por `<x-application-logo>` y comprobar si DomPDF puede cargarlo mediante `public_path()` o data URI.
-- [ ] Identificar pruebas existentes y factories disponibles.
-- [ ] Crear pruebas de caracterización mínimas para los cálculos financieros actuales antes de reemplazarlos.
+- [x] Crear rama de implementación desde la rama del plan sincronizada, conforme a la instrucción posterior del propietario.
+- [x] Ejecutar la suite actual y registrar fallos preexistentes.
+- [x] Ejecutar `npm run build` antes de cambios.
+- [x] Identificar migraciones y columnas actuales de `events`, `quotations`, `transactions`, `documents`, `clients` y `users`.
+- [x] Localizar todos los usos de `events.total_amount`, `transactions.category`, estados de movimientos y generación de folios.
+- [x] Localizar el activo oficial del logotipo usado por `<x-application-logo>` y comprobar si DomPDF puede cargarlo mediante `public_path()` o data URI.
+- [x] Identificar pruebas existentes y factories disponibles.
+- [x] Crear pruebas de caracterización mínimas para los cálculos financieros actuales antes de reemplazarlos.
 
 ### Criterios de aceptación
 
