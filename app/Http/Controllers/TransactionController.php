@@ -61,6 +61,60 @@ class TransactionController extends Controller
         ]);
     }
 
+    public function expenses(Request $request)
+    {
+        $query = Transaction::with(['client', 'event', 'supplier', 'expenseConcept'])
+            ->where('type', Transaction::TYPE_EXPENSE)
+            ->latest('transaction_date')
+            ->latest('id');
+
+        if ($request->filled('search')) {
+            $search = $request->string('search')->trim()->toString();
+
+            $query->where(function ($query) use ($search) {
+                $query->where('reference', 'like', "%{$search}%")
+                    ->orWhere('category', 'like', "%{$search}%")
+                    ->orWhere('method', 'like', "%{$search}%")
+                    ->orWhere('notes', 'like', "%{$search}%")
+                    ->orWhereHas('client', fn ($query) => $query->where('full_name', 'like', "%{$search}%"))
+                    ->orWhereHas('event', fn ($query) => $query->where('title', 'like', "%{$search}%"))
+                    ->orWhereHas('supplier', fn ($query) => $query->where('name', 'like', "%{$search}%"))
+                    ->orWhereHas('expenseConcept', fn ($query) => $query->where('name', 'like', "%{$search}%"));
+            });
+        }
+
+        if ($request->filled('from')) {
+            $query->whereDate('transaction_date', '>=', $request->date('from'));
+        }
+
+        if ($request->filled('to')) {
+            $query->whereDate('transaction_date', '<=', $request->date('to'));
+        }
+
+        if ($request->filled('supplier_id')) {
+            $query->where('supplier_id', $request->integer('supplier_id'));
+        }
+
+        if ($request->filled('expense_concept_id')) {
+            $query->where('expense_concept_id', $request->integer('expense_concept_id'));
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->string('status'));
+        }
+
+        $totalsQuery = clone $query;
+
+        return view('expenses.index', [
+            'transactions' => $query->paginate(15)->withQueryString(),
+            'suppliers' => Supplier::orderBy('name')->get(),
+            'expenseConcepts' => ExpenseConcept::orderBy('name')->get(),
+            'total' => (clone $totalsQuery)->sum('amount'),
+            'paidTotal' => (clone $totalsQuery)->where('status', 'paid')->sum('amount'),
+            'pendingTotal' => (clone $totalsQuery)->where('status', 'pending')->sum('amount'),
+        ]);
+    }
+
     public function create(Request $request)
     {
         $event = $request->filled('event_id') ? Event::with('client.user')->find($request->event_id) : null;

@@ -94,6 +94,10 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('permission:manage payments')
         ->name('transactions.email.store');
 
+    Route::get('/expenses', [TransactionController::class, 'expenses'])
+        ->middleware('permission:manage payments')
+        ->name('expenses.index');
+
     Route::resource('transactions', TransactionController::class)
         ->middleware('permission:manage payments');
 

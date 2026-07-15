@@ -15,9 +15,9 @@ class NavigationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        Permission::create(['name' => 'view dashboard']);
-        Permission::create(['name' => 'manage clients']);
-        Permission::create(['name' => 'manage users']);
+        Permission::findOrCreate('view dashboard');
+        Permission::findOrCreate('manage clients');
+        Permission::findOrCreate('manage users');
 
         $user->givePermissionTo(['view dashboard', 'manage clients']);
 
@@ -51,7 +51,7 @@ class NavigationTest extends TestCase
         $user = User::factory()->create();
 
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+            Permission::findOrCreate($permission);
         }
 
         $user->givePermissionTo($permissions);
@@ -61,6 +61,8 @@ class NavigationTest extends TestCase
         foreach (['Usuarios', 'Clientes', 'Servicios', 'Eventos', 'Cotizaciones', 'Movimientos', 'Calendario'] as $label) {
             $this->assertSame(2, substr_count($html, $label));
         }
+
+        $this->assertSame(2, substr_count($html, 'href="'.route('expenses.index').'"'));
 
         $this->assertStringContainsString('mobile-navigation-panel', $html);
 
