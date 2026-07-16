@@ -39,7 +39,6 @@ class SupplierPayablePaymentService
                 'transaction_date' => $data['transaction_date'],
                 'amount' => $data['amount'],
                 'method' => $data['method'] ?? null,
-                'category' => $payable->expenseConcept?->name,
                 'reference' => $this->references->next(Transaction::TYPE_EXPENSE, $data['transaction_date']),
                 'receipt_token' => (string) Str::uuid(),
                 'status' => 'paid',

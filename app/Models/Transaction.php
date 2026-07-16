@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\DomainLabels;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use LogicException;
@@ -13,6 +14,12 @@ class Transaction extends Model
     public const TYPE_INCOME = 'income';
 
     public const TYPE_EXPENSE = 'expense';
+
+    public const STATUS_PENDING = 'pending';
+
+    public const STATUS_PAID = 'paid';
+
+    public const STATUS_CANCELLED = 'cancelled';
 
     protected $fillable = [
         'client_id',
@@ -30,12 +37,20 @@ class Transaction extends Model
         'reference',
         'receipt_token',
         'status',
+        'cancelled_at',
+        'cancelled_by',
         'notes',
+        'proof_file_path',
+        'proof_original_name',
+        'proof_mime_type',
+        'proof_file_size',
     ];
 
     protected $casts = [
         'transaction_date' => 'date',
         'amount' => 'decimal:2',
+        'cancelled_at' => 'datetime',
+        'proof_file_size' => 'integer',
     ];
 
     protected static function booted(): void
@@ -102,6 +117,11 @@ class Transaction extends Model
         return $this->hasMany(ReceiptEmailLog::class)->latest();
     }
 
+    public function cancelledBy()
+    {
+        return $this->belongsTo(User::class, 'cancelled_by');
+    }
+
     public function getSignedAmountAttribute(): float
     {
         return $this->type === self::TYPE_EXPENSE
@@ -111,11 +131,7 @@ class Transaction extends Model
 
     public function getTypeLabelAttribute(): string
     {
-        return match ($this->type) {
-            self::TYPE_INCOME => 'Ingreso',
-            self::TYPE_EXPENSE => 'Gasto',
-            default => $this->type,
-        };
+        return DomainLabels::transactionType($this->type);
     }
 
     public function getScopeLabelAttribute(): string
@@ -125,5 +141,20 @@ class Transaction extends Model
             'operation' => 'Operación',
             default => $this->scope ?? '-',
         };
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return DomainLabels::transactionStatus($this->status);
+    }
+
+    public function getStatusClassesAttribute(): string
+    {
+        return DomainLabels::transactionStatusClasses($this->status);
+    }
+
+    public function getMethodLabelAttribute(): string
+    {
+        return DomainLabels::transactionMethod($this->method);
     }
 }

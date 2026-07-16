@@ -28,7 +28,7 @@
                                 <td data-label="Nombre" class="py-2">{{ $user->name }}</td>
                                 <td data-label="Email" class="py-2 break-all">{{ $user->email }}</td>
                                 <td data-label="Teléfono" class="py-2">{{ $user->phone ?? '-' }}</td>
-                                <td data-label="Rol" class="py-2">{{ $user->roles->pluck('name')->join(', ') ?: '-' }}</td>
+                                <td data-label="Rol" class="py-2">{{ $user->roles->pluck('name')->map(fn ($role) => \App\Support\DomainLabels::role($role))->join(', ') ?: '-' }}</td>
                                 <td data-label="Activo" class="py-2">{{ $user->is_active ? 'Sí' : 'No' }}</td>
                                 <td data-label="Acciones" class="py-2">
                                     <x-action-buttons

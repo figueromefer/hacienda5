@@ -6,99 +6,81 @@
     <div class="py-6">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white shadow rounded p-6">
-                @if ($errors->any())
-                    <div class="mb-6 rounded border border-red-200 bg-red-50 p-4 text-red-700">
-                        <div class="font-semibold mb-2">Corrige los siguientes errores:</div>
-                        <ul class="list-disc pl-5 space-y-1">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
                 <form action="{{ route('clients.store') }}" method="POST" class="space-y-6">
                     @csrf
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block mb-1">Tipo</label>
-                            <select name="type" class="w-full border rounded">
-                                <option value="active" @selected(old('type') === 'active')>Activo</option>
-                                <option value="prospect" @selected(old('type') === 'prospect')>Prospecto</option>
-                                <option value="past" @selected(old('type') === 'past')>Pasado</option>
+                            <label for="type" class="block mb-1">Tipo</label>
+                            <select id="type" name="type" class="w-full border rounded" required>
+                                <option value="prospect" @selected(old('type', 'prospect') === 'prospect')>Prospecto</option>
+                                <option value="active" @selected(old('type', 'prospect') === 'active')>Activo</option>
+                                <option value="past" @selected(old('type', 'prospect') === 'past')>Anterior</option>
                             </select>
+                            <x-input-error :messages="$errors->get('type')" class="mt-2" />
                         </div>
 
                         <div>
-                            <label class="block mb-1">Nombre completo</label>
-                            <input type="text" name="full_name" class="w-full border rounded" value="{{ old('full_name') }}">
+                            <label for="full_name" class="block mb-1">Nombre completo</label>
+                            <input id="full_name" type="text" name="full_name" class="w-full border rounded" value="{{ old('full_name') }}" required>
+                            <x-input-error :messages="$errors->get('full_name')" class="mt-2" />
                         </div>
 
                         <div>
-                            <label class="block mb-1">Empresa</label>
-                            <input type="text" name="company_name" class="w-full border rounded" value="{{ old('company_name') }}">
+                            <label for="company_name" class="block mb-1">Empresa</label>
+                            <input id="company_name" type="text" name="company_name" class="w-full border rounded" value="{{ old('company_name') }}">
+                            <x-input-error :messages="$errors->get('company_name')" class="mt-2" />
                         </div>
 
                         <div>
-                            <label class="block mb-1">Email del cliente</label>
-                            <input type="email" name="email" class="w-full border rounded" value="{{ old('email') }}">
+                            <label for="email" class="block mb-1">Correo y acceso al portal</label>
+                            <input id="email" type="email" name="email" class="w-full border rounded" value="{{ old('email') }}" required autocomplete="username">
+                            <x-input-error :messages="$errors->get('email')" class="mt-2" />
                         </div>
 
                         <div>
-                            <label class="block mb-1">Teléfono</label>
-                            <input type="text" name="phone" class="w-full border rounded" value="{{ old('phone') }}">
+                            <label for="phone" class="block mb-1">Teléfono</label>
+                            <input id="phone" type="text" name="phone" class="w-full border rounded" value="{{ old('phone') }}">
+                            <x-input-error :messages="$errors->get('phone')" class="mt-2" />
                         </div>
 
                         <div>
-                            <label class="block mb-1">Teléfono alterno</label>
-                            <input type="text" name="alternate_phone" class="w-full border rounded" value="{{ old('alternate_phone') }}">
+                            <label for="alternate_phone" class="block mb-1">Teléfono alterno</label>
+                            <input id="alternate_phone" type="text" name="alternate_phone" class="w-full border rounded" value="{{ old('alternate_phone') }}">
+                            <x-input-error :messages="$errors->get('alternate_phone')" class="mt-2" />
                         </div>
 
                         <div class="md:col-span-2">
-                            <label class="block mb-1">Origen</label>
-                            <input type="text" name="source" class="w-full border rounded" value="{{ old('source') }}">
+                            <label for="source" class="block mb-1">Origen</label>
+                            <input id="source" type="text" name="source" class="w-full border rounded" value="{{ old('source') }}">
+                            <x-input-error :messages="$errors->get('source')" class="mt-2" />
                         </div>
 
                         <div class="md:col-span-2">
-                            <label class="block mb-1">Notas</label>
-                            <textarea name="notes" class="w-full border rounded" rows="4">{{ old('notes') }}</textarea>
+                            <label for="notes" class="block mb-1">Notas</label>
+                            <textarea id="notes" name="notes" class="w-full border rounded" rows="4">{{ old('notes') }}</textarea>
+                            <x-input-error :messages="$errors->get('notes')" class="mt-2" />
                         </div>
                     </div>
 
-                    <div class="border rounded-lg p-5 bg-gray-50">
-                        <div class="flex items-center gap-3">
-                            <input
-                                id="create_portal_access"
-                                type="checkbox"
-                                name="create_portal_access"
-                                value="1"
-                                @checked(old('create_portal_access'))
-                                class="rounded border-gray-300"
-                            >
-                            <label for="create_portal_access" class="font-medium">
-                                Crear acceso al portal del cliente
-                            </label>
-                        </div>
-
-                        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <fieldset class="rounded-lg border bg-gray-50 p-5">
+                        <legend class="px-2 font-semibold">Acceso obligatorio al portal</legend>
+                        <p class="mb-4 text-sm text-gray-600">El cliente usará el correo indicado arriba para iniciar sesión.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block mb-1">Email de acceso</label>
-                                <input type="email" name="portal_email" class="w-full border rounded" value="{{ old('portal_email') }}">
+                                <label for="portal_password" class="block mb-1">Contraseña</label>
+                                <input id="portal_password" type="password" name="portal_password" class="w-full border rounded" required autocomplete="new-password">
+                                <x-input-error :messages="$errors->get('portal_password')" class="mt-2" />
                             </div>
-
                             <div>
-                                <label class="block mb-1">Contraseña inicial</label>
-                                <input type="text" name="portal_password" class="w-full border rounded" value="{{ old('portal_password') }}">
+                                <label for="portal_password_confirmation" class="block mb-1">Confirmar contraseña</label>
+                                <input id="portal_password_confirmation" type="password" name="portal_password_confirmation" class="w-full border rounded" required autocomplete="new-password">
+                                <x-input-error :messages="$errors->get('portal_password_confirmation')" class="mt-2" />
                             </div>
                         </div>
+                    </fieldset>
 
-                        <p class="mt-3 text-sm text-gray-600">
-                            Si activas esta opción se creará un usuario con rol <strong>cliente</strong> y se vinculará automáticamente con este cliente.
-                        </p>
-                    </div>
-
-                    <button class="px-4 py-2 bg-black text-white rounded">Guardar</button>
+                    <button class="px-4 py-2 bg-black text-white rounded">Guardar cliente</button>
                 </form>
             </div>
         </div>

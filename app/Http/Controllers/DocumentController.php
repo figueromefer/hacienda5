@@ -7,6 +7,7 @@ use App\Models\Document;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class DocumentController extends Controller
 {
@@ -17,7 +18,9 @@ class DocumentController extends Controller
 
     public function create(Request $request)
     {
-        $event = $request->filled('event_id') ? Event::with('client')->find($request->event_id) : null;
+        $event = $request->filled('event_id')
+            ? Event::with('client')->findOrFail($request->integer('event_id'))
+            : null;
 
         return view('documents.create', [
             'clients' => Client::orderBy('full_name')->get(),
@@ -40,11 +43,18 @@ class DocumentController extends Controller
         ]);
 
         $event = Event::with('client')->findOrFail($data['event_id']);
+
+        if (isset($data['client_id']) && (int) $data['client_id'] !== $event->client_id) {
+            throw ValidationException::withMessages([
+                'client_id' => 'El cliente seleccionado no corresponde al evento.',
+            ]);
+        }
+
         $file = $request->file('file');
         $path = $file->store('documents', 'public');
 
         Document::create([
-            'client_id' => $data['client_id'] ?? $event->client_id,
+            'client_id' => $event->client_id,
             'event_id' => $event->id,
             'uploaded_by' => $request->user()?->id,
             'category' => $data['category'],
@@ -60,7 +70,7 @@ class DocumentController extends Controller
 
     public function show(Document $document)
     {
-        return redirect()->to(asset('storage/' . $document->file_path));
+        return redirect()->to(asset('storage/'.$document->file_path));
     }
 
     public function destroy(Document $document)

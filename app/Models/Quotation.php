@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\DomainLabels;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,7 +24,15 @@ class Quotation extends Model
 
     protected $casts = [
         'valid_until' => 'date',
+        'subtotal' => 'decimal:2',
+        'discount' => 'decimal:2',
+        'total' => 'decimal:2',
     ];
+
+    public function getStatusLabelAttribute(): string
+    {
+        return DomainLabels::quotationStatus($this->status);
+    }
 
     public function client()
     {

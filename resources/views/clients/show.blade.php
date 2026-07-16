@@ -86,6 +86,7 @@
 
                     <div class="space-y-3">
                         @forelse($client->events as $event)
+                            @php($financialBalance = $eventBalances->get($event->id))
                             <div class="border rounded p-3">
                                 <div class="font-medium">{{ $event->title }}</div>
                                 <div class="text-sm text-gray-600">
@@ -93,6 +94,9 @@
                                 </div>
                                 <div class="text-sm text-gray-600">
                                     Estatus: {{ $event->status_label }}
+                                </div>
+                                <div class="text-sm text-gray-600">
+                                    Costo aprobado: ${{ number_format($financialBalance['approved_quotation_total'], 2) }} · Cobrado: ${{ number_format($financialBalance['paid_income'], 2) }} · Pendiente: ${{ number_format($financialBalance['pending_receivable'], 2) }}
                                 </div>
                                 <a href="{{ route('events.show', $event) }}" class="text-blue-600 text-sm">
                                     Ver evento

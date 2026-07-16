@@ -50,6 +50,7 @@ class PaymentController extends Controller
     public function show(Payment $payment)
     {
         $payment->load(['client', 'event', 'quotation']);
+
         return view('payments.show', compact('payment'));
     }
 

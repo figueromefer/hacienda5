@@ -20,13 +20,13 @@
 
         <main class="max-w-5xl mx-auto px-6 py-10">
             <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
-                <div class="p-8 border-b bg-green-50">
-                    <div class="inline-flex items-center gap-3 rounded-full bg-green-100 text-green-800 px-4 py-2 text-sm font-semibold">
-                        <span class="h-3 w-3 rounded-full bg-green-600"></span>
-                        RECIBO VERIFICADO EN SISTEMA
+                <div class="p-8 border-b {{ $transaction->status === \App\Models\Transaction::STATUS_CANCELLED ? 'bg-red-50' : 'bg-green-50' }}">
+                    <div class="inline-flex items-center gap-3 rounded-full px-4 py-2 text-sm font-semibold {{ $transaction->status === \App\Models\Transaction::STATUS_CANCELLED ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
+                        <span class="h-3 w-3 rounded-full {{ $transaction->status === \App\Models\Transaction::STATUS_CANCELLED ? 'bg-red-600' : 'bg-green-600' }}"></span>
+                        {{ $transaction->status === \App\Models\Transaction::STATUS_CANCELLED ? 'RECIBO CANCELADO' : 'RECIBO VERIFICADO EN SISTEMA' }}
                     </div>
                     <h1 class="mt-6 text-3xl font-bold">{{ $receiptTitle }} #{{ $transaction->id }}</h1>
-                    <p class="mt-2 text-gray-600">Este recibo existe en el sistema oficial de Hacienda Cinco.</p>
+                    <p class="mt-2 text-gray-600">{{ $transaction->status === \App\Models\Transaction::STATUS_CANCELLED ? 'Este movimiento se conserva solo para auditoría y no afecta cifras financieras.' : 'Este recibo existe y está vigente en el sistema oficial de Hacienda Cinco.' }}</p>
                 </div>
 
                 <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">

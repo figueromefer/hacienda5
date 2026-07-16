@@ -6,9 +6,9 @@
                 <form action="{{ route('expense-concepts.store') }}" method="POST" class="space-y-4">
                     @csrf
                     @include('expense-concepts.partials.form')
-                    <div class="flex flex-wrap gap-2">
-                        <button class="rounded bg-black px-4 py-2 text-white">Guardar concepto</button>
-                        <a href="{{ route('expense-concepts.index') }}" class="rounded border px-4 py-2">Cancelar</a>
+                    <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                        <a href="{{ route('expense-concepts.index') }}" class="inline-flex min-h-11 items-center justify-center rounded border px-4 py-2">Cancelar</a>
+                        <button type="submit" class="inline-flex min-h-11 items-center justify-center rounded bg-black px-4 py-2 text-white">Guardar concepto</button>
                     </div>
                 </form>
             </div>

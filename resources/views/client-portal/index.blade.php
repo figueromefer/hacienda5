@@ -34,6 +34,7 @@
 
                     <div class="space-y-3">
                         @forelse($client->events as $event)
+                            @php($financialBalance = $eventBalances->get($event->id))
                             <div class="border rounded p-4">
                                 <div class="font-semibold">{{ $event->title }}</div>
                                 <div class="text-sm text-gray-600 mt-1">
@@ -49,7 +50,10 @@
                                     Invitados: {{ $event->guest_count ?? '-' }}
                                 </div>
                                 <div class="text-sm text-gray-600">
-                                    Total: ${{ number_format($event->total_amount ?? 0, 2) }}
+                                    Costo aprobado: ${{ number_format($financialBalance['approved_quotation_total'], 2) }}
+                                </div>
+                                <div class="text-sm text-gray-600">
+                                    Cobrado: ${{ number_format($financialBalance['paid_income'], 2) }} · Pendiente: ${{ number_format($financialBalance['pending_receivable'], 2) }}
                                 </div>
                                 @if($event->notes)
                                     <div class="mt-2 text-sm text-gray-700">

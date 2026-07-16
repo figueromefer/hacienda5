@@ -119,7 +119,20 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('permission:manage payments')
         ->name('expenses.index');
 
+    Route::get('/incomes', [TransactionController::class, 'incomes'])
+        ->middleware('permission:manage payments')
+        ->name('incomes.index');
+
+    Route::get('/transactions/{transaction}/proof', [TransactionController::class, 'downloadProof'])
+        ->middleware('permission:manage payments')
+        ->name('transactions.proof');
+
+    Route::patch('/transactions/{transaction}/cancel', [TransactionController::class, 'cancel'])
+        ->middleware('permission:manage payments')
+        ->name('transactions.cancel');
+
     Route::resource('transactions', TransactionController::class)
+        ->except(['destroy'])
         ->middleware('permission:manage payments');
 
     Route::resource('documents', DocumentController::class)
@@ -138,13 +151,14 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('permission:manage events')
         ->name('events.tasks.store');
 
-    Route::patch('/event-tasks/{eventTask}/status', [EventTaskController::class, 'updateStatus'])
-        ->middleware('permission:manage events')
-        ->name('events.tasks.status');
-
-    Route::delete('/event-tasks/{eventTask}', [EventTaskController::class, 'destroy'])
-        ->middleware('permission:manage events')
-        ->name('events.tasks.destroy');
+    Route::get('/event-tasks/{eventTask}/edit', [EventTaskController::class, 'edit'])
+        ->name('event-tasks.edit');
+    Route::put('/event-tasks/{eventTask}', [EventTaskController::class, 'update'])
+        ->name('event-tasks.update');
+    Route::patch('/event-tasks/{eventTask}/complete', [EventTaskController::class, 'complete'])
+        ->name('event-tasks.complete');
+    Route::patch('/event-tasks/{eventTask}/cancel', [EventTaskController::class, 'cancel'])
+        ->name('event-tasks.cancel');
 
     Route::post('/events/{event}/notes', [EventNoteController::class, 'store'])
         ->middleware('permission:manage events')

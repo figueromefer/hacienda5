@@ -6,10 +6,19 @@
                 <p class="text-sm text-gray-500 mt-1">Vista administrativa del recibo registrado en sistema.</p>
             </div>
             <div class="flex flex-wrap gap-2">
-                <a href="{{ route('transactions.index') }}" style="display:inline-flex;align-items:center;border-radius:10px;background:#e5e7eb;color:#1f2937;padding:10px 16px;font-weight:600;text-decoration:none;">Volver</a>
-                <a href="{{ route('transactions.edit', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:10px;background:#fffbeb;color:#b45309;padding:10px 16px;font-weight:600;text-decoration:none;">Editar</a>
+                <a href="{{ $backUrl }}" style="display:inline-flex;align-items:center;border-radius:10px;background:#e5e7eb;color:#1f2937;padding:10px 16px;font-weight:600;text-decoration:none;">{{ $backLabel }}</a>
+                @if($transaction->status !== \App\Models\Transaction::STATUS_CANCELLED)
+                    <a href="{{ route('transactions.edit', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:10px;background:#fffbeb;color:#b45309;padding:10px 16px;font-weight:600;text-decoration:none;">Editar</a>
+                    <form method="POST" action="{{ route('transactions.cancel', $transaction) }}" onsubmit="return confirm('¿Cancelar este movimiento? Se conservará para auditoría y dejará de afectar las cifras.')">
+                        @csrf @method('PATCH')
+                        <button style="display:inline-flex;align-items:center;border-radius:10px;background:#b91c1c;color:#fff;padding:10px 16px;font-weight:600;border:0;">Cancelar movimiento</button>
+                    </form>
+                @endif
+                @if($transaction->proof_file_path)
+                    <a href="{{ route('transactions.proof', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:10px;background:#ecfdf5;color:#047857;padding:10px 16px;font-weight:600;text-decoration:none;">Ver comprobante</a>
+                @endif
                 @if($transaction->receipt_token)
-                    <a href="{{ route('receipts.public.show', $transaction->receipt_token) }}" target="_blank" style="display:inline-flex;align-items:center;border-radius:10px;background:#ecfdf5;color:#047857;padding:10px 16px;font-weight:600;text-decoration:none;">Validar</a>
+                    <a href="{{ route('receipts.public.show', $transaction->receipt_token) }}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;border-radius:10px;background:#ecfdf5;color:#047857;padding:10px 16px;font-weight:600;text-decoration:none;">Validar</a>
                 @endif
                 <a href="{{ route('transactions.pdf', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:10px;background:#243834;color:#fff !important;padding:10px 16px;font-weight:600;text-decoration:none;">Descargar PDF</a>
                 @if($transaction->type === \App\Models\Transaction::TYPE_INCOME && $transaction->status === 'paid')
@@ -31,6 +40,14 @@
 
     <div style="padding:32px 16px;">
         <div style="max-width:920px;margin:0 auto;">
+            @if($transaction->status === \App\Models\Transaction::STATUS_CANCELLED)
+                <div style="margin-bottom:20px;border:2px solid #b91c1c;background:#fef2f2;color:#991b1b;border-radius:16px;padding:18px;font-weight:700;">
+                    MOVIMIENTO CANCELADO — No es un recibo vigente y no afecta cifras financieras.
+                    @if($transaction->cancelled_at)
+                        <div style="margin-top:6px;font-size:13px;font-weight:500;">Cancelado el {{ $transaction->cancelled_at->format('d/m/Y H:i') }}.</div>
+                    @endif
+                </div>
+            @endif
             <div style="background:#fff;border-radius:24px;box-shadow:0 20px 45px rgba(0,0,0,.08);overflow:hidden;">
                 <div class="receipt-brand-header" style="background:#243834;padding:24px 32px;display:flex;align-items:center;gap:22px;">
                     <img src="{{ asset('images/hacienda-cinco-logo.png') }}" alt="Hacienda Cinco" style="width:96px !important;max-width:96px !important;height:auto !important;display:block !important;flex:0 0 96px !important;object-fit:contain !important;">
@@ -52,7 +69,7 @@
                         </div>
                         <div style="border:1px solid #e5e7eb;background:#f9fafb;border-radius:16px;padding:16px;">
                             <div style="font-size:12px;text-transform:uppercase;color:#6b7280;">Estatus</div>
-                            <div style="font-weight:700;margin-top:4px;color:#374151;">{{ $transaction->status }}</div>
+                            <div style="font-weight:700;margin-top:4px;color:#374151;">{{ $transaction->status_label }}</div>
                         </div>
                         <div style="border:1px solid #e5e7eb;background:#f9fafb;border-radius:16px;padding:16px;">
                             <div style="font-size:12px;text-transform:uppercase;color:#6b7280;">Referencia</div>
@@ -117,7 +134,7 @@
                         <p style="font-size:14px;color:#4b5563;margin:6px 0 0;">Esta URL es la fuente oficial para validar que el recibo no fue alterado.</p>
                         <div style="margin-top:8px;font-size:12px;color:#6b7280;word-break:break-all;">{{ route('receipts.public.show', $transaction->receipt_token) }}</div>
                     </div>
-                    <a href="{{ route('receipts.public.show', $transaction->receipt_token) }}" target="_blank" style="display:inline-flex;white-space:nowrap;border-radius:10px;background:#ecfdf5;color:#047857;padding:10px 16px;font-weight:700;text-decoration:none;">Abrir validación</a>
+                    <a href="{{ route('receipts.public.show', $transaction->receipt_token) }}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;white-space:nowrap;border-radius:10px;background:#ecfdf5;color:#047857;padding:10px 16px;font-weight:700;text-decoration:none;">Abrir validación</a>
                 </div>
             @endif
 

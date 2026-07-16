@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        if (!$admin->hasRole('super_admin')) {
+        if (! $admin->hasRole('super_admin')) {
             $admin->assignRole('super_admin');
         }
     }

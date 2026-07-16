@@ -4,15 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\Event;
+use App\Models\EventTask;
 use App\Models\Quotation;
 use App\Models\Transaction;
+use App\Services\FinancialBalanceCalculator;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, FinancialBalanceCalculator $balanceCalculator)
     {
         $period = in_array($request->get('period'), ['6', '12', 'year'], true)
             ? $request->get('period')
@@ -24,10 +26,17 @@ class DashboardController extends Controller
             default => now()->startOfMonth()->subMonths(5),
         };
 
-        $income = Transaction::where('type', Transaction::TYPE_INCOME)->where('status', 'paid')->sum('amount');
-        $expenses = Transaction::where('type', Transaction::TYPE_EXPENSE)->where('status', 'paid')->sum('amount');
+        $income = Transaction::where('type', Transaction::TYPE_INCOME)->where('status', Transaction::STATUS_PAID)->sum('amount');
+        $expenses = Transaction::where('type', Transaction::TYPE_EXPENSE)->where('status', Transaction::STATUS_PAID)->sum('amount');
         $balance = $income - $expenses;
-        $pendingIncome = Transaction::where('type', Transaction::TYPE_INCOME)->where('status', 'pending')->sum('amount');
+        $events = Event::query()
+            ->select('id')
+            ->with([
+                'quotations:id,event_id,status,total',
+                'transactions:id,event_id,type,status,amount,transaction_date',
+            ])
+            ->get();
+        $pendingIncome = $balanceCalculator->totalsForEvents($events)['pending_receivable'];
 
         $driver = DB::connection()->getDriverName();
         $monthExpression = $driver === 'sqlite'
@@ -60,18 +69,27 @@ class DashboardController extends Controller
         $chartExpenses = $series->map(fn ($month) => (float) optional($monthly->get($month))->expenses)->values();
         $chartBalance = $series->map(function ($month) use ($monthly) {
             $row = $monthly->get($month);
+
             return (float) optional($row)->income - (float) optional($row)->expenses;
         })->values();
 
         return view('dashboard', [
             'clientsCount' => Client::count(),
-            'eventsCount' => Event::count(),
+            'eventsCount' => $events->count(),
             'income' => $income,
             'expenses' => $expenses,
             'balance' => $balance,
             'pendingIncome' => $pendingIncome,
             'draftQuotations' => Quotation::where('status', 'draft')->count(),
             'nextEvents' => Event::with('client')->orderBy('event_date')->take(5)->get(),
+            'assignedTasks' => EventTask::query()
+                ->with('event:id,title,event_date')
+                ->pending()
+                ->where('assigned_to', $request->user()->id)
+                ->orderByRaw('CASE WHEN due_date IS NULL THEN 1 ELSE 0 END')
+                ->orderBy('due_date')
+                ->orderBy('id')
+                ->get(),
             'period' => $period,
             'chartLabels' => $chartLabels,
             'chartIncome' => $chartIncome,

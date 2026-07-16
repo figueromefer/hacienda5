@@ -7,16 +7,33 @@ use App\Models\Event;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Services\FinancialBalanceCalculator;
+use App\Support\MoneyNormalizer;
+use App\Support\SearchTerm;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class EventController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $events = Event::with('client')->orderBy('event_date')->paginate(15);
+        $search = SearchTerm::clean($request->query('search'));
 
-        return view('events.index', compact('events'));
+        $events = Event::with('client')
+            ->when($search !== '', function ($query) use ($search) {
+                $like = SearchTerm::like($search);
+
+                $query->where(function ($query) use ($like) {
+                    $query->where('title', 'like', $like)
+                        ->orWhere('event_type', 'like', $like)
+                        ->orWhere('event_date', 'like', $like)
+                        ->orWhereHas('client', fn ($query) => $query->where('full_name', 'like', $like));
+                });
+            })
+            ->orderBy('event_date')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('events.index', compact('events', 'search'));
     }
 
     public function create()
@@ -28,23 +45,9 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'client_id' => ['required', 'exists:clients,id'],
-            'title' => ['required', 'string', 'max:255'],
-            'event_type' => ['required', 'string', 'max:255'],
-            'status' => ['required', Rule::in(Event::STATUSES)],
-            'event_date' => ['required', 'date'],
-            'start_time' => ['nullable'],
-            'end_time' => ['nullable'],
-            'guest_count' => ['nullable', 'integer', 'min:0'],
-            'budget_estimate' => ['nullable', 'numeric', 'min:0'],
-            'total_amount' => ['nullable', 'numeric', 'min:0'],
-            'address' => ['nullable', 'string', 'max:255'],
-            'notes' => ['nullable', 'string'],
-        ]);
+        $request->merge(MoneyNormalizer::normalizeArray($request->all(), ['budget_estimate']));
 
-        $data['total_amount'] = $data['total_amount'] ?? 0;
-
+        $data = $this->validateEvent($request);
         Event::create($data);
 
         return redirect()->route('events.index')->with('success', 'Evento creado correctamente.');
@@ -62,16 +65,17 @@ class EventController extends Controller
         ]);
 
         $financialBalance = $balanceCalculator->forEvent($event);
+        $approvedQuotationTotal = $financialBalance['approved_quotation_total'];
         $income = $financialBalance['paid_income'];
-        $expenses = $financialBalance['expenses'];
-        $balance = $financialBalance['balance'];
-        $pendingIncome = $financialBalance['pending_income'];
+        $expenses = $financialBalance['paid_expenses'];
+        $balance = $financialBalance['cash_balance'];
+        $pendingIncome = $financialBalance['pending_receivable'];
 
         $timeline = collect()
             ->merge($event->transactions->map(fn ($transaction) => [
                 'date' => $transaction->created_at,
                 'type' => $transaction->type === Transaction::TYPE_INCOME ? 'Ingreso' : 'Gasto',
-                'title' => ($transaction->type === Transaction::TYPE_INCOME ? 'Ingreso registrado' : 'Gasto registrado'),
+                'title' => $transaction->type === Transaction::TYPE_INCOME ? 'Ingreso registrado' : 'Gasto registrado',
                 'description' => '$'.number_format($transaction->amount, 2).' · '.($transaction->category ?? 'Sin categoría'),
                 'color' => $transaction->type === Transaction::TYPE_INCOME ? 'green' : 'red',
             ]))
@@ -92,9 +96,20 @@ class EventController extends Controller
             ->sortByDesc('date')
             ->values();
 
-        $users = User::orderBy('name')->get();
+        $users = User::assignableToEventTasks()
+            ->orderBy('name')
+            ->get();
 
-        return view('events.show', compact('event', 'users', 'income', 'expenses', 'balance', 'pendingIncome', 'timeline'));
+        return view('events.show', compact(
+            'event',
+            'users',
+            'approvedQuotationTotal',
+            'income',
+            'expenses',
+            'balance',
+            'pendingIncome',
+            'timeline',
+        ));
     }
 
     public function edit(Event $event)
@@ -107,24 +122,9 @@ class EventController extends Controller
 
     public function update(Request $request, Event $event)
     {
-        $data = $request->validate([
-            'client_id' => ['required', 'exists:clients,id'],
-            'title' => ['required', 'string', 'max:255'],
-            'event_type' => ['required', 'string', 'max:255'],
-            'status' => ['required', Rule::in(Event::STATUSES)],
-            'event_date' => ['required', 'date'],
-            'start_time' => ['nullable'],
-            'end_time' => ['nullable'],
-            'guest_count' => ['nullable', 'integer', 'min:0'],
-            'budget_estimate' => ['nullable', 'numeric', 'min:0'],
-            'total_amount' => ['nullable', 'numeric', 'min:0'],
-            'address' => ['nullable', 'string', 'max:255'],
-            'notes' => ['nullable', 'string'],
-        ]);
+        $request->merge(MoneyNormalizer::normalizeArray($request->all(), ['budget_estimate']));
 
-        $data['total_amount'] = $data['total_amount'] ?? 0;
-
-        $event->update($data);
+        $event->update($this->validateEvent($request));
 
         return redirect()->route('events.index')->with('success', 'Evento actualizado correctamente.');
     }
@@ -134,5 +134,22 @@ class EventController extends Controller
         $event->delete();
 
         return redirect()->route('events.index')->with('success', 'Evento eliminado correctamente.');
+    }
+
+    private function validateEvent(Request $request): array
+    {
+        return $request->validate([
+            'client_id' => ['required', 'exists:clients,id'],
+            'title' => ['required', 'string', 'max:255'],
+            'event_type' => ['required', 'string', 'max:255'],
+            'status' => ['required', Rule::in(Event::STATUSES)],
+            'event_date' => ['required', 'date'],
+            'start_time' => ['nullable'],
+            'end_time' => ['nullable'],
+            'guest_count' => ['nullable', 'integer', 'min:0'],
+            'budget_estimate' => ['nullable', 'numeric', 'min:0'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'notes' => ['nullable', 'string'],
+        ]);
     }
 }

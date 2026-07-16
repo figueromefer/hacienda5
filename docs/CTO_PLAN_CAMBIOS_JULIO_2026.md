@@ -79,14 +79,14 @@ Para clientes nuevos, el acceso al portal deja de ser opcional.
 
 ### Tareas
 
-- [ ] Crear rama de implementación desde el `main` más reciente.
-- [ ] Ejecutar la suite actual y registrar fallos preexistentes.
-- [ ] Ejecutar `npm run build` antes de cambios.
-- [ ] Identificar migraciones y columnas actuales de `events`, `quotations`, `transactions`, `documents`, `clients` y `users`.
-- [ ] Localizar todos los usos de `events.total_amount`, `transactions.category`, estados de movimientos y generación de folios.
-- [ ] Localizar el activo oficial del logotipo usado por `<x-application-logo>` y comprobar si DomPDF puede cargarlo mediante `public_path()` o data URI.
-- [ ] Identificar pruebas existentes y factories disponibles.
-- [ ] Crear pruebas de caracterización mínimas para los cálculos financieros actuales antes de reemplazarlos.
+- [x] Crear rama de implementación desde la rama del plan sincronizada, conforme a la instrucción posterior del propietario.
+- [x] Ejecutar la suite actual y registrar fallos preexistentes.
+- [x] Ejecutar `npm run build` antes de cambios.
+- [x] Identificar migraciones y columnas actuales de `events`, `quotations`, `transactions`, `documents`, `clients` y `users`.
+- [x] Localizar todos los usos de `events.total_amount`, `transactions.category`, estados de movimientos y generación de folios.
+- [x] Localizar el activo oficial del logotipo usado por `<x-application-logo>` y comprobar si DomPDF puede cargarlo mediante `public_path()` o data URI.
+- [x] Identificar pruebas existentes y factories disponibles.
+- [x] Crear pruebas de caracterización mínimas para los cálculos financieros actuales antes de reemplazarlos.
 
 ### Criterios de aceptación
 
@@ -103,22 +103,22 @@ Para clientes nuevos, el acceso al portal deja de ser opcional.
 
 ### 3.1 Componente monetario reutilizable
 
-- [ ] Crear una solución común para inputs monetarios que soporte `old()`, valores de edición, símbolo `$`, separadores y dos decimales.
-- [ ] Crear normalización del lado servidor reutilizable para retirar `$`, espacios y comas antes de validar.
-- [ ] Aplicar atributos accesibles y teclado móvil adecuado.
-- [ ] Agregar pruebas unitarias de normalización: vacío, enteros, decimales, valores con comas y valores con símbolo.
+- [x] Crear una solución común para inputs monetarios que soporte `old()`, valores de edición, símbolo `$`, separadores y dos decimales.
+- [x] Crear normalización del lado servidor reutilizable para retirar `$`, espacios y comas antes de validar.
+- [x] Aplicar atributos accesibles y teclado móvil adecuado.
+- [x] Agregar pruebas unitarias de normalización: vacío, enteros, decimales, valores con comas y valores con símbolo.
 
 ### 3.2 Etiquetas comunes
 
-- [ ] Centralizar etiquetas en español de estados de cotizaciones.
-- [ ] Centralizar etiquetas y clases visuales de estados de eventos.
-- [ ] Centralizar traducción de tipo de cliente: `prospect` → `Prospecto`, `active` → `Activo`, `past` → `Anterior` o la etiqueta española ya usada por el formulario.
-- [ ] Mostrar roles con primera letra mayúscula sin modificar el valor interno.
+- [x] Centralizar etiquetas en español de estados de cotizaciones.
+- [x] Centralizar etiquetas y clases visuales de estados de eventos.
+- [x] Centralizar traducción de tipo de cliente: `prospect` → `Prospecto`, `active` → `Activo`, `past` → `Anterior` o la etiqueta española ya usada por el formulario.
+- [x] Mostrar roles con primera letra mayúscula sin modificar el valor interno.
 
 ### 3.3 Búsqueda reutilizable
 
-- [ ] Definir patrón de búsquedas mediante parámetro `search`, consultas agrupadas y `withQueryString()`.
-- [ ] Evitar consultas N+1 y escapar correctamente términos.
+- [x] Definir patrón de búsquedas mediante parámetro `search`, consultas agrupadas y `withQueryString()`.
+- [x] Evitar consultas N+1 y escapar correctamente términos.
 
 ### Criterios de aceptación
 
@@ -137,57 +137,57 @@ Para clientes nuevos, el acceso al portal deja de ser opcional.
 
 Archivo principal esperado: `resources/views/layouts/navigation.blade.php`.
 
-- [ ] Retirar del nivel principal: Usuarios, Clientes, Servicios, Conceptos de gasto y Gastos.
-- [ ] Agregar como último elemento un menú **Catálogos** con: Usuarios, Clientes, Servicios y Conceptos de gasto.
-- [ ] Respetar permisos individualmente; Catálogos solo aparece si el usuario puede ver al menos una opción.
-- [ ] Implementar dropdown en escritorio y sección desplegable/accesible en móvil.
-- [ ] Mantener Proveedores como opción principal porque no fue solicitado dentro de Catálogos.
-- [ ] Gastos e Ingresos se accederán desde Movimientos, no desde la navegación principal.
+- [x] Retirar del nivel principal: Usuarios, Clientes, Servicios, Conceptos de gasto y Gastos.
+- [x] Agregar como último elemento un menú **Catálogos** con: Usuarios, Clientes, Servicios y Conceptos de gasto.
+- [x] Respetar permisos individualmente; Catálogos solo aparece si el usuario puede ver al menos una opción.
+- [x] Implementar dropdown en escritorio y sección desplegable/accesible en móvil.
+- [x] Mantener Proveedores como opción principal porque no fue solicitado dentro de Catálogos.
+- [x] Gastos e Ingresos se accederán desde Movimientos, no desde la navegación principal.
 
 ### 4.2 Dashboard
 
-- [ ] En el encabezado de Dashboard agregar accesos rápidos a: Nuevo cliente, Nuevo evento, Nueva cotización y Nuevo movimiento.
-- [ ] Mostrar cada acceso solo si el usuario tiene su permiso correspondiente.
-- [ ] Mantener diseño responsivo.
+- [x] En el encabezado de Dashboard agregar accesos rápidos a: Nuevo cliente, Nuevo evento, Nueva cotización y Nuevo movimiento.
+- [x] Mostrar cada acceso solo si el usuario tiene su permiso correspondiente.
+- [x] Mantener diseño responsivo.
 
 ### 4.3 Usuarios
 
 Archivos esperados: `UserController`, vistas `users/*` y pruebas Feature.
 
-- [ ] Teléfono: permitir únicamente dígitos en interfaz y servidor. Usar `inputmode="numeric"` y patrón/sanitización; no usar `type="number"` porque puede alterar ceros iniciales.
-- [ ] Mostrar nombres de roles con primera letra mayúscula.
-- [ ] Mostrar errores de validación junto a contraseña y confirmación. La regla `confirmed` debe producir un mensaje visible en alta y edición.
-- [ ] Excluir del índice a usuarios con rol `cliente`.
-- [ ] Excluir el rol `cliente` de los dropdowns de alta y edición.
-- [ ] Impedir acceso directo por URL a edición/eliminación de un usuario con rol `cliente`.
-- [ ] No alterar los nombres internos de roles.
+- [x] Teléfono: permitir únicamente dígitos en interfaz y servidor. Usar `inputmode="numeric"` y patrón/sanitización; no usar `type="number"` porque puede alterar ceros iniciales.
+- [x] Mostrar nombres de roles con primera letra mayúscula.
+- [x] Mostrar errores de validación junto a contraseña y confirmación. La regla `confirmed` debe producir un mensaje visible en alta y edición.
+- [x] Excluir del índice a usuarios con rol `cliente`.
+- [x] Excluir el rol `cliente` de los dropdowns de alta y edición.
+- [x] Impedir acceso directo por URL a edición/eliminación de un usuario con rol `cliente`.
+- [x] No alterar los nombres internos de roles.
 
 ### 4.4 Clientes y acceso obligatorio
 
-- [ ] Tipo predeterminado en alta: `prospect` / Prospecto, incluyendo después de un error de validación.
-- [ ] Mostrar el tipo en español en la tabla.
-- [ ] Eliminar el checkbox de acceso al portal.
-- [ ] Hacer obligatorio el correo para nuevos clientes.
-- [ ] Crear siempre usuario relacionado con rol `cliente` dentro de la misma transacción.
-- [ ] Agregar confirmación de contraseña y errores visibles.
-- [ ] Mantener sincronizados nombre, correo, teléfono y estado relevante entre cliente y usuario.
-- [ ] En edición, contraseña opcional para clientes que ya tienen usuario; si se captura, exigir confirmación.
-- [ ] Evitar correos duplicados con validación que ignore al usuario relacionado.
-- [ ] Definir comportamiento seguro para clientes históricos sin usuario; no crear contraseñas desconocidas sin informar.
+- [x] Tipo predeterminado en alta: `prospect` / Prospecto, incluyendo después de un error de validación.
+- [x] Mostrar el tipo en español en la tabla.
+- [x] Eliminar el checkbox de acceso al portal.
+- [x] Hacer obligatorio el correo para nuevos clientes.
+- [x] Crear siempre usuario relacionado con rol `cliente` dentro de la misma transacción.
+- [x] Agregar confirmación de contraseña y errores visibles.
+- [x] Mantener sincronizados nombre, correo, teléfono y estado relevante entre cliente y usuario.
+- [x] En edición, contraseña opcional para clientes que ya tienen usuario; si se captura, exigir confirmación.
+- [x] Evitar correos duplicados con validación que ignore al usuario relacionado.
+- [x] Definir comportamiento seguro para clientes históricos sin usuario; no crear contraseñas desconocidas sin informar.
 
 ### 4.5 Recuperación de contraseña
 
-- [ ] Confirmar que el enlace “Olvidé mi contraseña” está disponible en login.
-- [ ] Crear prueba Feature que solicite recuperación para un usuario con rol `cliente` y verifique el envío de la notificación.
-- [ ] Crear prueba del restablecimiento mediante token válido.
-- [ ] Verificar que un usuario inactivo no obtenga acceso después de cambiar contraseña, si el login ya aplica esa regla.
-- [ ] Documentar variables de correo necesarias para prueba manual; no modificar secretos.
+- [x] Confirmar que el enlace “Olvidé mi contraseña” está disponible en login.
+- [x] Crear prueba Feature que solicite recuperación para un usuario con rol `cliente` y verifique el envío de la notificación.
+- [x] Crear prueba del restablecimiento mediante token válido.
+- [x] Verificar que un usuario inactivo no obtenga acceso después de cambiar contraseña, si el login ya aplica esa regla.
+- [x] Documentar variables de correo necesarias para prueba manual; no modificar secretos.
 
 ### 4.6 Profile en español
 
-- [ ] Traducir todos los textos visibles de `profile` y parciales relacionados.
-- [ ] Traducir mensajes de ayuda, botones, confirmaciones y modal de eliminación.
-- [ ] No modificar nombres de campos ni rutas.
+- [x] Traducir todos los textos visibles de `profile` y parciales relacionados.
+- [x] Traducir mensajes de ayuda, botones, confirmaciones y modal de eliminación.
+- [x] No modificar nombres de campos ni rutas.
 
 ### Criterios de aceptación
 
@@ -206,39 +206,39 @@ Archivos esperados: `UserController`, vistas `users/*` y pruebas Feature.
 
 ### 5.1 Alta y edición de evento
 
-- [ ] Cambiar etiqueta a **Presupuesto estimado total**.
-- [ ] Aplicar componente monetario.
-- [ ] Quitar el campo **Monto total** de alta y edición.
-- [ ] Retirar `total_amount` de validación y asignación en controladores.
-- [ ] Mantener temporalmente la columna existente para compatibilidad si otras partes aún la requieren; no eliminarla hasta completar el reemplazo financiero y comprobar referencias.
+- [x] Cambiar etiqueta a **Presupuesto estimado total**.
+- [x] Aplicar componente monetario.
+- [x] Quitar el campo **Monto total** de alta y edición.
+- [x] Retirar `total_amount` de validación y asignación en controladores.
+- [x] Mantener temporalmente la columna existente para compatibilidad si otras partes aún la requieren; no eliminarla hasta completar el reemplazo financiero y comprobar referencias.
 
 ### 5.2 Listado de eventos
 
-- [ ] Agregar buscador por título, cliente, tipo de evento y, cuando sea razonable, fecha.
-- [ ] Conservar paginación y filtros en query string.
-- [ ] Mostrar cada estado con etiqueta española y color consistente.
-- [ ] Asegurar contraste accesible y no depender solo del color.
+- [x] Agregar buscador por título, cliente, tipo de evento y, cuando sea razonable, fecha.
+- [x] Conservar paginación y filtros en query string.
+- [x] Mostrar cada estado con etiqueta española y color consistente.
+- [x] Asegurar contraste accesible y no depender solo del color.
 
 ### 5.3 Perfil del evento
 
-- [ ] Agregar acceso rápido a cotizaciones del evento, usando filtro `event_id` en el índice de cotizaciones.
-- [ ] Agregar campo/tarjeta **Costo evento** con la suma de cotizaciones aprobadas.
-- [ ] Mostrar **Pendiente por cobrar** con la nueva regla financiera.
-- [ ] Los botones `+ Ingreso` y `+ Gasto` deben abrir el formulario de movimiento con `event_id` y `type` correctos.
-- [ ] La lista de movimientos debe ofrecer Cancelar para movimientos no cancelados y mostrar claramente los cancelados.
-- [ ] No ofrecer eliminación como sustituto de cancelación.
+- [x] Agregar acceso rápido a cotizaciones del evento, usando filtro `event_id` en el índice de cotizaciones.
+- [x] Agregar campo/tarjeta **Costo evento** con la suma de cotizaciones aprobadas.
+- [x] Mostrar **Pendiente por cobrar** con la nueva regla financiera.
+- [x] Los botones `+ Ingreso` y `+ Gasto` deben abrir el formulario de movimiento con `event_id` y `type` correctos.
+- [x] La lista de movimientos debe ofrecer Cancelar para movimientos no cancelados y mostrar claramente los cancelados.
+- [x] No ofrecer eliminación como sustituto de cancelación.
 
 ### 5.4 Carga de documentos desde evento
 
-- [ ] Al entrar desde el evento, precargar y mostrar cliente y evento.
-- [ ] El servidor debe derivar el cliente desde el evento y rechazar una combinación distinta manipulada.
-- [ ] Mantener la posibilidad de cambiar de evento únicamente cuando el flujo general de documentos lo requiera.
+- [x] Al entrar desde el evento, precargar y mostrar cliente y evento.
+- [x] El servidor debe derivar el cliente desde el evento y rechazar una combinación distinta manipulada.
+- [x] Mantener la posibilidad de cambiar de evento únicamente cuando el flujo general de documentos lo requiera.
 
 ### 5.5 Contratos
 
-- [ ] Aplicar el componente monetario a renta total, anticipo, segundo pago, depósito por daños y costo de hora extra.
-- [ ] Normalizar en servidor antes de validar.
-- [ ] Conservar cálculos y generación de contrato existentes.
+- [x] Aplicar el componente monetario a renta total, anticipo, segundo pago, depósito por daños y costo de hora extra.
+- [x] Normalizar en servidor antes de validar.
+- [x] Conservar cálculos y generación de contrato existentes.
 
 ### Criterios de aceptación
 
@@ -256,36 +256,36 @@ Archivos esperados: `UserController`, vistas `users/*` y pruebas Feature.
 
 ### 6.1 Listado
 
-- [ ] Agregar búsqueda por folio, cliente, evento y estado/etiqueta cuando sea viable.
-- [ ] Agregar filtro `event_id` para el acceso rápido desde el evento.
-- [ ] Mostrar estados en español.
-- [ ] Mantener paginación con parámetros.
+- [x] Agregar búsqueda por folio, cliente, evento y estado/etiqueta cuando sea viable.
+- [x] Agregar filtro `event_id` para el acceso rápido desde el evento.
+- [x] Mostrar estados en español.
+- [x] Mantener paginación con parámetros.
 
 ### 6.2 Alta y edición
 
-- [ ] Al seleccionar cliente, el selector de evento debe contener únicamente “Sin evento” y eventos de ese cliente.
-- [ ] En edición, conservar selección válida y limpiar un evento si se cambia a otro cliente al que no pertenece.
-- [ ] Validar en servidor que el evento pertenece al cliente en `store` y `update`.
-- [ ] Mover Descuento después de Items.
-- [ ] Aplicar formato monetario a precio unitario, total por item, subtotal, descuento y total.
-- [ ] Los totales visuales deben actualizarse al cambiar cantidad, precio o descuento, pero el servidor recalcula todo.
-- [ ] Antes de Items agregar un recuadro informativo del evento seleccionado: nombre/título, fecha, tipo, número de invitados, estado y presupuesto estimado. Si se elige “Sin evento”, mostrar un estado vacío claro.
-- [ ] No cargar todos los eventos sin filtrar en el DOM si puede evitarse; puede usarse un mapa JSON pequeño o endpoint protegido.
+- [x] Al seleccionar cliente, el selector de evento debe contener únicamente “Sin evento” y eventos de ese cliente.
+- [x] En edición, conservar selección válida y limpiar un evento si se cambia a otro cliente al que no pertenece.
+- [x] Validar en servidor que el evento pertenece al cliente en `store` y `update`.
+- [x] Mover Descuento después de Items.
+- [x] Aplicar formato monetario a precio unitario, total por item, subtotal, descuento y total.
+- [x] Los totales visuales deben actualizarse al cambiar cantidad, precio o descuento, pero el servidor recalcula todo.
+- [x] Antes de Items agregar un recuadro informativo del evento seleccionado: nombre/título, fecha, tipo, número de invitados, estado y presupuesto estimado. Si se elige “Sin evento”, mostrar un estado vacío claro.
+- [x] No cargar todos los eventos sin filtrar en el DOM si puede evitarse; puede usarse un mapa JSON pequeño o endpoint protegido.
 
 ### 6.3 Folio
 
-- [ ] Para nuevas cotizaciones usar formato corto y seguro basado en ID, recomendado: `C-000123`.
-- [ ] Generarlo después de crear el registro dentro de la misma transacción para evitar colisiones.
-- [ ] Conservar folios históricos sin migración destructiva.
-- [ ] Agregar índice único si no existe y si los datos actuales lo permiten; si existen duplicados, emitir `BLOQUEO CTO`.
+- [x] Para nuevas cotizaciones usar formato corto y seguro basado en ID, recomendado: `C-000123`.
+- [x] Generarlo después de crear el registro dentro de la misma transacción para evitar colisiones.
+- [x] Conservar folios históricos sin migración destructiva.
+- [x] Agregar índice único si no existe y si los datos actuales lo permiten; si existen duplicados, emitir `BLOQUEO CTO`.
 
 ### 6.4 PDF premium
 
-- [ ] Incorporar logotipo oficial de Hacienda Cinco con una ruta compatible con DomPDF.
-- [ ] Rediseñar encabezado, jerarquía tipográfica, datos de cliente/evento, tabla de conceptos y bloque de totales para una apariencia premium y sobria.
-- [ ] Mantener tamaño carta y evitar cortes de tabla o totales entre páginas.
-- [ ] Probar con 1 item, muchos items, descuento cero y descuento positivo.
-- [ ] No enlazar imágenes remotas en el PDF.
+- [x] Incorporar logotipo oficial de Hacienda Cinco con una ruta compatible con DomPDF.
+- [x] Rediseñar encabezado, jerarquía tipográfica, datos de cliente/evento, tabla de conceptos y bloque de totales para una apariencia premium y sobria.
+- [x] Mantener tamaño carta y evitar cortes de tabla o totales entre páginas.
+- [x] Probar con 1 item, muchos items, descuento cero y descuento positivo.
+- [x] No enlazar imágenes remotas en el PDF.
 
 ### Criterios de aceptación
 
@@ -303,34 +303,34 @@ Archivos esperados: `UserController`, vistas `users/*` y pruebas Feature.
 
 ### 7.1 Pantallas de Ingresos y Gastos
 
-- [ ] Mantener Movimientos como pantalla principal.
-- [ ] Agregar botones visibles a **Ingresos** y **Gastos** dentro de Movimientos.
-- [ ] Crear pantalla de Ingresos equivalente a la existente de Gastos.
-- [ ] Refactorizar consultas/vistas compartidas para no duplicar dos módulos completos.
-- [ ] En ambas pantallas, excluir cancelados de totales. Los cancelados pueden mostrarse si el filtro lo solicita, pero nunca sumarse.
-- [ ] Corregir el total general de Gastos para que no incluya cancelados ni mezcle pendientes históricos indebidamente.
+- [x] Mantener Movimientos como pantalla principal.
+- [x] Agregar botones visibles a **Ingresos** y **Gastos** dentro de Movimientos.
+- [x] Crear pantalla de Ingresos equivalente a la existente de Gastos.
+- [x] Refactorizar consultas/vistas compartidas para no duplicar dos módulos completos.
+- [x] En ambas pantallas, excluir cancelados de totales. Los cancelados pueden mostrarse si el filtro lo solicita, pero nunca sumarse.
+- [x] Corregir el total general de Gastos para que no incluya cancelados ni mezcle pendientes históricos indebidamente.
 
 ### 7.2 Alta y edición
 
-- [ ] Aplicar componente monetario al monto.
-- [ ] Si la URL contiene `type=income`, preseleccionar Ingreso.
-- [ ] Si contiene `type=expense`, preseleccionar Gasto.
-- [ ] Si contiene `event_id`, precargar evento y cliente coherentes.
-- [ ] Agregar botón Cancelar que regrese al evento cuando existe `event_id`; en caso contrario, a Movimientos.
-- [ ] Retirar Categoría de alta, edición y validación. Mantener columna histórica nullable por compatibilidad salvo que una auditoría demuestre que puede eliminarse sin riesgo.
-- [ ] Retirar selector de estado. Los nuevos movimientos se guardan como `paid` en servidor.
-- [ ] No permitir editar directamente un movimiento cancelado, salvo campos explícitamente seguros definidos después de auditoría.
-- [ ] Validar coherencia entre cliente, evento y cotización.
+- [x] Aplicar componente monetario al monto.
+- [x] Si la URL contiene `type=income`, preseleccionar Ingreso.
+- [x] Si contiene `type=expense`, preseleccionar Gasto.
+- [x] Si contiene `event_id`, precargar evento y cliente coherentes.
+- [x] Agregar botón Cancelar que regrese al evento cuando existe `event_id`; en caso contrario, a Movimientos.
+- [x] Retirar Categoría de alta, edición y validación. Mantener columna histórica nullable por compatibilidad salvo que una auditoría demuestre que puede eliminarse sin riesgo.
+- [x] Retirar selector de estado. Los nuevos movimientos se guardan como `paid` en servidor.
+- [x] No permitir editar directamente un movimiento cancelado, salvo campos explícitamente seguros definidos después de auditoría.
+- [x] Validar coherencia entre cliente, evento y cotización.
 
 ### 7.3 Cancelación
 
-- [ ] Agregar ruta `PATCH` y método específico para cancelar.
-- [ ] Solo permitir cancelar movimientos que no estén cancelados.
-- [ ] Hacer la operación idempotente o devolver un mensaje claro si ya estaba cancelado.
-- [ ] Conservar referencia, comprobante, autoría y datos del movimiento.
-- [ ] Registrar `cancelled_at` y `cancelled_by` mediante migración si el esquema no tiene auditoría equivalente.
-- [ ] Excluir cancelados de recibos vigentes, balances, ingresos, gastos, pendiente por cobrar y cuentas por pagar relacionadas.
-- [ ] Revisar efectos automáticos de `SupplierPayable::refreshAutomaticStatus()` al cancelar.
+- [x] Agregar ruta `PATCH` y método específico para cancelar.
+- [x] Solo permitir cancelar movimientos que no estén cancelados.
+- [x] Hacer la operación idempotente o devolver un mensaje claro si ya estaba cancelado.
+- [x] Conservar referencia, comprobante, autoría y datos del movimiento.
+- [x] Registrar `cancelled_at` y `cancelled_by` mediante migración si el esquema no tiene auditoría equivalente.
+- [x] Excluir cancelados de recibos vigentes, balances, ingresos, gastos, pendiente por cobrar y cuentas por pagar relacionadas.
+- [x] Revisar efectos automáticos de `SupplierPayable::refreshAutomaticStatus()` al cancelar.
 
 ### 7.4 Comprobante
 
@@ -343,13 +343,13 @@ Como el requisito es un archivo por movimiento, la implementación recomendada e
 
 Tareas:
 
-- [ ] Aceptar PDF, JPG, JPEG, PNG y WEBP, con límite razonable documentado.
-- [ ] Guardar con nombre generado, nunca con el nombre original como ruta.
-- [ ] Mostrar enlace de descarga/vista en detalle y listados relevantes.
-- [ ] Proteger la descarga con autenticación y permiso `manage payments`; no exponer una ruta arbitraria recibida del usuario.
-- [ ] Al reemplazar comprobante, borrar el archivo anterior después de guardar correctamente el nuevo.
-- [ ] Si ocurre rollback de base de datos, evitar dejar archivos huérfanos.
-- [ ] Al cancelar, conservar el comprobante.
+- [x] Aceptar PDF, JPG, JPEG, PNG y WEBP, con límite razonable documentado.
+- [x] Guardar con nombre generado, nunca con el nombre original como ruta.
+- [x] Mostrar enlace de descarga/vista en detalle y listados relevantes.
+- [x] Proteger la descarga con autenticación y permiso `manage payments`; no exponer una ruta arbitraria recibida del usuario.
+- [x] Al reemplazar comprobante, borrar el archivo anterior después de guardar correctamente el nuevo.
+- [x] Si ocurre rollback de base de datos, evitar dejar archivos huérfanos.
+- [x] Al cancelar, conservar el comprobante.
 
 ### Criterios de aceptación
 
@@ -382,25 +382,25 @@ Debe devolver al menos:
 
 ### 8.2 Consultas
 
-- [ ] Usar relaciones cargadas o consultas agregadas eficientes.
-- [ ] Evitar que distintas pantallas calculen el mismo concepto de forma distinta.
-- [ ] Revisar Dashboard, evento, cliente, exportaciones XLSX, recibos, portal de cliente y cualquier reporte que use `total_amount` o estados.
-- [ ] Decidir si `events.total_amount` queda deprecado temporalmente o puede retirarse en una migración posterior. No eliminar hasta demostrar que no tiene consumidores.
+- [x] Usar relaciones cargadas o consultas agregadas eficientes.
+- [x] Evitar que distintas pantallas calculen el mismo concepto de forma distinta.
+- [x] Revisar Dashboard, evento, cliente, exportaciones XLSX, recibos, portal de cliente y cualquier reporte que use `total_amount` o estados.
+- [x] Decidir si `events.total_amount` queda deprecado temporalmente o puede retirarse en una migración posterior. No eliminar hasta demostrar que no tiene consumidores.
 
 ### 8.3 Pruebas financieras obligatorias
 
-- [ ] Evento sin cotizaciones: costo 0, pendiente 0.
-- [ ] Una cotización aprobada: costo igual a su total.
-- [ ] Varias aprobadas: suma correcta.
-- [ ] Cotizaciones no aprobadas: no cuentan.
-- [ ] Ingreso pagado: reduce pendiente.
-- [ ] Ingreso cancelado: no reduce pendiente.
-- [ ] Gasto pagado: no reduce pendiente por cobrar.
-- [ ] Sobrepago: pendiente 0 y sobrepago positivo.
-- [ ] Movimiento histórico pending: no cuenta como cobrado.
-- [ ] Cotización aprobada de otro evento: no cuenta.
-- [ ] Cambiar una cotización de approved a rejected actualiza el cálculo.
-- [ ] Cancelar y volver a consultar no deja totales cacheados incorrectos.
+- [x] Evento sin cotizaciones: costo 0, pendiente 0.
+- [x] Una cotización aprobada: costo igual a su total.
+- [x] Varias aprobadas: suma correcta.
+- [x] Cotizaciones no aprobadas: no cuentan.
+- [x] Ingreso pagado: reduce pendiente.
+- [x] Ingreso cancelado: no reduce pendiente.
+- [x] Gasto pagado: no reduce pendiente por cobrar.
+- [x] Sobrepago: pendiente 0 y sobrepago positivo.
+- [x] Movimiento histórico pending: no cuenta como cobrado.
+- [x] Cotización aprobada de otro evento: no cuenta.
+- [x] Cambiar una cotización de approved a rejected actualiza el cálculo.
+- [x] Cancelar y volver a consultar no deja totales cacheados incorrectos.
 
 ### Criterios de aceptación
 
@@ -417,34 +417,34 @@ Debe devolver al menos:
 
 ### 9.1 Conceptos de gasto
 
-- [ ] Homologar botones de acciones con el patrón visual y accesible de otras tablas.
-- [ ] Revisar desktop y móvil.
+- [x] Homologar botones de acciones con el patrón visual y accesible de otras tablas.
+- [x] Revisar desktop y móvil.
 
 ### 9.2 Matriz manual mínima
 
 Probar con roles administrador, empleado con permisos parciales y cliente:
 
-- [ ] Navegación Catálogos y permisos.
-- [ ] Alta/edición de usuario con teléfono inválido y contraseñas distintas.
-- [ ] Alta de cliente, acceso al portal y recuperación de contraseña.
-- [ ] Alta/edición/búsqueda de evento.
-- [ ] Alta/edición/búsqueda/PDF de cotización.
-- [ ] Restricción de eventos por cliente.
-- [ ] Alta de ingreso y gasto desde evento y desde Movimientos.
-- [ ] Cancelación y actualización inmediata de totales.
-- [ ] Carga y descarga de comprobante.
-- [ ] Contratos con montos formateados.
-- [ ] Carga de documento con cliente/evento precargados.
-- [ ] Profile completamente en español.
+- [x] Navegación Catálogos y permisos.
+- [x] Alta/edición de usuario con teléfono inválido y contraseñas distintas.
+- [x] Alta de cliente, acceso al portal y recuperación de contraseña.
+- [x] Alta/edición/búsqueda de evento.
+- [x] Alta/edición/búsqueda/PDF de cotización.
+- [x] Restricción de eventos por cliente.
+- [x] Alta de ingreso y gasto desde evento y desde Movimientos.
+- [x] Cancelación y actualización inmediata de totales.
+- [x] Carga y descarga de comprobante.
+- [x] Contratos con montos formateados.
+- [x] Carga de documento con cliente/evento precargados.
+- [x] Profile completamente en español.
 
 ### 9.3 Validación automática final
 
-- [ ] `php artisan test`
-- [ ] `vendor/bin/pint --test`
-- [ ] `npm run build`
-- [ ] Revisar `php artisan route:list` para rutas nuevas y permisos.
-- [ ] Revisar migraciones con base de datos de pruebas limpia.
-- [ ] Probar rollback de las migraciones nuevas.
+- [x] `php artisan test`
+- [x] `vendor/bin/pint --test`
+- [x] `npm run build`
+- [x] Revisar `php artisan route:list` para rutas nuevas y permisos.
+- [x] Revisar migraciones con base de datos de pruebas limpia.
+- [x] Probar rollback de las migraciones nuevas.
 
 ### 9.4 Entrega de Codex
 
@@ -464,7 +464,54 @@ Codex debe entregar:
 
 ---
 
-## 10. Trazabilidad de solicitudes
+## 10. Fase 8 — Ajustes finales posteriores al cierre
+
+### 10.1 Recibos y movimientos
+
+- [x] Abrir “Ver recibo” desde el evento en una pestaña nueva con `noopener` y `noreferrer`.
+- [x] Compactar el PDF de recibo para una página carta con información representativa, conservando el bloque de autenticidad.
+- [x] Centralizar etiquetas y estilos en español de estados de movimientos y recibos.
+- [x] Implementar retorno contextual seguro desde recibos a Gastos, Ingresos, Movimientos o Evento.
+- [x] Agregar búsqueda de Movimientos por campos visibles y relaciones relevantes, conservando filtros y paginación.
+- [x] Homologar las acciones de Movimientos mediante dropdown responsive y badges de estado.
+
+### 10.2 Tareas de eventos y Dashboard
+
+- [x] Limitar responsables a usuarios internos activos y validar la asignación en servidor.
+- [x] Permitir editar título, responsable, fecha límite y estado mediante una ruta explícita y protegida.
+- [x] Permitir completar o cancelar tareas desde Evento y Dashboard sin eliminarlas.
+- [x] Centralizar estados, etiquetas y estilos de tareas.
+- [x] Mostrar en Dashboard las tareas pendientes del usuario autenticado, ordenadas por fecha límite, sin N+1 y con estado vacío.
+
+### 10.3 Exportación, calendario y perfil
+
+- [x] Mostrar “Costo del evento” en la exportación financiera usando `FinancialBalanceCalculator` y cotizaciones aprobadas.
+- [x] Usar el nombre del evento como título visible del calendario, conservando horario, colores y enlaces.
+- [x] Agregar “Editar perfil” al dropdown de usuario y navegación móvil, conservando “Cerrar sesión”.
+
+### 10.4 Validación
+
+- [x] Cubrir tareas, Dashboard, movimientos, recibos/PDF, calendario, navegación y exportación financiera con pruebas específicas.
+- [x] Ejecutar `php artisan test`, `vendor/bin/pint --test`, `npm run build`, `git diff --check` y `php artisan route:list`.
+- [x] Confirmar árbol limpio, ausencia de temporales y ausencia de `TODO`, `FIXME`, `dd` o `dump` relacionados.
+- [ ] Dejar documentada como pendiente la comprobación visual manual de que el recibo representativo ocupa una página carta.
+
+### Criterios de aceptación
+
+- Los recibos conservan toda la información, traducen estados desde una fuente común y regresan únicamente a orígenes permitidos.
+- Movimientos se puede buscar y operar de forma responsive sin duplicar lógica de estados ni cálculos.
+- Solo usuarios internos activos pueden recibir tareas; las tareas se editan, completan y cancelan con autorización del servidor.
+- El Dashboard muestra únicamente tareas pendientes asignadas al usuario autenticado y carga sus eventos eficientemente.
+- Exportación, evento y reportes comparten el costo calculado por `FinancialBalanceCalculator`.
+- Calendario y navegación cumplen los ajustes sin romper permisos, enlaces ni presentación móvil.
+
+### Commit sugerido
+
+`feat: incorpora ajustes finales de operación`
+
+---
+
+## 11. Trazabilidad de solicitudes
 
 | ID | Solicitud | Fase |
 |---|---|---|
@@ -503,10 +550,21 @@ Codex debe entregar:
 | R33 | Profile en español | 2 |
 | R34 | Botón Cancelar en nuevo movimiento | 5 |
 | R35 | Costo evento por cotizaciones aprobadas | 3 y 6 |
+| R36 | Recibo en pestaña nueva desde evento | 8 |
+| R37 | PDF de recibo compacto con autenticidad | 8 |
+| R38 | Estados de movimientos y recibos en español | 8 |
+| R39 | Retorno contextual seguro desde recibos | 8 |
+| R40 | Buscador y tabla responsive de Movimientos | 8 |
+| R41 | Responsables internos activos para tareas | 8 |
+| R42 | Edición y transiciones de tareas | 8 |
+| R43 | Tareas asignadas en Dashboard | 8 |
+| R44 | Costo del evento en exportación financiera | 8 |
+| R45 | Nombre del evento como título de calendario | 8 |
+| R46 | Editar perfil en navegación | 8 |
 
 ---
 
-## 11. Despliegue previsto, no ejecutar desde Codex
+## 12. Despliegue previsto, no ejecutar desde Codex
 
 Cuando todas las pruebas pasen y el CTO apruebe el PR:
 

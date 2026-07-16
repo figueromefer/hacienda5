@@ -20,14 +20,17 @@
                 <form
                     action="{{ route('transactions.store') }}"
                     method="POST"
+                    enctype="multipart/form-data"
                     class="space-y-4"
                     x-data='receiptEmailFields(
                         @json(old('type', $selectedType ?? 'income')),
-                        @json(old('status', 'paid')),
                         @json(old('receipt_to', $suggestedRecipients->implode(', '))),
                         @json(old('receipt_cc', '')),
                         @json($clientRecipientMap),
-                        @json($eventRecipientMap)
+                        @json($eventRecipientMap),
+                        @json((string) old('client_id', $selectedEvent?->client_id)),
+                        @json((string) old('event_id', $selectedEvent?->id)),
+                        @json((string) old('quotation_id'))
                     )'
                 >
                     @csrf
@@ -50,8 +53,8 @@
                     </div>
 
                     <div>
-                        <label>Cliente</label>
-                        <select name="client_id" class="w-full border rounded" @change="addSuggestions(clientMap[$event.target.value] || [])">
+                        <label for="client_id">Cliente</label>
+                        <select id="client_id" name="client_id" class="w-full border rounded" x-model="clientId" @change="ensureCoherentSelection(); addSuggestions(clientMap[$event.target.value] || [])">
                             <option value="">Selecciona un cliente</option>
                             @foreach($clients as $client)
                                 <option value="{{ $client->id }}" @selected((string) old('client_id', $selectedEvent?->client_id) === (string) $client->id)>{{ $client->full_name }}</option>
@@ -60,13 +63,25 @@
                     </div>
 
                     <div>
-                        <label>Evento</label>
-                        <select name="event_id" class="w-full border rounded" @change="addSuggestions(eventMap[$event.target.value] || [])">
+                        <label for="event_id">Evento</label>
+                        <select id="event_id" name="event_id" class="w-full border rounded" x-model="eventId" @change="ensureQuotation(); addSuggestions(eventMap[$event.target.value] || [])">
                             <option value="">Sin evento</option>
                             @foreach($events as $event)
-                                <option value="{{ $event->id }}" @selected((string) old('event_id', $selectedEvent?->id) === (string) $event->id)>{{ $event->title }}</option>
+                                <option value="{{ $event->id }}" :disabled="clientId && clientId !== '{{ $event->client_id }}'" x-show="!clientId || clientId === '{{ $event->client_id }}'">{{ $event->title }}</option>
                             @endforeach
                         </select>
+                        @error('event_id')<div class="mt-1 text-sm text-red-600">{{ $message }}</div>@enderror
+                    </div>
+
+                    <div>
+                        <label for="quotation_id">Cotización (opcional)</label>
+                        <select id="quotation_id" name="quotation_id" class="w-full border rounded" x-model="quotationId">
+                            <option value="">Sin cotización</option>
+                            @foreach($quotations as $quotation)
+                                <option value="{{ $quotation->id }}" :disabled="clientId !== '{{ $quotation->client_id }}' || eventId !== '{{ (string) $quotation->event_id }}'" x-show="clientId === '{{ $quotation->client_id }}' && eventId === '{{ (string) $quotation->event_id }}'">{{ $quotation->folio ?: 'Cotización #'.$quotation->id }}</option>
+                            @endforeach
+                        </select>
+                        @error('quotation_id')<div class="mt-1 text-sm text-red-600">{{ $message }}</div>@enderror
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -75,8 +90,9 @@
                             <input type="date" name="transaction_date" class="w-full border rounded" value="{{ old('transaction_date', now()->format('Y-m-d')) }}">
                         </div>
                         <div>
-                            <label>Monto</label>
-                            <input type="number" step="0.01" min="0.01" name="amount" class="w-full border rounded" value="{{ old('amount') }}">
+                            <label for="amount">Monto</label>
+                            <x-money-input id="amount" name="amount" :value="old('amount')" required />
+                            @error('amount')<div class="mt-1 text-sm text-red-600">{{ $message }}</div>@enderror
                         </div>
                     </div>
 
@@ -90,20 +106,9 @@
                                 <option value="other" @selected(old('method') === 'other')>Otro</option>
                             </select>
                         </div>
-                        <div>
-                            <label>Estatus</label>
-                            <select name="status" class="w-full border rounded" x-model="status">
-                                <option value="paid" @selected(old('status', 'paid') === 'paid')>Pagado</option>
-                                <option value="pending" @selected(old('status') === 'pending')>Pendiente</option>
-                                <option value="cancelled" @selected(old('status') === 'cancelled')>Cancelado</option>
-                            </select>
-                        </div>
                     </div>
 
-                    <div>
-                        <label>Categoría</label>
-                        <input type="text" name="category" class="w-full border rounded" value="{{ old('category') }}">
-                    </div>
+                    <div class="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-800">El movimiento se registrará como pagado. Para anularlo después se utilizará la acción Cancelar, conservando su auditoría.</div>
 
                     <div x-cloak x-show="type === 'expense'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -132,7 +137,7 @@
 
                     <section
                         x-cloak
-                        x-show="type === 'income' && status === 'paid'"
+                        x-show="type === 'income'"
                         class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 space-y-4"
                     >
                         <div>
@@ -160,7 +165,17 @@
                         <textarea name="notes" class="w-full border rounded">{{ old('notes') }}</textarea>
                     </div>
 
-                    <button class="w-full md:w-auto px-4 py-3 md:py-2 bg-black text-white rounded">Guardar</button>
+                    <div>
+                        <label for="proof_file">Comprobante (opcional)</label>
+                        <input id="proof_file" name="proof_file" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp" class="mt-1 block w-full rounded border border-gray-300 p-2">
+                        <p class="mt-1 text-xs text-gray-500">PDF, JPG, PNG o WEBP. Máximo 10 MB.</p>
+                        @error('proof_file')<div class="mt-1 text-sm text-red-600">{{ $message }}</div>@enderror
+                    </div>
+
+                    <div class="flex flex-col-reverse gap-2 md:flex-row">
+                        <a x-bind:href="eventId ? @js(url('/events')).concat('/', eventId) : @js(route('transactions.index'))" class="w-full rounded bg-gray-200 px-4 py-3 text-center md:w-auto md:py-2">Cancelar</a>
+                        <button class="w-full md:w-auto px-4 py-3 md:py-2 bg-black text-white rounded">Guardar</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -169,14 +184,29 @@
 
 @push('scripts')
     <script>
-        function receiptEmailFields(type, status, to, cc, clientMap, eventMap) {
+        function receiptEmailFields(type, to, cc, clientMap, eventMap, clientId, eventId, quotationId) {
             return {
                 type,
-                status,
                 to,
                 cc,
                 clientMap,
                 eventMap,
+                clientId,
+                eventId,
+                quotationId,
+                ensureCoherentSelection() {
+                    const option = this.$root.querySelector(`#event_id option[value="${this.eventId}"]`);
+                    if (option?.disabled) {
+                        this.eventId = '';
+                    }
+                    this.ensureQuotation();
+                },
+                ensureQuotation() {
+                    const option = this.$root.querySelector(`#quotation_id option[value="${this.quotationId}"]`);
+                    if (option?.disabled) {
+                        this.quotationId = '';
+                    }
+                },
                 addSuggestions(suggestions) {
                     const current = this.to.split(/[,;\n]+/).map(email => email.trim()).filter(Boolean);
                     const known = new Set(current.map(email => email.toLowerCase()));

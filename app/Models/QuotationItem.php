@@ -18,6 +18,11 @@ class QuotationItem extends Model
         'total',
     ];
 
+    protected $casts = [
+        'unit_price' => 'decimal:2',
+        'total' => 'decimal:2',
+    ];
+
     public function quotation()
     {
         return $this->belongsTo(Quotation::class);

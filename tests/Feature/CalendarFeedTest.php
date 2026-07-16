@@ -81,11 +81,17 @@ class CalendarFeedTest extends TestCase
         $overnightPayload = $events->firstWhere('id', (string) $overnight->id);
 
         $this->assertTrue($allDayPayload['allDay']);
+        $this->assertSame('Evento sin hora', $allDayPayload['title']);
         $this->assertSame('2026-07-14', $allDayPayload['start']);
         $this->assertNull($allDayPayload['end']);
+        $this->assertNull($allDayPayload['extendedProps']['startTime']);
+        $this->assertNull($allDayPayload['extendedProps']['endTime']);
         $this->assertFalse($overnightPayload['allDay']);
+        $this->assertSame('Evento nocturno', $overnightPayload['title']);
         $this->assertSame('2026-07-23T20:17:00', $overnightPayload['start']);
         $this->assertSame('2026-07-24T02:35:00', $overnightPayload['end']);
+        $this->assertSame('20:17:00', $overnightPayload['extendedProps']['startTime']);
+        $this->assertSame('02:35:00', $overnightPayload['extendedProps']['endTime']);
         $this->assertSame('America/Mexico_City', config('app.timezone'));
     }
 
@@ -109,7 +115,7 @@ class CalendarFeedTest extends TestCase
             ->getJson(route('calendar.feed'))
             ->assertOk()
             ->assertJsonFragment([
-                'title' => 'Boda recién apartada · Cliente de prueba · Boda · Apartado',
+                'title' => 'Boda recién apartada',
                 'status' => Event::STATUS_RESERVED,
             ]);
     }
