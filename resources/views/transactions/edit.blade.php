@@ -17,7 +17,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('transactions.update', $transaction) }}" method="POST" class="space-y-4" x-data="{ type: @js(old('type', $transaction->type)) }">
+                <form action="{{ route('transactions.update', $transaction) }}" method="POST" enctype="multipart/form-data" class="space-y-4" x-data="transactionEditForm(@js(old('type', $transaction->type)), @js((string) old('client_id', $transaction->client_id)), @js((string) old('event_id', $transaction->event_id)), @js((string) old('quotation_id', $transaction->quotation_id)))">
                     @csrf
                     @method('PUT')
 
@@ -44,8 +44,8 @@
                     </div>
 
                     <div>
-                        <label>Cliente</label>
-                        <select name="client_id" class="w-full border rounded">
+                        <label for="client_id">Cliente</label>
+                        <select id="client_id" name="client_id" class="w-full border rounded" x-model="clientId" @change="ensureCoherentSelection()">
                             @foreach($clients as $client)
                                 <option value="{{ $client->id }}" @selected((string) old('client_id', $transaction->client_id) === (string) $client->id)>{{ $client->full_name }}</option>
                             @endforeach
@@ -53,13 +53,25 @@
                     </div>
 
                     <div>
-                        <label>Evento</label>
-                        <select name="event_id" class="w-full border rounded">
+                        <label for="event_id">Evento</label>
+                        <select id="event_id" name="event_id" class="w-full border rounded" x-model="eventId" @change="ensureQuotation()">
                             <option value="">Sin evento</option>
                             @foreach($events as $event)
-                                <option value="{{ $event->id }}" @selected((string) old('event_id', $transaction->event_id) === (string) $event->id)>{{ $event->title }}</option>
+                                <option value="{{ $event->id }}" :disabled="clientId && clientId !== '{{ $event->client_id }}'" x-show="!clientId || clientId === '{{ $event->client_id }}'">{{ $event->title }}</option>
                             @endforeach
                         </select>
+                        @error('event_id')<div class="mt-1 text-sm text-red-600">{{ $message }}</div>@enderror
+                    </div>
+
+                    <div>
+                        <label for="quotation_id">Cotización (opcional)</label>
+                        <select id="quotation_id" name="quotation_id" class="w-full border rounded" x-model="quotationId">
+                            <option value="">Sin cotización</option>
+                            @foreach($quotations as $quotation)
+                                <option value="{{ $quotation->id }}" :disabled="clientId !== '{{ $quotation->client_id }}' || eventId !== '{{ (string) $quotation->event_id }}'" x-show="clientId === '{{ $quotation->client_id }}' && eventId === '{{ (string) $quotation->event_id }}'">{{ $quotation->folio ?: 'Cotización #'.$quotation->id }}</option>
+                            @endforeach
+                        </select>
+                        @error('quotation_id')<div class="mt-1 text-sm text-red-600">{{ $message }}</div>@enderror
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -68,8 +80,9 @@
                             <input type="date" name="transaction_date" class="w-full border rounded" value="{{ old('transaction_date', $transaction->transaction_date?->format('Y-m-d')) }}">
                         </div>
                         <div>
-                            <label>Monto</label>
-                            <input type="number" step="0.01" min="0.01" name="amount" class="w-full border rounded" value="{{ old('amount', $transaction->amount) }}">
+                            <label for="amount">Monto</label>
+                            <x-money-input id="amount" name="amount" :value="old('amount', $transaction->amount)" required />
+                            @error('amount')<div class="mt-1 text-sm text-red-600">{{ $message }}</div>@enderror
                         </div>
                     </div>
 
@@ -82,20 +95,9 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div>
-                            <label>Estatus</label>
-                            <select name="status" class="w-full border rounded">
-                                <option value="paid" @selected(old('status', $transaction->status) === 'paid')>Pagado</option>
-                                <option value="pending" @selected(old('status', $transaction->status) === 'pending')>Pendiente</option>
-                                <option value="cancelled" @selected(old('status', $transaction->status) === 'cancelled')>Cancelado</option>
-                            </select>
-                        </div>
                     </div>
 
-                    <div>
-                        <label>Categoría</label>
-                        <input type="text" name="category" class="w-full border rounded" value="{{ old('category', $transaction->category) }}">
-                    </div>
+                    <div class="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700">Estado conservado: <strong>{{ $transaction->status_label }}</strong>. El estado no se modifica desde este formulario.</div>
 
                     <div x-cloak x-show="type === 'expense'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -129,8 +131,18 @@
                         <textarea name="notes" class="w-full border rounded">{{ old('notes', $transaction->notes) }}</textarea>
                     </div>
 
+                    <div>
+                        <label for="proof_file">{{ $transaction->proof_file_path ? 'Reemplazar comprobante' : 'Comprobante (opcional)' }}</label>
+                        <input id="proof_file" name="proof_file" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp" class="mt-1 block w-full rounded border border-gray-300 p-2">
+                        <p class="mt-1 text-xs text-gray-500">PDF, JPG, PNG o WEBP. Máximo 10 MB.</p>
+                        @if($transaction->proof_file_path)
+                            <a href="{{ route('transactions.proof', $transaction) }}" class="mt-2 inline-flex text-sm font-medium text-blue-700 hover:underline">Ver comprobante actual</a>
+                        @endif
+                        @error('proof_file')<div class="mt-1 text-sm text-red-600">{{ $message }}</div>@enderror
+                    </div>
+
                     <div class="flex flex-col-reverse md:flex-row gap-2">
-                        <a href="{{ route('transactions.index') }}" class="w-full md:w-auto px-4 py-3 md:py-2 bg-gray-200 text-center rounded">Cancelar</a>
+                        <a x-bind:href="eventId ? @js(url('/events')).concat('/', eventId) : @js(route('transactions.index'))" class="w-full md:w-auto px-4 py-3 md:py-2 bg-gray-200 text-center rounded">Cancelar</a>
                         <button class="w-full md:w-auto px-4 py-3 md:py-2 bg-black text-white rounded">Guardar cambios</button>
                     </div>
                 </form>
@@ -138,3 +150,29 @@
         </div>
     </div>
 </x-app-layout>
+
+@push('scripts')
+    <script>
+        function transactionEditForm(type, clientId, eventId, quotationId) {
+            return {
+                type,
+                clientId,
+                eventId,
+                quotationId,
+                ensureCoherentSelection() {
+                    const option = this.$root.querySelector(`#event_id option[value="${this.eventId}"]`);
+                    if (option?.disabled) {
+                        this.eventId = '';
+                    }
+                    this.ensureQuotation();
+                },
+                ensureQuotation() {
+                    const option = this.$root.querySelector(`#quotation_id option[value="${this.quotationId}"]`);
+                    if (option?.disabled) {
+                        this.quotationId = '';
+                    }
+                },
+            };
+        }
+    </script>
+@endpush

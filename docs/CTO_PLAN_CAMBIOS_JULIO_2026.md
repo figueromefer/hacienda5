@@ -303,34 +303,34 @@ Archivos esperados: `UserController`, vistas `users/*` y pruebas Feature.
 
 ### 7.1 Pantallas de Ingresos y Gastos
 
-- [ ] Mantener Movimientos como pantalla principal.
-- [ ] Agregar botones visibles a **Ingresos** y **Gastos** dentro de Movimientos.
-- [ ] Crear pantalla de Ingresos equivalente a la existente de Gastos.
-- [ ] Refactorizar consultas/vistas compartidas para no duplicar dos módulos completos.
-- [ ] En ambas pantallas, excluir cancelados de totales. Los cancelados pueden mostrarse si el filtro lo solicita, pero nunca sumarse.
-- [ ] Corregir el total general de Gastos para que no incluya cancelados ni mezcle pendientes históricos indebidamente.
+- [x] Mantener Movimientos como pantalla principal.
+- [x] Agregar botones visibles a **Ingresos** y **Gastos** dentro de Movimientos.
+- [x] Crear pantalla de Ingresos equivalente a la existente de Gastos.
+- [x] Refactorizar consultas/vistas compartidas para no duplicar dos módulos completos.
+- [x] En ambas pantallas, excluir cancelados de totales. Los cancelados pueden mostrarse si el filtro lo solicita, pero nunca sumarse.
+- [x] Corregir el total general de Gastos para que no incluya cancelados ni mezcle pendientes históricos indebidamente.
 
 ### 7.2 Alta y edición
 
-- [ ] Aplicar componente monetario al monto.
-- [ ] Si la URL contiene `type=income`, preseleccionar Ingreso.
-- [ ] Si contiene `type=expense`, preseleccionar Gasto.
-- [ ] Si contiene `event_id`, precargar evento y cliente coherentes.
-- [ ] Agregar botón Cancelar que regrese al evento cuando existe `event_id`; en caso contrario, a Movimientos.
-- [ ] Retirar Categoría de alta, edición y validación. Mantener columna histórica nullable por compatibilidad salvo que una auditoría demuestre que puede eliminarse sin riesgo.
-- [ ] Retirar selector de estado. Los nuevos movimientos se guardan como `paid` en servidor.
-- [ ] No permitir editar directamente un movimiento cancelado, salvo campos explícitamente seguros definidos después de auditoría.
-- [ ] Validar coherencia entre cliente, evento y cotización.
+- [x] Aplicar componente monetario al monto.
+- [x] Si la URL contiene `type=income`, preseleccionar Ingreso.
+- [x] Si contiene `type=expense`, preseleccionar Gasto.
+- [x] Si contiene `event_id`, precargar evento y cliente coherentes.
+- [x] Agregar botón Cancelar que regrese al evento cuando existe `event_id`; en caso contrario, a Movimientos.
+- [x] Retirar Categoría de alta, edición y validación. Mantener columna histórica nullable por compatibilidad salvo que una auditoría demuestre que puede eliminarse sin riesgo.
+- [x] Retirar selector de estado. Los nuevos movimientos se guardan como `paid` en servidor.
+- [x] No permitir editar directamente un movimiento cancelado, salvo campos explícitamente seguros definidos después de auditoría.
+- [x] Validar coherencia entre cliente, evento y cotización.
 
 ### 7.3 Cancelación
 
-- [ ] Agregar ruta `PATCH` y método específico para cancelar.
-- [ ] Solo permitir cancelar movimientos que no estén cancelados.
-- [ ] Hacer la operación idempotente o devolver un mensaje claro si ya estaba cancelado.
-- [ ] Conservar referencia, comprobante, autoría y datos del movimiento.
-- [ ] Registrar `cancelled_at` y `cancelled_by` mediante migración si el esquema no tiene auditoría equivalente.
-- [ ] Excluir cancelados de recibos vigentes, balances, ingresos, gastos, pendiente por cobrar y cuentas por pagar relacionadas.
-- [ ] Revisar efectos automáticos de `SupplierPayable::refreshAutomaticStatus()` al cancelar.
+- [x] Agregar ruta `PATCH` y método específico para cancelar.
+- [x] Solo permitir cancelar movimientos que no estén cancelados.
+- [x] Hacer la operación idempotente o devolver un mensaje claro si ya estaba cancelado.
+- [x] Conservar referencia, comprobante, autoría y datos del movimiento.
+- [x] Registrar `cancelled_at` y `cancelled_by` mediante migración si el esquema no tiene auditoría equivalente.
+- [x] Excluir cancelados de recibos vigentes, balances, ingresos, gastos, pendiente por cobrar y cuentas por pagar relacionadas.
+- [x] Revisar efectos automáticos de `SupplierPayable::refreshAutomaticStatus()` al cancelar.
 
 ### 7.4 Comprobante
 
@@ -343,13 +343,13 @@ Como el requisito es un archivo por movimiento, la implementación recomendada e
 
 Tareas:
 
-- [ ] Aceptar PDF, JPG, JPEG, PNG y WEBP, con límite razonable documentado.
-- [ ] Guardar con nombre generado, nunca con el nombre original como ruta.
-- [ ] Mostrar enlace de descarga/vista en detalle y listados relevantes.
-- [ ] Proteger la descarga con autenticación y permiso `manage payments`; no exponer una ruta arbitraria recibida del usuario.
-- [ ] Al reemplazar comprobante, borrar el archivo anterior después de guardar correctamente el nuevo.
-- [ ] Si ocurre rollback de base de datos, evitar dejar archivos huérfanos.
-- [ ] Al cancelar, conservar el comprobante.
+- [x] Aceptar PDF, JPG, JPEG, PNG y WEBP, con límite razonable documentado.
+- [x] Guardar con nombre generado, nunca con el nombre original como ruta.
+- [x] Mostrar enlace de descarga/vista en detalle y listados relevantes.
+- [x] Proteger la descarga con autenticación y permiso `manage payments`; no exponer una ruta arbitraria recibida del usuario.
+- [x] Al reemplazar comprobante, borrar el archivo anterior después de guardar correctamente el nuevo.
+- [x] Si ocurre rollback de base de datos, evitar dejar archivos huérfanos.
+- [x] Al cancelar, conservar el comprobante.
 
 ### Criterios de aceptación
 

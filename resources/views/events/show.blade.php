@@ -100,9 +100,12 @@
                             <div class="border rounded p-3 flex justify-between items-center gap-4">
                                 <div>
                                     <div class="font-semibold">{{ $transaction->type === 'income' ? 'Ingreso' : 'Gasto' }} - ${{ number_format($transaction->amount, 2) }}</div>
-                                    <div class="text-sm text-gray-600">{{ $transaction->transaction_date->format('d/m/Y') }} · {{ $transaction->category ?? 'Sin categoría' }}</div>
+                                    <div class="text-sm text-gray-600">{{ $transaction->transaction_date->format('d/m/Y') }} · {{ $transaction->notes ?? $transaction->category ?? 'Sin notas' }}</div>
                                 </div>
                                 <div class="flex items-center gap-2">
+                                    @if($transaction->proof_file_path)
+                                        <a href="{{ route('transactions.proof', $transaction) }}" class="rounded bg-emerald-600 px-3 py-2 text-xs font-semibold text-white">Comprobante</a>
+                                    @endif
                                     @if($transaction->status === 'cancelled')
                                         <span class="rounded-full bg-gray-200 px-2 py-1 text-xs font-semibold text-gray-700">Cancelado</span>
                                     @else
@@ -131,11 +134,14 @@
                                         Recibo #{{ $transaction->id }} · {{ $transaction->type_label }} · ${{ number_format($transaction->amount, 2) }}
                                     </div>
                                     <div class="text-sm text-gray-600">
-                                        {{ $transaction->transaction_date?->format('d/m/Y') }} · {{ $transaction->category ?? 'Sin categoría' }} · {{ $transaction->status }}
+                                        {{ $transaction->transaction_date?->format('d/m/Y') }} · {{ $transaction->notes ?? $transaction->category ?? 'Sin notas' }} · {{ $transaction->status_label }}
                                     </div>
                                     <div class="mt-1 text-sm font-medium text-gray-700">Referencia: {{ $transaction->reference ?: '-' }}</div>
                                 </div>
                                 <div class="flex flex-wrap gap-2">
+                                    @if($transaction->proof_file_path)
+                                        <a href="{{ route('transactions.proof', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:9999px;background:#ecfdf5;color:#047857;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">Comprobante</a>
+                                    @endif
                                     <a href="{{ route('transactions.show', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:9999px;background:#eff6ff;color:#1d4ed8;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">Ver recibo</a>
                                     <a href="{{ route('transactions.pdf', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:9999px;background:#243834;color:#ffffff !important;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">PDF</a>
                                     @if($transaction->receipt_token)

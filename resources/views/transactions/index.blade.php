@@ -1,10 +1,12 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Movimientos</h2>
-            <a href="{{ route('transactions.create') }}" class="px-4 py-2 bg-black text-white rounded">
-                Nuevo movimiento
-            </a>
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ route('incomes.index') }}" class="rounded bg-green-700 px-4 py-2 text-white">Ingresos</a>
+                <a href="{{ route('expenses.index') }}" class="rounded bg-red-700 px-4 py-2 text-white">Gastos</a>
+                <a href="{{ route('transactions.create') }}" class="rounded bg-black px-4 py-2 text-white">Nuevo movimiento</a>
+            </div>
         </div>
     </x-slot>
 
@@ -12,6 +14,9 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
             @if(session('success'))
                 <div class="bg-green-50 border border-green-200 text-green-700 rounded p-4">{{ session('success') }}</div>
+            @endif
+            @if(session('warning'))
+                <div class="rounded border border-amber-200 bg-amber-50 p-4 text-amber-800">{{ session('warning') }}</div>
             @endif
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -30,7 +35,7 @@
             </div>
 
             <div class="bg-white shadow rounded p-6">
-                <form method="GET" action="{{ route('transactions.index') }}" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+                <form method="GET" action="{{ route('transactions.index') }}" class="grid grid-cols-1 gap-4 items-end md:grid-cols-2 xl:grid-cols-7">
                     <div>
                         <label class="block mb-1 text-sm">Tipo</label>
                         <select name="type" class="w-full border rounded">
@@ -63,6 +68,15 @@
                     <div>
                         <label class="block mb-1 text-sm">Hasta</label>
                         <input type="date" name="to" class="w-full border rounded" value="{{ request('to') }}">
+                    </div>
+                    <div>
+                        <label class="block mb-1 text-sm">Estado</label>
+                        <select name="status" class="w-full border rounded">
+                            <option value="">Todos</option>
+                            <option value="paid" @selected(request('status') === 'paid')>Pagado</option>
+                            <option value="pending" @selected(request('status') === 'pending')>Pendiente histórico</option>
+                            <option value="cancelled" @selected(request('status') === 'cancelled')>Cancelado</option>
+                        </select>
                     </div>
                     <div class="flex gap-2">
                         <button class="px-4 py-2 bg-black text-white rounded">Filtrar</button>
@@ -99,7 +113,7 @@
                                     </span>
                                 </td>
                                 <td data-label="Alcance" class="py-2 whitespace-nowrap">{{ $transaction->scope_label }}</td>
-                                <td data-label="Cliente" class="py-2">{{ $transaction->client->full_name }}</td>
+                                <td data-label="Cliente" class="py-2">{{ $transaction->client?->full_name ?? 'Sin cliente' }}</td>
                                 <td data-label="Evento" class="py-2">{{ $transaction->event?->title ?? '-' }}</td>
                                 <td data-label="Categoría" class="py-2">{{ $transaction->category ?? '-' }}</td>
                                 <td data-label="Proveedor / concepto" class="py-2">
@@ -112,7 +126,7 @@
                                 <td data-label="Monto" class="py-2 text-right whitespace-nowrap {{ $transaction->type === 'income' ? 'text-green-700' : 'text-red-700' }}">
                                     {{ $transaction->type === 'expense' ? '-' : '' }}${{ number_format($transaction->amount, 2) }}
                                 </td>
-                                <td data-label="Estatus" class="py-2 whitespace-nowrap">{{ $transaction->status }}</td>
+                                <td data-label="Estatus" class="py-2 whitespace-nowrap">{{ $transaction->status_label }}</td>
                                 <td data-label="Acciones" class="py-2">
                                     <div class="flex flex-wrap gap-2">
                                         <a href="{{ route('transactions.show', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:9999px;background:#eff6ff;color:#1d4ed8;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">
@@ -126,14 +140,16 @@
                                                 Validar
                                             </a>
                                         @endif
-                                        <a href="{{ route('transactions.edit', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:9999px;background:#fffbeb;color:#b45309;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">
-                                            Editar
-                                        </a>
-                                        <form action="{{ route('transactions.destroy', $transaction) }}" method="POST" onsubmit="return confirm('¿Eliminar este movimiento?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" style="display:inline-flex;align-items:center;border-radius:9999px;background:#fef2f2;color:#b91c1c;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;border:none;">Eliminar</button>
-                                        </form>
+                                        @if($transaction->proof_file_path)
+                                            <a href="{{ route('transactions.proof', $transaction) }}" class="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700">Comprobante</a>
+                                        @endif
+                                        @if($transaction->status !== \App\Models\Transaction::STATUS_CANCELLED)
+                                            <a href="{{ route('transactions.edit', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:9999px;background:#fffbeb;color:#b45309;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">Editar</a>
+                                            <form action="{{ route('transactions.cancel', $transaction) }}" method="POST" onsubmit="return confirm('¿Cancelar este movimiento? Se conservará para auditoría y dejará de afectar las cifras.')">
+                                                @csrf @method('PATCH')
+                                                <button type="submit" style="display:inline-flex;align-items:center;border-radius:9999px;background:#fef2f2;color:#b91c1c;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;border:none;">Cancelar</button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

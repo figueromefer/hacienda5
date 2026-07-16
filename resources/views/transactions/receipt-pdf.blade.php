@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <style>
-        body{font-family:DejaVu Sans, sans-serif;margin:0;color:#222;background:#fff}.header{background:#243834;padding:22px 34px;color:#fff;height:110px}.logo{width:120px;float:left}.brand{float:left;margin-left:20px;margin-top:35px;letter-spacing:5px;font-size:18px}.brand small{display:block;letter-spacing:8px;font-size:12px;margin-top:4px}.wrap{padding:42px 58px}.date{text-align:left;margin-bottom:42px;font-size:15px;text-transform:uppercase}.title{text-align:center;font-size:22px;font-weight:bold;margin-bottom:36px;letter-spacing:.5px}.text{font-size:17px;line-height:1.85;text-align:justify}.signature{margin-top:90px;text-align:center;font-weight:bold}.line{width:320px;border-top:1px solid #222;margin:0 auto 10px}.policy{margin-top:65px;font-size:12px;line-height:1.6;text-align:justify;font-weight:bold}.meta{margin-top:24px;font-size:12px;color:#555}.notes{margin-top:25px;font-size:13px;line-height:1.5}.clear{clear:both}.verification{margin-top:34px;border:1px solid #ddd;border-radius:10px;padding:14px;background:#fafafa}.qr{width:92px;float:left;margin-right:16px}.verify-title{font-size:12px;font-weight:bold;color:#243834;text-transform:uppercase}.verify-url{font-size:10px;color:#555;word-break:break-all;margin-top:6px}.verify-copy{font-size:11px;color:#555;line-height:1.4;margin-top:5px}
+        body{font-family:DejaVu Sans, sans-serif;margin:0;color:#222;background:#fff}.header{background:#243834;padding:22px 34px;color:#fff;height:110px}.logo{width:120px;float:left}.brand{float:left;margin-left:20px;margin-top:35px;letter-spacing:5px;font-size:18px}.brand small{display:block;letter-spacing:8px;font-size:12px;margin-top:4px}.wrap{padding:42px 58px}.cancelled{margin-bottom:28px;border:2px solid #991b1b;background:#fef2f2;color:#991b1b;padding:14px;text-align:center;font-size:16px;font-weight:bold}.date{text-align:left;margin-bottom:42px;font-size:15px;text-transform:uppercase}.title{text-align:center;font-size:22px;font-weight:bold;margin-bottom:36px;letter-spacing:.5px}.text{font-size:17px;line-height:1.85;text-align:justify}.signature{margin-top:90px;text-align:center;font-weight:bold}.line{width:320px;border-top:1px solid #222;margin:0 auto 10px}.policy{margin-top:65px;font-size:12px;line-height:1.6;text-align:justify;font-weight:bold}.meta{margin-top:24px;font-size:12px;color:#555}.notes{margin-top:25px;font-size:13px;line-height:1.5}.clear{clear:both}.verification{margin-top:34px;border:1px solid #ddd;border-radius:10px;padding:14px;background:#fafafa}.qr{width:92px;float:left;margin-right:16px}.verify-title{font-size:12px;font-weight:bold;color:#243834;text-transform:uppercase}.verify-url{font-size:10px;color:#555;word-break:break-all;margin-top:6px}.verify-copy{font-size:11px;color:#555;line-height:1.4;margin-top:5px}
     </style>
 </head>
 <body>
@@ -25,6 +25,9 @@
     </div>
 
     <div class="wrap">
+        @if($transaction->status === \App\Models\Transaction::STATUS_CANCELLED)
+            <div class="cancelled">DOCUMENTO CANCELADO — NO ES UN RECIBO VIGENTE</div>
+        @endif
         <div class="date">{{ $transaction->transaction_date?->locale('es')->translatedFormat('d-F-Y') }}</div>
         <div class="title">{{ $receiptTitle }}</div>
 

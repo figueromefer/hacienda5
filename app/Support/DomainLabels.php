@@ -28,6 +28,12 @@ class DomainLabels
         'cancelled' => 'bg-gray-200 text-gray-800',
     ];
 
+    public const TRANSACTION_STATUSES = [
+        'pending' => 'Pendiente histórico',
+        'paid' => 'Pagado',
+        'cancelled' => 'Cancelado',
+    ];
+
     public static function quotationStatus(?string $status): string
     {
         return self::QUOTATION_STATUSES[$status] ?? (string) $status;
@@ -41,6 +47,11 @@ class DomainLabels
     public static function eventStatusClasses(?string $status): string
     {
         return self::EVENT_STATUS_CLASSES[$status] ?? 'bg-gray-100 text-gray-800';
+    }
+
+    public static function transactionStatus(?string $status): string
+    {
+        return self::TRANSACTION_STATUSES[$status] ?? (string) $status;
     }
 
     public static function role(?string $role): string

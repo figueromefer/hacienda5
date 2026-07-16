@@ -119,11 +119,20 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('permission:manage payments')
         ->name('expenses.index');
 
+    Route::get('/incomes', [TransactionController::class, 'incomes'])
+        ->middleware('permission:manage payments')
+        ->name('incomes.index');
+
+    Route::get('/transactions/{transaction}/proof', [TransactionController::class, 'downloadProof'])
+        ->middleware('permission:manage payments')
+        ->name('transactions.proof');
+
     Route::patch('/transactions/{transaction}/cancel', [TransactionController::class, 'cancel'])
         ->middleware('permission:manage payments')
         ->name('transactions.cancel');
 
     Route::resource('transactions', TransactionController::class)
+        ->except(['destroy'])
         ->middleware('permission:manage payments');
 
     Route::resource('documents', DocumentController::class)
