@@ -21,7 +21,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div><strong>Cliente:</strong> {{ $quotation->client->full_name }}</div>
                     <div><strong>Evento:</strong> {{ $quotation->event?->title ?? 'Sin evento' }}</div>
-                    <div><strong>Estatus:</strong> {{ $quotation->status }}</div>
+                    <div><strong>Estatus:</strong> {{ $quotation->status_label }}</div>
                     <div><strong>Válida hasta:</strong> {{ $quotation->valid_until?->format('d/m/Y') ?? '-' }}</div>
                 </div>
 
@@ -48,8 +48,8 @@
                             <tr class="border-b">
                                 <td data-label="Descripción" class="py-2">{{ $item->description }}</td>
                                 <td data-label="Cantidad" class="py-2">{{ $item->quantity }}</td>
-                                <td data-label="Precio unitario" class="py-2">${{ number_format($item->unit_price, 2) }}</td>
-                                <td data-label="Total" class="py-2">${{ number_format($item->total, 2) }}</td>
+                                <td data-label="Precio unitario" class="py-2">$ {{ number_format($item->unit_price, 2) }}</td>
+                                <td data-label="Total" class="py-2">$ {{ number_format($item->total, 2) }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -58,15 +58,15 @@
                 <div class="mt-6 max-w-sm ml-auto space-y-2">
                     <div class="flex justify-between">
                         <span>Subtotal</span>
-                        <span>${{ number_format($quotation->subtotal, 2) }}</span>
+                        <span>$ {{ number_format($quotation->subtotal, 2) }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span>Descuento</span>
-                        <span>${{ number_format($quotation->discount, 2) }}</span>
+                        <span>$ {{ number_format($quotation->discount, 2) }}</span>
                     </div>
                     <div class="flex justify-between text-lg font-bold border-t pt-2">
                         <span>Total</span>
-                        <span>${{ number_format($quotation->total, 2) }}</span>
+                        <span>$ {{ number_format($quotation->total, 2) }}</span>
                     </div>
                 </div>
             </div>

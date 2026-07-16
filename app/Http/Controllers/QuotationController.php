@@ -6,18 +6,41 @@ use App\Models\Client;
 use App\Models\Event;
 use App\Models\Quotation;
 use App\Models\Service;
+use App\Support\DomainLabels;
+use App\Support\MoneyNormalizer;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class QuotationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $quotations = Quotation::with(['client', 'event'])
+        $search = trim((string) $request->query('search'));
+        $matchingStatuses = collect(DomainLabels::QUOTATION_STATUSES)
+            ->filter(fn (string $label, string $status) => str_contains(Str::lower($label), Str::lower($search))
+                || str_contains(Str::lower($status), Str::lower($search)))
+            ->keys();
+
+        $quotations = Quotation::query()
+            ->with(['client', 'event'])
+            ->when($request->filled('event_id'), fn ($query) => $query->where('event_id', $request->integer('event_id')))
+            ->when($search !== '', function ($query) use ($matchingStatuses, $search) {
+                $query->where(function ($query) use ($matchingStatuses, $search) {
+                    $query->where('folio', 'like', "%{$search}%")
+                        ->orWhereHas('client', fn ($client) => $client->where('full_name', 'like', "%{$search}%"))
+                        ->orWhereHas('event', fn ($event) => $event->where('title', 'like', "%{$search}%"));
+
+                    if ($matchingStatuses->isNotEmpty()) {
+                        $query->orWhereIn('status', $matchingStatuses);
+                    }
+                });
+            })
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
         return view('quotations.index', compact('quotations'));
     }
@@ -26,16 +49,24 @@ class QuotationController extends Controller
     {
         return view('quotations.create', [
             'clients' => Client::orderBy('full_name')->get(),
-            'events' => Event::orderBy('event_date')->get(),
+            'events' => $this->quotationEvents(),
             'services' => Service::where('is_active', true)->orderBy('name')->get(),
         ]);
     }
 
     public function store(Request $request)
     {
+        $request->merge(MoneyNormalizer::normalizeArray($request->all(), [
+            'discount',
+            'items.*.unit_price',
+        ]));
+
         $data = $request->validate([
             'client_id' => ['required', 'exists:clients,id'],
-            'event_id' => ['nullable', 'exists:events,id'],
+            'event_id' => [
+                'nullable',
+                Rule::exists('events', 'id')->where(fn ($query) => $query->where('client_id', $request->input('client_id'))),
+            ],
             'status' => ['required', 'in:draft,sent,approved,rejected,expired'],
             'valid_until' => ['nullable', 'date'],
             'discount' => ['nullable', 'numeric', 'min:0'],
@@ -48,17 +79,12 @@ class QuotationController extends Controller
         ]);
 
         DB::transaction(function () use ($data) {
-            $subtotal = collect($data['items'])->sum(function ($item) {
-                return $item['quantity'] * $item['unit_price'];
-            });
-
-            $discount = $data['discount'] ?? 0;
-            $total = max($subtotal - $discount, 0);
+            [$items, $subtotal, $discount, $total] = $this->calculateTotals($data);
 
             $quotation = Quotation::create([
                 'client_id' => $data['client_id'],
                 'event_id' => $data['event_id'] ?? null,
-                'folio' => 'COT-'.now()->format('YmdHis'),
+                'folio' => null,
                 'status' => $data['status'],
                 'subtotal' => $subtotal,
                 'discount' => $discount,
@@ -67,14 +93,12 @@ class QuotationController extends Controller
                 'notes' => $data['notes'] ?? null,
             ]);
 
-            foreach ($data['items'] as $item) {
-                $quotation->items()->create([
-                    'service_id' => $item['service_id'] ?? null,
-                    'description' => $item['description'],
-                    'quantity' => $item['quantity'],
-                    'unit_price' => $item['unit_price'],
-                    'total' => $item['quantity'] * $item['unit_price'],
-                ]);
+            $quotation->update([
+                'folio' => 'C-'.str_pad((string) $quotation->id, 6, '0', STR_PAD_LEFT),
+            ]);
+
+            foreach ($items as $item) {
+                $quotation->items()->create($item);
             }
         });
 
@@ -92,7 +116,8 @@ class QuotationController extends Controller
     {
         $quotation->load(['client', 'event', 'items.service']);
 
-        $pdf = Pdf::loadView('quotations.pdf', compact('quotation'))
+        $logoPath = public_path('images/hacienda-cinco-logo.png');
+        $pdf = Pdf::loadView('quotations.pdf', compact('quotation', 'logoPath'))
             ->setPaper('letter');
 
         $reference = Str::slug($quotation->folio ?: (string) $quotation->id);
@@ -107,16 +132,24 @@ class QuotationController extends Controller
         return view('quotations.edit', [
             'quotation' => $quotation,
             'clients' => Client::orderBy('full_name')->get(),
-            'events' => Event::orderBy('event_date')->get(),
+            'events' => $this->quotationEvents(),
             'services' => Service::where('is_active', true)->orderBy('name')->get(),
         ]);
     }
 
     public function update(Request $request, Quotation $quotation)
     {
+        $request->merge(MoneyNormalizer::normalizeArray($request->all(), [
+            'discount',
+            'items.*.unit_price',
+        ]));
+
         $data = $request->validate([
             'client_id' => ['required', 'exists:clients,id'],
-            'event_id' => ['nullable', 'exists:events,id'],
+            'event_id' => [
+                'nullable',
+                Rule::exists('events', 'id')->where(fn ($query) => $query->where('client_id', $request->input('client_id'))),
+            ],
             'status' => ['required', 'in:draft,sent,approved,rejected,expired'],
             'valid_until' => ['nullable', 'date'],
             'discount' => ['nullable', 'numeric', 'min:0'],
@@ -129,12 +162,7 @@ class QuotationController extends Controller
         ]);
 
         DB::transaction(function () use ($data, $quotation) {
-            $subtotal = collect($data['items'])->sum(function ($item) {
-                return $item['quantity'] * $item['unit_price'];
-            });
-
-            $discount = $data['discount'] ?? 0;
-            $total = max($subtotal - $discount, 0);
+            [$items, $subtotal, $discount, $total] = $this->calculateTotals($data);
 
             $quotation->update([
                 'client_id' => $data['client_id'],
@@ -149,14 +177,8 @@ class QuotationController extends Controller
 
             $quotation->items()->delete();
 
-            foreach ($data['items'] as $item) {
-                $quotation->items()->create([
-                    'service_id' => $item['service_id'] ?? null,
-                    'description' => $item['description'],
-                    'quantity' => $item['quantity'],
-                    'unit_price' => $item['unit_price'],
-                    'total' => $item['quantity'] * $item['unit_price'],
-                ]);
+            foreach ($items as $item) {
+                $quotation->items()->create($item);
             }
         });
 
@@ -168,5 +190,38 @@ class QuotationController extends Controller
         $quotation->delete();
 
         return redirect()->route('quotations.index')->with('success', 'Cotización eliminada correctamente.');
+    }
+
+    private function quotationEvents()
+    {
+        return Event::query()
+            ->select(['id', 'client_id', 'title', 'event_date', 'event_type', 'guest_count', 'status', 'budget_estimate'])
+            ->orderBy('event_date')
+            ->get();
+    }
+
+    private function calculateTotals(array $data): array
+    {
+        $subtotal = '0.00';
+        $items = [];
+
+        foreach ($data['items'] as $item) {
+            $itemTotal = bcmul((string) $item['quantity'], (string) $item['unit_price'], 2);
+            $subtotal = bcadd($subtotal, $itemTotal, 2);
+            $items[] = [
+                'service_id' => $item['service_id'] ?? null,
+                'description' => $item['description'],
+                'quantity' => $item['quantity'],
+                'unit_price' => $item['unit_price'],
+                'total' => $itemTotal,
+            ];
+        }
+
+        $discount = bcadd('0.00', (string) ($data['discount'] ?? 0), 2);
+        $total = bccomp($subtotal, $discount, 2) === 1
+            ? bcsub($subtotal, $discount, 2)
+            : '0.00';
+
+        return [$items, $subtotal, $discount, $total];
     }
 }

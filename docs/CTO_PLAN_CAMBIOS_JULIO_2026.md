@@ -256,36 +256,36 @@ Archivos esperados: `UserController`, vistas `users/*` y pruebas Feature.
 
 ### 6.1 Listado
 
-- [ ] Agregar búsqueda por folio, cliente, evento y estado/etiqueta cuando sea viable.
-- [ ] Agregar filtro `event_id` para el acceso rápido desde el evento.
-- [ ] Mostrar estados en español.
-- [ ] Mantener paginación con parámetros.
+- [x] Agregar búsqueda por folio, cliente, evento y estado/etiqueta cuando sea viable.
+- [x] Agregar filtro `event_id` para el acceso rápido desde el evento.
+- [x] Mostrar estados en español.
+- [x] Mantener paginación con parámetros.
 
 ### 6.2 Alta y edición
 
-- [ ] Al seleccionar cliente, el selector de evento debe contener únicamente “Sin evento” y eventos de ese cliente.
-- [ ] En edición, conservar selección válida y limpiar un evento si se cambia a otro cliente al que no pertenece.
-- [ ] Validar en servidor que el evento pertenece al cliente en `store` y `update`.
-- [ ] Mover Descuento después de Items.
-- [ ] Aplicar formato monetario a precio unitario, total por item, subtotal, descuento y total.
-- [ ] Los totales visuales deben actualizarse al cambiar cantidad, precio o descuento, pero el servidor recalcula todo.
-- [ ] Antes de Items agregar un recuadro informativo del evento seleccionado: nombre/título, fecha, tipo, número de invitados, estado y presupuesto estimado. Si se elige “Sin evento”, mostrar un estado vacío claro.
-- [ ] No cargar todos los eventos sin filtrar en el DOM si puede evitarse; puede usarse un mapa JSON pequeño o endpoint protegido.
+- [x] Al seleccionar cliente, el selector de evento debe contener únicamente “Sin evento” y eventos de ese cliente.
+- [x] En edición, conservar selección válida y limpiar un evento si se cambia a otro cliente al que no pertenece.
+- [x] Validar en servidor que el evento pertenece al cliente en `store` y `update`.
+- [x] Mover Descuento después de Items.
+- [x] Aplicar formato monetario a precio unitario, total por item, subtotal, descuento y total.
+- [x] Los totales visuales deben actualizarse al cambiar cantidad, precio o descuento, pero el servidor recalcula todo.
+- [x] Antes de Items agregar un recuadro informativo del evento seleccionado: nombre/título, fecha, tipo, número de invitados, estado y presupuesto estimado. Si se elige “Sin evento”, mostrar un estado vacío claro.
+- [x] No cargar todos los eventos sin filtrar en el DOM si puede evitarse; puede usarse un mapa JSON pequeño o endpoint protegido.
 
 ### 6.3 Folio
 
-- [ ] Para nuevas cotizaciones usar formato corto y seguro basado en ID, recomendado: `C-000123`.
-- [ ] Generarlo después de crear el registro dentro de la misma transacción para evitar colisiones.
-- [ ] Conservar folios históricos sin migración destructiva.
-- [ ] Agregar índice único si no existe y si los datos actuales lo permiten; si existen duplicados, emitir `BLOQUEO CTO`.
+- [x] Para nuevas cotizaciones usar formato corto y seguro basado en ID, recomendado: `C-000123`.
+- [x] Generarlo después de crear el registro dentro de la misma transacción para evitar colisiones.
+- [x] Conservar folios históricos sin migración destructiva.
+- [x] Agregar índice único si no existe y si los datos actuales lo permiten; si existen duplicados, emitir `BLOQUEO CTO`.
 
 ### 6.4 PDF premium
 
-- [ ] Incorporar logotipo oficial de Hacienda Cinco con una ruta compatible con DomPDF.
-- [ ] Rediseñar encabezado, jerarquía tipográfica, datos de cliente/evento, tabla de conceptos y bloque de totales para una apariencia premium y sobria.
-- [ ] Mantener tamaño carta y evitar cortes de tabla o totales entre páginas.
-- [ ] Probar con 1 item, muchos items, descuento cero y descuento positivo.
-- [ ] No enlazar imágenes remotas en el PDF.
+- [x] Incorporar logotipo oficial de Hacienda Cinco con una ruta compatible con DomPDF.
+- [x] Rediseñar encabezado, jerarquía tipográfica, datos de cliente/evento, tabla de conceptos y bloque de totales para una apariencia premium y sobria.
+- [x] Mantener tamaño carta y evitar cortes de tabla o totales entre páginas.
+- [x] Probar con 1 item, muchos items, descuento cero y descuento positivo.
+- [x] No enlazar imágenes remotas en el PDF.
 
 ### Criterios de aceptación
 
