@@ -382,25 +382,25 @@ Debe devolver al menos:
 
 ### 8.2 Consultas
 
-- [ ] Usar relaciones cargadas o consultas agregadas eficientes.
-- [ ] Evitar que distintas pantallas calculen el mismo concepto de forma distinta.
-- [ ] Revisar Dashboard, evento, cliente, exportaciones XLSX, recibos, portal de cliente y cualquier reporte que use `total_amount` o estados.
-- [ ] Decidir si `events.total_amount` queda deprecado temporalmente o puede retirarse en una migración posterior. No eliminar hasta demostrar que no tiene consumidores.
+- [x] Usar relaciones cargadas o consultas agregadas eficientes.
+- [x] Evitar que distintas pantallas calculen el mismo concepto de forma distinta.
+- [x] Revisar Dashboard, evento, cliente, exportaciones XLSX, recibos, portal de cliente y cualquier reporte que use `total_amount` o estados.
+- [x] Decidir si `events.total_amount` queda deprecado temporalmente o puede retirarse en una migración posterior. No eliminar hasta demostrar que no tiene consumidores.
 
 ### 8.3 Pruebas financieras obligatorias
 
-- [ ] Evento sin cotizaciones: costo 0, pendiente 0.
-- [ ] Una cotización aprobada: costo igual a su total.
-- [ ] Varias aprobadas: suma correcta.
-- [ ] Cotizaciones no aprobadas: no cuentan.
-- [ ] Ingreso pagado: reduce pendiente.
-- [ ] Ingreso cancelado: no reduce pendiente.
-- [ ] Gasto pagado: no reduce pendiente por cobrar.
-- [ ] Sobrepago: pendiente 0 y sobrepago positivo.
-- [ ] Movimiento histórico pending: no cuenta como cobrado.
-- [ ] Cotización aprobada de otro evento: no cuenta.
-- [ ] Cambiar una cotización de approved a rejected actualiza el cálculo.
-- [ ] Cancelar y volver a consultar no deja totales cacheados incorrectos.
+- [x] Evento sin cotizaciones: costo 0, pendiente 0.
+- [x] Una cotización aprobada: costo igual a su total.
+- [x] Varias aprobadas: suma correcta.
+- [x] Cotizaciones no aprobadas: no cuentan.
+- [x] Ingreso pagado: reduce pendiente.
+- [x] Ingreso cancelado: no reduce pendiente.
+- [x] Gasto pagado: no reduce pendiente por cobrar.
+- [x] Sobrepago: pendiente 0 y sobrepago positivo.
+- [x] Movimiento histórico pending: no cuenta como cobrado.
+- [x] Cotización aprobada de otro evento: no cuenta.
+- [x] Cambiar una cotización de approved a rejected actualiza el cálculo.
+- [x] Cancelar y volver a consultar no deja totales cacheados incorrectos.
 
 ### Criterios de aceptación
 

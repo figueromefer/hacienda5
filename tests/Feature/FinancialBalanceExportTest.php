@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Client;
 use App\Models\Event;
 use App\Models\ExpenseConcept;
+use App\Models\Quotation;
 use App\Models\Supplier;
 use App\Models\Transaction;
 use App\Models\User;
@@ -39,6 +40,8 @@ class FinancialBalanceExportTest extends TestCase
         $user = $this->authorizedUser('manage events');
         $client = $this->client('Diego Chávez');
         $event = $this->event($client, ['total_amount' => 10000]);
+        $this->quotation($client, $event, 'approved', 10000);
+        $this->quotation($client, $event, 'draft', 50000);
 
         $this->transaction($client, $event, 'income', 'paid', 3000, 'ING-2026-000001', '2026-07-01');
         $this->transaction($client, $event, 'income', 'paid', 2000, 'ING-2026-000002', '2026-07-05');
@@ -57,9 +60,9 @@ class FinancialBalanceExportTest extends TestCase
         $summary = $spreadsheet->getSheetByName('Resumen');
         $this->assertSame(10000.0, (float) $summary->getCell('B11')->getCalculatedValue());
         $this->assertSame(5000.0, (float) $summary->getCell('B12')->getCalculatedValue());
-        $this->assertSame(1000.0, (float) $summary->getCell('B13')->getCalculatedValue());
+        $this->assertSame(5000.0, (float) $summary->getCell('B13')->getCalculatedValue());
         $this->assertSame(500.0, (float) $summary->getCell('B14')->getCalculatedValue());
-        $this->assertSame(5000.0, (float) $summary->getCell('B15')->getCalculatedValue());
+        $this->assertSame(0.0, (float) $summary->getCell('B15')->getCalculatedValue());
         $this->assertSame(4500.0, (float) $summary->getCell('B16')->getCalculatedValue());
         $this->assertSame('dd/mm/yyyy', $summary->getStyle('B7')->getNumberFormat()->getFormatCode());
 
@@ -82,6 +85,9 @@ class FinancialBalanceExportTest extends TestCase
         $firstEvent = $this->event($client, ['title' => 'Boda Diego', 'total_amount' => 12000]);
         $secondEvent = $this->event($client, ['title' => 'Cena Diego', 'total_amount' => 8000]);
         $otherEvent = $this->event($otherClient, ['title' => 'Evento secreto', 'total_amount' => 99999]);
+        $this->quotation($client, $firstEvent, 'approved', 12000);
+        $this->quotation($client, $secondEvent, 'approved', 8000);
+        $this->quotation($otherClient, $otherEvent, 'approved', 99999);
 
         $this->transaction($client, $firstEvent, 'income', 'paid', 4000, 'ING-2026-000010', '2026-07-01');
         $this->transaction($client, $secondEvent, 'income', 'paid', 3000, 'ING-2026-000011', '2026-07-02');
@@ -112,7 +118,8 @@ class FinancialBalanceExportTest extends TestCase
         $this->assertSame('Cena Diego', $summary->getCell('A7')->getValue());
         $this->assertSame(20000.0, (float) $summary->getCell('D8')->getCalculatedValue());
         $this->assertSame(7000.0, (float) $summary->getCell('E8')->getCalculatedValue());
-        $this->assertSame(13000.0, (float) $summary->getCell('H8')->getCalculatedValue());
+        $this->assertSame(13000.0, (float) $summary->getCell('F8')->getCalculatedValue());
+        $this->assertSame(0.0, (float) $summary->getCell('H8')->getCalculatedValue());
         $this->assertSame(7000.0, (float) $summary->getCell('I8')->getCalculatedValue());
 
         $movements = $spreadsheet->getSheetByName('Movimientos');
@@ -362,6 +369,19 @@ class FinancialBalanceExportTest extends TestCase
             'category' => $category,
             'reference' => $reference,
             'status' => $status,
+        ]);
+    }
+
+    private function quotation(Client $client, Event $event, string $status, float $total): Quotation
+    {
+        return Quotation::create([
+            'client_id' => $client->id,
+            'event_id' => $event->id,
+            'folio' => 'COT-'.fake()->unique()->numerify('######'),
+            'status' => $status,
+            'subtotal' => $total,
+            'discount' => 0,
+            'total' => $total,
         ]);
     }
 

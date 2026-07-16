@@ -16,7 +16,7 @@ class FinancialBalanceCalculator
             ->sortBy(fn (Transaction $transaction) => $transaction->transaction_date->format('Y-m-d').str_pad((string) $transaction->id, 12, '0', STR_PAD_LEFT))
             ->values();
 
-        $paid = $transactions->where('status', 'paid');
+        $paid = $transactions->where('status', Transaction::STATUS_PAID);
         $approvedQuotationTotal = $this->sum($event->quotations->where('status', 'approved')->pluck('total'));
         $paidIncome = $this->sum($paid->where('type', Transaction::TYPE_INCOME)->pluck('amount'));
         $paidExpenses = $this->sum($paid->where('type', Transaction::TYPE_EXPENSE)->pluck('amount'));
@@ -46,12 +46,40 @@ class FinancialBalanceCalculator
         ];
     }
 
+    public function forEvents(Collection $events): Collection
+    {
+        return $events->mapWithKeys(
+            fn (Event $event): array => [$event->getKey() => $this->forEvent($event)],
+        );
+    }
+
+    public function totalsForEvents(Collection $events): array
+    {
+        $keys = [
+            'approved_quotation_total',
+            'paid_income',
+            'paid_expenses',
+            'pending_receivable',
+            'overpayment',
+            'cash_balance',
+        ];
+        $totals = array_fill_keys($keys, '0.00');
+
+        foreach ($this->forEvents($events) as $balance) {
+            foreach ($keys as $key) {
+                $totals[$key] = bcadd($totals[$key], $balance[$key], 2);
+            }
+        }
+
+        return $totals;
+    }
+
     public function withRunningBalance(Collection $transactions): Collection
     {
         $runningBalance = '0.00';
 
         return $transactions->map(function (Transaction $transaction) use (&$runningBalance): array {
-            if ($transaction->status === 'paid') {
+            if ($transaction->status === Transaction::STATUS_PAID) {
                 $runningBalance = $transaction->type === Transaction::TYPE_EXPENSE
                     ? bcsub($runningBalance, (string) $transaction->amount, 2)
                     : bcadd($runningBalance, (string) $transaction->amount, 2);

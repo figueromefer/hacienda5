@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\User;
+use App\Services\FinancialBalanceCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -63,18 +64,21 @@ class ClientController extends Controller
         return redirect()->route('clients.index')->with('success', 'Cliente creado correctamente.');
     }
 
-    public function show(Client $client)
+    public function show(Client $client, FinancialBalanceCalculator $balanceCalculator)
     {
         $client->load([
             'user',
-            'events',
+            'events.quotations:id,event_id,status,total',
+            'events.transactions:id,event_id,type,status,amount,transaction_date',
             'quotations',
             'payments',
             'documents',
             'transactions.event',
         ]);
 
-        return view('clients.show', compact('client'));
+        $eventBalances = $balanceCalculator->forEvents($client->events);
+
+        return view('clients.show', compact('client', 'eventBalances'));
     }
 
     public function edit(Client $client)

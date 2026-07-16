@@ -36,8 +36,8 @@ class FinancialBalanceWorkbook
         $movements = $spreadsheet->createSheet()->setTitle('Movimientos');
         $balance = $this->calculator->forEvent($event);
 
-        $movementRange = $this->writeMovements($movements, $balance['transactions'], false);
-        $this->writeEventSummary($summary, $event, $movementRange, 'Movimientos');
+        $this->writeMovements($movements, $balance['transactions'], false);
+        $this->writeEventSummary($summary, $event, $balance);
         $spreadsheet->setActiveSheetIndex(0);
 
         return $spreadsheet;
@@ -53,8 +53,8 @@ class FinancialBalanceWorkbook
         foreach ($events as $event) {
             $sheet = $spreadsheet->createSheet()->setTitle('Evento '.$event->id);
             $balance = $this->calculator->forEvent($event);
-            $movementRange = $this->writeEventMovementsBlock($sheet, $balance['transactions']);
-            $this->writeEventSummary($sheet, $event, $movementRange, $sheet->getTitle());
+            $this->writeEventMovementsBlock($sheet, $balance['transactions']);
+            $this->writeEventSummary($sheet, $event, $balance);
             $sheet->freezePane('A20');
         }
 
@@ -110,8 +110,7 @@ class FinancialBalanceWorkbook
     private function writeEventSummary(
         Worksheet $sheet,
         Event $event,
-        array $movementRange,
-        string $movementSheet,
+        array $balance,
     ): void {
         $this->title($sheet, 'BALANCE FINANCIERO DEL EVENTO', 'A1:D1');
         $sheet->setCellValue('A2', 'Hacienda Cinco La Victoria');
@@ -132,26 +131,13 @@ class FinancialBalanceWorkbook
 
         $sheet->fromArray([
             ['Concepto', 'Monto MXN'],
-            ['Costo total', (float) $event->total_amount],
-            ['Ingresos pagados', null],
-            ['Ingresos pendientes', null],
-            ['Gastos pagados', null],
-            ['Saldo pendiente', null],
-            ['Balance', null],
+            ['Costo por cotizaciones aprobadas', (float) $balance['approved_quotation_total']],
+            ['Ingresos pagados', (float) $balance['paid_income']],
+            ['Pendiente por cobrar', (float) $balance['pending_receivable']],
+            ['Gastos pagados', (float) $balance['paid_expenses']],
+            ['Sobrepago', (float) $balance['overpayment']],
+            ['Balance de caja', (float) $balance['cash_balance']],
         ], null, 'A10');
-
-        $typeColumn = $movementRange['type'];
-        $statusColumn = $movementRange['status'];
-        $amountColumn = $movementRange['amount'];
-        $firstRow = $movementRange['first_row'];
-        $lastRow = $movementRange['last_row'];
-        $source = "'{$movementSheet}'";
-
-        $sheet->setCellValue('B12', "=SUMIFS({$source}!\${$amountColumn}\${$firstRow}:\${$amountColumn}\${$lastRow},{$source}!\${$typeColumn}\${$firstRow}:\${$typeColumn}\${$lastRow},\"Ingreso\",{$source}!\${$statusColumn}\${$firstRow}:\${$statusColumn}\${$lastRow},\"Pagado\")");
-        $sheet->setCellValue('B13', "=SUMIFS({$source}!\${$amountColumn}\${$firstRow}:\${$amountColumn}\${$lastRow},{$source}!\${$typeColumn}\${$firstRow}:\${$typeColumn}\${$lastRow},\"Ingreso\",{$source}!\${$statusColumn}\${$firstRow}:\${$statusColumn}\${$lastRow},\"Pendiente\")");
-        $sheet->setCellValue('B14', "=SUMIFS({$source}!\${$amountColumn}\${$firstRow}:\${$amountColumn}\${$lastRow},{$source}!\${$typeColumn}\${$firstRow}:\${$typeColumn}\${$lastRow},\"Gasto\",{$source}!\${$statusColumn}\${$firstRow}:\${$statusColumn}\${$lastRow},\"Pagado\")");
-        $sheet->setCellValue('B15', '=B11-B12');
-        $sheet->setCellValue('B16', '=B12-B14');
 
         $this->tableHeader($sheet, 'A10:B10');
         $sheet->getStyle('A11:B16')->getBorders()->getBottom()->setBorderStyle(Border::BORDER_HAIR)->getColor()->setARGB('D1D5DB');
@@ -173,7 +159,7 @@ class FinancialBalanceWorkbook
         $sheet->mergeCells('A2:I2');
         $sheet->getStyle('A2:I2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheet->fromArray([
-            ['Evento', 'Tipo', 'Fecha', 'Costo total', 'Ingresos pagados', 'Ingresos pendientes', 'Gastos', 'Saldo pendiente', 'Balance'],
+            ['Evento', 'Tipo', 'Fecha', 'Costo aprobado', 'Ingresos pagados', 'Pendiente por cobrar', 'Gastos', 'Sobrepago', 'Balance de caja'],
         ], null, 'A5');
         $this->tableHeader($sheet, 'A5:I5');
 
@@ -211,9 +197,9 @@ class FinancialBalanceWorkbook
         $sheet->setShowGridlines(false);
     }
 
-    private function writeEventMovementsBlock(Worksheet $sheet, Collection $transactions): array
+    private function writeEventMovementsBlock(Worksheet $sheet, Collection $transactions): void
     {
-        return $this->writeMovements($sheet, $transactions, false, 19, false);
+        $this->writeMovements($sheet, $transactions, false, 19, false);
     }
 
     private function writeMovements(
@@ -222,7 +208,7 @@ class FinancialBalanceWorkbook
         bool $includeEvent,
         int $headerRow = 5,
         bool $withTitle = true,
-    ): array {
+    ): void {
         $headers = ['Fecha', 'Referencia'];
 
         if ($includeEvent) {
@@ -243,8 +229,6 @@ class FinancialBalanceWorkbook
         $this->tableHeader($sheet, 'A'.$headerRow.':'.$lastColumn.$headerRow);
         $firstRow = $headerRow + 1;
         $row = $firstRow;
-        $typeIndex = $includeEvent ? 4 : 3;
-        $statusIndex = $includeEvent ? 9 : 8;
         $amountIndex = $includeEvent ? 10 : 9;
         $balanceIndex = $includeEvent ? 11 : 10;
 
@@ -266,18 +250,13 @@ class FinancialBalanceWorkbook
             $this->setText($sheet, Coordinate::stringFromColumnIndex($column++).$row, $this->methodLabel($transaction->method));
             $this->setText($sheet, Coordinate::stringFromColumnIndex($column++).$row, $this->statusLabel($transaction->status));
             $sheet->setCellValue(Coordinate::stringFromColumnIndex($column).$row, (float) $transaction->amount);
-            $typeColumn = Coordinate::stringFromColumnIndex($typeIndex);
-            $statusColumn = Coordinate::stringFromColumnIndex($statusIndex);
             $amountColumn = Coordinate::stringFromColumnIndex($amountIndex);
             $balanceColumn = Coordinate::stringFromColumnIndex($balanceIndex);
-            $delta = "IF({$statusColumn}{$row}=\"Pagado\",IF({$typeColumn}{$row}=\"Ingreso\",{$amountColumn}{$row},-{$amountColumn}{$row}),0)";
-            $sheet->setCellValue($balanceColumn.$row, $row === $firstRow ? '='.$delta : "={$balanceColumn}".($row - 1).'+'.$delta);
+            $sheet->setCellValue($balanceColumn.$row, (float) $item['running_balance']);
             $row++;
         }
 
         $lastRow = max($firstRow, $row - 1);
-        $typeColumn = Coordinate::stringFromColumnIndex($typeIndex);
-        $statusColumn = Coordinate::stringFromColumnIndex($statusIndex);
         $amountColumn = Coordinate::stringFromColumnIndex($amountIndex);
         $balanceColumn = Coordinate::stringFromColumnIndex($balanceIndex);
 
@@ -298,13 +277,6 @@ class FinancialBalanceWorkbook
         );
         $sheet->setShowGridlines(false);
 
-        return [
-            'first_row' => $firstRow,
-            'last_row' => $lastRow,
-            'type' => $typeColumn,
-            'status' => $statusColumn,
-            'amount' => $amountColumn,
-        ];
     }
 
     private function title(Worksheet $sheet, string $title, string $range): void

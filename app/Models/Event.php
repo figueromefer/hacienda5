@@ -37,6 +37,7 @@ class Event extends Model
         'end_time',
         'guest_count',
         'budget_estimate',
+        // Conservado para compatibilidad histórica; no es fuente de cálculos financieros.
         'total_amount',
         'notes',
         'google_event_id',

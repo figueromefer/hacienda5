@@ -15,6 +15,8 @@ use ZipArchive;
 
 class EventContractGenerator
 {
+    public function __construct(private FinancialBalanceCalculator $balanceCalculator) {}
+
     public const EXPECTED_PLACEHOLDERS = [
         'arrendatario_nombre',
         'arrendatario_rfc',
@@ -50,7 +52,7 @@ class EventContractGenerator
 
     public function generate(Event $event, array $data): Document
     {
-        $event->loadMissing(['client', 'transactions']);
+        $event->loadMissing(['client', 'transactions', 'quotations']);
 
         $templatePath = (string) config('contracts.template_path');
 
@@ -107,7 +109,8 @@ class EventContractGenerator
 
     private function values(Event $event, array $data): array
     {
-        $total = (float) ($data['renta_total'] ?? $event->total_amount ?? 0);
+        $financialBalance = $this->balanceCalculator->forEvent($event);
+        $total = (float) ($data['renta_total'] ?? $financialBalance['approved_quotation_total']);
         $anticipo = (float) ($data['anticipo_monto'] ?? 0);
         $segundoPago = (float) ($data['segundo_pago_monto'] ?? 0);
         $saldo = (float) ($data['saldo_monto'] ?? max($total - $anticipo - $segundoPago, 0));

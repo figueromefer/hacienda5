@@ -33,7 +33,7 @@
                 <div class="text-2xl font-bold text-red-700">${{ number_format($expenses, 2) }}</div>
             </div>
             <div class="bg-white p-5 shadow rounded">
-                <div class="text-sm text-gray-500">Pendiente</div>
+                <div class="text-sm text-gray-500">Pendiente por cobrar</div>
                 <div class="text-2xl font-bold text-yellow-600">${{ number_format($pendingIncome, 2) }}</div>
             </div>
             <div class="bg-white p-5 shadow rounded">
