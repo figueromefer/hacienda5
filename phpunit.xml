@@ -20,6 +20,7 @@
     <php>
         <env name="APP_ENV" value="testing" force="true"/>
         <env name="APP_CONFIG_CACHE" value="/tmp/hacienda-cinco-phpunit-config-cache.php" force="true"/>
+        <env name="APP_ROUTES_CACHE" value="/tmp/hacienda-cinco-phpunit-routes-cache.php" force="true"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>

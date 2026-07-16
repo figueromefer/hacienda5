@@ -36,18 +36,18 @@
                                 <td data-label="Descripción" class="py-2">{{ $expenseConcept->description ?: '—' }}</td>
                                 <td data-label="Acciones" class="py-2">
                                     <div class="flex flex-wrap gap-2">
-                                        <a href="{{ route('expense-concepts.show', $expenseConcept) }}" class="text-blue-700 underline">Ver</a>
-                                        <a href="{{ route('expense-concepts.edit', $expenseConcept) }}" class="text-amber-700 underline">Editar</a>
+                                        <a href="{{ route('expense-concepts.show', $expenseConcept) }}" aria-label="Ver concepto {{ $expenseConcept->name }}" class="inline-flex min-h-11 items-center justify-center rounded bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">Ver</a>
+                                        <a href="{{ route('expense-concepts.edit', $expenseConcept) }}" aria-label="Editar concepto {{ $expenseConcept->name }}" class="inline-flex min-h-11 items-center justify-center rounded bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700 hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2">Editar</a>
                                         <form action="{{ route('expense-concepts.destroy', $expenseConcept) }}" method="POST" onsubmit="return confirm('¿Archivar este concepto de gasto?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="text-red-700 underline">Archivar</button>
+                                            <button type="submit" aria-label="Archivar concepto {{ $expenseConcept->name }}" class="inline-flex min-h-11 items-center justify-center rounded bg-red-50 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2">Archivar</button>
                                         </form>
                                     </div>
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="3" class="py-4">No hay conceptos de gasto activos que mostrar.</td></tr>
+                            <tr><td colspan="3" class="py-6 text-center text-gray-500">No hay conceptos de gasto activos que mostrar.</td></tr>
                         @endforelse
                     </tbody>
                 </table>

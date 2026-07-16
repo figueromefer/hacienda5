@@ -417,34 +417,34 @@ Debe devolver al menos:
 
 ### 9.1 Conceptos de gasto
 
-- [ ] Homologar botones de acciones con el patrón visual y accesible de otras tablas.
-- [ ] Revisar desktop y móvil.
+- [x] Homologar botones de acciones con el patrón visual y accesible de otras tablas.
+- [x] Revisar desktop y móvil.
 
 ### 9.2 Matriz manual mínima
 
 Probar con roles administrador, empleado con permisos parciales y cliente:
 
-- [ ] Navegación Catálogos y permisos.
-- [ ] Alta/edición de usuario con teléfono inválido y contraseñas distintas.
-- [ ] Alta de cliente, acceso al portal y recuperación de contraseña.
-- [ ] Alta/edición/búsqueda de evento.
-- [ ] Alta/edición/búsqueda/PDF de cotización.
-- [ ] Restricción de eventos por cliente.
-- [ ] Alta de ingreso y gasto desde evento y desde Movimientos.
-- [ ] Cancelación y actualización inmediata de totales.
-- [ ] Carga y descarga de comprobante.
-- [ ] Contratos con montos formateados.
-- [ ] Carga de documento con cliente/evento precargados.
-- [ ] Profile completamente en español.
+- [x] Navegación Catálogos y permisos.
+- [x] Alta/edición de usuario con teléfono inválido y contraseñas distintas.
+- [x] Alta de cliente, acceso al portal y recuperación de contraseña.
+- [x] Alta/edición/búsqueda de evento.
+- [x] Alta/edición/búsqueda/PDF de cotización.
+- [x] Restricción de eventos por cliente.
+- [x] Alta de ingreso y gasto desde evento y desde Movimientos.
+- [x] Cancelación y actualización inmediata de totales.
+- [x] Carga y descarga de comprobante.
+- [x] Contratos con montos formateados.
+- [x] Carga de documento con cliente/evento precargados.
+- [x] Profile completamente en español.
 
 ### 9.3 Validación automática final
 
-- [ ] `php artisan test`
-- [ ] `vendor/bin/pint --test`
-- [ ] `npm run build`
-- [ ] Revisar `php artisan route:list` para rutas nuevas y permisos.
-- [ ] Revisar migraciones con base de datos de pruebas limpia.
-- [ ] Probar rollback de las migraciones nuevas.
+- [x] `php artisan test`
+- [x] `vendor/bin/pint --test`
+- [x] `npm run build`
+- [x] Revisar `php artisan route:list` para rutas nuevas y permisos.
+- [x] Revisar migraciones con base de datos de pruebas limpia.
+- [x] Probar rollback de las migraciones nuevas.
 
 ### 9.4 Entrega de Codex
 

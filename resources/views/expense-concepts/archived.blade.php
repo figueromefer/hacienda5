@@ -13,6 +13,9 @@
                     <label for="search" class="sr-only">Buscar archivados</label>
                     <input id="search" name="search" type="search" value="{{ $search }}" placeholder="Buscar por nombre o descripción" class="w-full rounded border-gray-300 sm:max-w-md">
                     <button class="rounded bg-brand-green px-4 py-2 text-white">Buscar</button>
+                    @if($search !== '')
+                        <a href="{{ route('expense-concepts.archived') }}" class="rounded border px-4 py-2 text-center">Limpiar</a>
+                    @endif
                 </form>
 
                 <table class="responsive-table w-full border-collapse text-left">
@@ -23,15 +26,17 @@
                                 <td data-label="Nombre" class="py-2">{{ $expenseConcept->name }}</td>
                                 <td data-label="Descripción" class="py-2">{{ $expenseConcept->description ?: '—' }}</td>
                                 <td data-label="Acciones" class="py-2">
-                                    <form action="{{ route('expense-concepts.restore', $expenseConcept) }}" method="POST">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button class="text-green-700 underline">Restaurar</button>
-                                    </form>
+                                    <div class="flex flex-wrap gap-2">
+                                        <form action="{{ route('expense-concepts.restore', $expenseConcept) }}" method="POST">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" aria-label="Restaurar concepto {{ $expenseConcept->name }}" class="inline-flex min-h-11 items-center justify-center rounded bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2">Restaurar</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="3" class="py-4">No hay conceptos de gasto archivados.</td></tr>
+                            <tr><td colspan="3" class="py-6 text-center text-gray-500">No hay conceptos de gasto archivados.</td></tr>
                         @endforelse
                     </tbody>
                 </table>

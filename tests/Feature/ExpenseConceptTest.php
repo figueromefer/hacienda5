@@ -101,6 +101,28 @@ class ExpenseConceptTest extends TestCase
             ->assertSee('Audio')->assertDontSee('Flores');
     }
 
+    public function test_action_controls_follow_the_accessible_responsive_pattern(): void
+    {
+        $active = ExpenseConcept::create(['name' => 'Montaje', 'is_active' => true]);
+        $archived = ExpenseConcept::create(['name' => 'Desmontaje', 'is_active' => false]);
+        $user = $this->authorizedUser();
+
+        $this->actingAs($user)->get(route('expense-concepts.index'))
+            ->assertOk()
+            ->assertSee('responsive-table', false)
+            ->assertSee('aria-label="Ver concepto Montaje"', false)
+            ->assertSee('aria-label="Editar concepto Montaje"', false)
+            ->assertSee('aria-label="Archivar concepto Montaje"', false)
+            ->assertSee('min-h-11', false)
+            ->assertSee(route('expense-concepts.show', $active), false);
+
+        $this->actingAs($user)->get(route('expense-concepts.archived'))
+            ->assertOk()
+            ->assertSee('responsive-table', false)
+            ->assertSee('aria-label="Restaurar concepto Desmontaje"', false)
+            ->assertSee(route('expense-concepts.restore', $archived), false);
+    }
+
     public function test_navigation_link_is_visible_only_with_permission_in_desktop_and_mobile(): void
     {
         Permission::findOrCreate('view dashboard');

@@ -27,7 +27,7 @@ class IncomeReceiptMail extends Mailable
     {
         return new Envelope(
             from: new Address(config('mail.from.address'), config('mail.from.name')),
-            subject: 'Confirmación de abono - Recibo #' . $this->transaction->id,
+            subject: 'Confirmación de abono - Recibo #'.$this->transaction->id,
         );
     }
 
@@ -56,7 +56,7 @@ class IncomeReceiptMail extends Mailable
             'publicUrl' => $this->transaction->receipt_token ? route('receipts.public.show', $this->transaction->receipt_token) : null,
         ])->setPaper('letter');
 
-        $filename = 'recibo-' . $this->transaction->id . '-' . Str::slug($this->transaction->client?->full_name ?? 'cliente') . '.pdf';
+        $filename = 'recibo-'.$this->transaction->id.'-'.Str::slug($this->transaction->client?->full_name ?? 'cliente').'.pdf';
 
         return [
             Attachment::fromData(fn () => $pdf->output(), $filename)
