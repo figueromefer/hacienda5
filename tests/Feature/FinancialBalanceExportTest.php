@@ -58,6 +58,7 @@ class FinancialBalanceExportTest extends TestCase
         $this->assertSame(['Resumen', 'Movimientos'], $spreadsheet->getSheetNames());
 
         $summary = $spreadsheet->getSheetByName('Resumen');
+        $this->assertSame('Costo del evento', $summary->getCell('A11')->getValue());
         $this->assertSame(10000.0, (float) $summary->getCell('B11')->getCalculatedValue());
         $this->assertSame(5000.0, (float) $summary->getCell('B12')->getCalculatedValue());
         $this->assertSame(5000.0, (float) $summary->getCell('B13')->getCalculatedValue());

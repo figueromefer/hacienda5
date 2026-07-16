@@ -142,7 +142,7 @@
                                     @if($transaction->proof_file_path)
                                         <a href="{{ route('transactions.proof', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:9999px;background:#ecfdf5;color:#047857;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">Comprobante</a>
                                     @endif
-                                    <a href="{{ route('transactions.show', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:9999px;background:#eff6ff;color:#1d4ed8;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">Ver recibo</a>
+                                    <a href="{{ route('transactions.show', ['transaction' => $transaction, 'origin' => 'event']) }}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;border-radius:9999px;background:#eff6ff;color:#1d4ed8;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">Ver recibo</a>
                                     <a href="{{ route('transactions.pdf', $transaction) }}" style="display:inline-flex;align-items:center;border-radius:9999px;background:#243834;color:#ffffff !important;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">PDF</a>
                                     @if($transaction->receipt_token)
                                         <a href="{{ route('receipts.public.show', $transaction->receipt_token) }}" target="_blank" style="display:inline-flex;align-items:center;border-radius:9999px;background:#ecfdf5;color:#047857;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;">Validar</a>
@@ -184,13 +184,13 @@
                     <div class="md:col-span-2"><label class="block text-sm mb-1">Título</label><input type="text" name="title" class="w-full border rounded" required></div>
                     <div><label class="block text-sm mb-1">Fecha límite</label><input type="datetime-local" name="due_date" class="w-full border rounded"></div>
                     <div><label class="block text-sm mb-1">Responsable</label><select name="assigned_to" class="w-full border rounded"><option value="">Sin asignar</option>@foreach($users as $user)<option value="{{ $user->id }}">{{ $user->name }}</option>@endforeach</select></div>
-                    <div><label class="block text-sm mb-1">Estatus</label><select name="status" class="w-full border rounded"><option value="pending">Pendiente</option><option value="done">Hecha</option><option value="cancelled">Cancelada</option></select></div>
+                    <div><label class="block text-sm mb-1">Estatus</label><select name="status" class="w-full border rounded">@foreach(\App\Models\EventTask::STATUS_LABELS as $value => $label)<option value="{{ $value }}">{{ $label }}</option>@endforeach</select></div>
                     <div class="md:col-span-2"><label class="block text-sm mb-1">Notas</label><input type="text" name="notes" class="w-full border rounded"></div>
                     <div class="md:col-span-1 flex items-end"><button class="w-full px-4 py-2 bg-black text-white rounded">Agregar tarea</button></div>
                 </form>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    @foreach(['pending' => 'Pendientes', 'done' => 'Completadas', 'cancelled' => 'Canceladas'] as $status => $label)
+                    @foreach(\App\Models\EventTask::STATUS_LABELS as $status => $label)
                         <div class="rounded-xl border bg-gray-50 p-4">
                             <div class="flex items-center justify-between mb-3">
                                 <h4 class="font-semibold text-gray-800">{{ $label }}</h4>
@@ -199,15 +199,20 @@
                             <div class="space-y-3">
                                 @forelse($event->tasks->where('status', $status) as $task)
                                     <div class="rounded-xl border bg-white p-4 shadow-sm">
-                                        <div class="font-semibold text-gray-900">{{ $task->title }}</div>
+                                        <div class="flex items-start justify-between gap-2">
+                                            <div class="font-semibold text-gray-900">{{ $task->title }}</div>
+                                            <span class="inline-flex rounded-full px-2 py-1 text-xs font-semibold {{ $task->status_classes }}">{{ $task->status_label }}</span>
+                                        </div>
                                         <div class="mt-2 text-sm text-gray-600">Responsable: {{ $task->assignedUser?->name ?? 'Sin asignar' }}</div>
                                         <div class="text-sm text-gray-600">Fecha límite: {{ $task->due_date?->format('d/m/Y H:i') ?? '-' }}</div>
                                         @if($task->notes)<div class="mt-2 text-sm text-gray-700">{{ $task->notes }}</div>@endif
-                                        <form action="{{ route('events.tasks.destroy', $task) }}" method="POST" onsubmit="return confirm('¿Eliminar esta tarea?')" class="mt-3 text-right">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="text-sm text-red-600 hover:text-red-800">Eliminar</button>
-                                        </form>
+                                        <div class="mt-3 flex flex-wrap justify-end gap-2">
+                                            <a href="{{ route('event-tasks.edit', $task) }}" class="rounded bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700">Editar</a>
+                                            @if($task->status === \App\Models\EventTask::STATUS_PENDING)
+                                                <form action="{{ route('event-tasks.complete', $task) }}" method="POST">@csrf @method('PATCH')<button class="rounded bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700">Completar</button></form>
+                                                <form action="{{ route('event-tasks.cancel', $task) }}" method="POST" onsubmit="return confirm('¿Cancelar esta tarea? Se conservará en el historial.')">@csrf @method('PATCH')<button class="rounded bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-700">Cancelar</button></form>
+                                            @endif
+                                        </div>
                                     </div>
                                 @empty
                                     <div class="rounded-xl border border-dashed p-4 text-center text-sm text-gray-500">Sin tareas</div>

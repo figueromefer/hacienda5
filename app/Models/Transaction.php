@@ -131,11 +131,7 @@ class Transaction extends Model
 
     public function getTypeLabelAttribute(): string
     {
-        return match ($this->type) {
-            self::TYPE_INCOME => 'Ingreso',
-            self::TYPE_EXPENSE => 'Gasto',
-            default => $this->type,
-        };
+        return DomainLabels::transactionType($this->type);
     }
 
     public function getScopeLabelAttribute(): string
@@ -150,5 +146,15 @@ class Transaction extends Model
     public function getStatusLabelAttribute(): string
     {
         return DomainLabels::transactionStatus($this->status);
+    }
+
+    public function getStatusClassesAttribute(): string
+    {
+        return DomainLabels::transactionStatusClasses($this->status);
+    }
+
+    public function getMethodLabelAttribute(): string
+    {
+        return DomainLabels::transactionMethod($this->method);
     }
 }

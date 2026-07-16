@@ -82,7 +82,7 @@
                             <div class="text-sm font-semibold">{{ Auth::user()->name }}</div>
                             <div class="text-xs break-all">{{ Auth::user()->email }}</div>
                         </div>
-                        <x-dropdown-link :href="route('profile.edit')">Perfil</x-dropdown-link>
+                        <x-dropdown-link :href="route('profile.edit')">Editar perfil</x-dropdown-link>
                         <x-dropdown-link :href="route('logout.get')">Cerrar sesión</x-dropdown-link>
                     </x-slot>
                 </x-dropdown>
@@ -131,7 +131,7 @@
                 <div class="font-medium text-sm text-white/70 break-all">{{ Auth::user()->email }}</div>
             </div>
             <div class="mt-3">
-                <x-responsive-nav-link :href="route('profile.edit')">Perfil</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('profile.edit')">Editar perfil</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('logout.get')">Cerrar sesión</x-responsive-nav-link>
             </div>
         </div>

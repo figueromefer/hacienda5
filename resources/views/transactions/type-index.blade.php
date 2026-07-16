@@ -71,9 +71,9 @@
                         <label for="status" class="mb-1 block text-sm">Estado</label>
                         <select id="status" name="status" class="w-full rounded border-gray-300">
                             <option value="">Todos</option>
-                            <option value="paid" @selected(request('status') === 'paid')>Pagado</option>
-                            <option value="pending" @selected(request('status') === 'pending')>Pendiente histórico</option>
-                            <option value="cancelled" @selected(request('status') === 'cancelled')>Cancelado</option>
+                            @foreach(\App\Support\DomainLabels::TRANSACTION_STATUSES as $value => $label)
+                                <option value="{{ $value }}" @selected(request('status') === $value)>{{ $label }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="flex flex-col gap-2 sm:flex-row md:col-span-2 xl:col-span-6 xl:justify-end">
@@ -109,11 +109,11 @@
                                     <td data-label="Proveedor" class="py-3">{{ $transaction->supplier?->name ?? '-' }}</td>
                                     <td data-label="Concepto" class="py-3">{{ $transaction->expenseConcept?->name ?? $transaction->category ?? '-' }}</td>
                                 @endif
-                                <td data-label="Estado" class="py-3">{{ $transaction->status_label }}</td>
+                                <td data-label="Estado" class="py-3"><span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $transaction->status_classes }}">{{ $transaction->status_label }}</span></td>
                                 <td data-label="Monto" class="whitespace-nowrap py-3 text-right font-semibold {{ $isExpense ? 'text-red-700' : 'text-green-700' }}">${{ number_format($transaction->amount, 2) }}</td>
                                 <td data-label="Acciones" class="py-3">
                                     <div class="flex flex-wrap gap-2">
-                                        <a href="{{ route('transactions.show', $transaction) }}" class="rounded-full bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700">Ver</a>
+                                        <a href="{{ route('transactions.show', ['transaction' => $transaction, 'origin' => $isExpense ? 'expenses' : 'incomes']) }}" class="rounded-full bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700">Ver</a>
                                         @if($transaction->proof_file_path)
                                             <a href="{{ route('transactions.proof', $transaction) }}" class="rounded-full bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700">Comprobante</a>
                                         @endif

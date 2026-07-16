@@ -72,7 +72,7 @@ class CalendarController extends Controller
 
         return [
             'id' => (string) $event->id,
-            'title' => "{$event->title} · {$clientName} · {$event->event_type} · {$event->status_label}",
+            'title' => $event->title,
             'start' => $start,
             'end' => $end,
             'allDay' => ! $hasStartTime,
@@ -86,6 +86,8 @@ class CalendarController extends Controller
                 'eventType' => $event->event_type,
                 'status' => $event->status,
                 'statusLabel' => $event->status_label,
+                'startTime' => $startTime,
+                'endTime' => $endTime,
             ],
         ];
     }

@@ -131,7 +131,7 @@ class FinancialBalanceWorkbook
 
         $sheet->fromArray([
             ['Concepto', 'Monto MXN'],
-            ['Costo por cotizaciones aprobadas', (float) $balance['approved_quotation_total']],
+            ['Costo del evento', (float) $balance['approved_quotation_total']],
             ['Ingresos pagados', (float) $balance['paid_income']],
             ['Pendiente por cobrar', (float) $balance['pending_receivable']],
             ['Gastos pagados', (float) $balance['paid_expenses']],
@@ -247,8 +247,8 @@ class FinancialBalanceWorkbook
             $this->setText($sheet, Coordinate::stringFromColumnIndex($column++).$row, $transaction->category ?: 'Sin categoría');
             $this->setText($sheet, Coordinate::stringFromColumnIndex($column++).$row, $transaction->supplier?->name);
             $this->setText($sheet, Coordinate::stringFromColumnIndex($column++).$row, $transaction->expenseConcept?->name);
-            $this->setText($sheet, Coordinate::stringFromColumnIndex($column++).$row, $this->methodLabel($transaction->method));
-            $this->setText($sheet, Coordinate::stringFromColumnIndex($column++).$row, $this->statusLabel($transaction->status));
+            $this->setText($sheet, Coordinate::stringFromColumnIndex($column++).$row, $transaction->method_label);
+            $this->setText($sheet, Coordinate::stringFromColumnIndex($column++).$row, $transaction->status_label);
             $sheet->setCellValue(Coordinate::stringFromColumnIndex($column).$row, (float) $transaction->amount);
             $amountColumn = Coordinate::stringFromColumnIndex($amountIndex);
             $balanceColumn = Coordinate::stringFromColumnIndex($balanceIndex);
@@ -313,26 +313,5 @@ class FinancialBalanceWorkbook
     private function setText(Worksheet $sheet, string $cell, ?string $value): void
     {
         $sheet->setCellValueExplicit($cell, (string) $value, DataType::TYPE_STRING);
-    }
-
-    private function methodLabel(?string $method): string
-    {
-        return match ($method) {
-            'transfer' => 'Transferencia',
-            'cash' => 'Efectivo',
-            'card' => 'Tarjeta',
-            'other' => 'Otro',
-            default => $method ?: '-',
-        };
-    }
-
-    private function statusLabel(string $status): string
-    {
-        return match ($status) {
-            'paid' => 'Pagado',
-            'pending' => 'Pendiente',
-            'cancelled' => 'Cancelado',
-            default => $status,
-        };
     }
 }

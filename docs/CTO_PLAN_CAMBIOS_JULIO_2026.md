@@ -464,7 +464,54 @@ Codex debe entregar:
 
 ---
 
-## 10. Trazabilidad de solicitudes
+## 10. Fase 8 — Ajustes finales posteriores al cierre
+
+### 10.1 Recibos y movimientos
+
+- [x] Abrir “Ver recibo” desde el evento en una pestaña nueva con `noopener` y `noreferrer`.
+- [x] Compactar el PDF de recibo para una página carta con información representativa, conservando el bloque de autenticidad.
+- [x] Centralizar etiquetas y estilos en español de estados de movimientos y recibos.
+- [x] Implementar retorno contextual seguro desde recibos a Gastos, Ingresos, Movimientos o Evento.
+- [x] Agregar búsqueda de Movimientos por campos visibles y relaciones relevantes, conservando filtros y paginación.
+- [x] Homologar las acciones de Movimientos mediante dropdown responsive y badges de estado.
+
+### 10.2 Tareas de eventos y Dashboard
+
+- [x] Limitar responsables a usuarios internos activos y validar la asignación en servidor.
+- [x] Permitir editar título, responsable, fecha límite y estado mediante una ruta explícita y protegida.
+- [x] Permitir completar o cancelar tareas desde Evento y Dashboard sin eliminarlas.
+- [x] Centralizar estados, etiquetas y estilos de tareas.
+- [x] Mostrar en Dashboard las tareas pendientes del usuario autenticado, ordenadas por fecha límite, sin N+1 y con estado vacío.
+
+### 10.3 Exportación, calendario y perfil
+
+- [x] Mostrar “Costo del evento” en la exportación financiera usando `FinancialBalanceCalculator` y cotizaciones aprobadas.
+- [x] Usar el nombre del evento como título visible del calendario, conservando horario, colores y enlaces.
+- [x] Agregar “Editar perfil” al dropdown de usuario y navegación móvil, conservando “Cerrar sesión”.
+
+### 10.4 Validación
+
+- [x] Cubrir tareas, Dashboard, movimientos, recibos/PDF, calendario, navegación y exportación financiera con pruebas específicas.
+- [x] Ejecutar `php artisan test`, `vendor/bin/pint --test`, `npm run build`, `git diff --check` y `php artisan route:list`.
+- [x] Confirmar árbol limpio, ausencia de temporales y ausencia de `TODO`, `FIXME`, `dd` o `dump` relacionados.
+- [ ] Dejar documentada como pendiente la comprobación visual manual de que el recibo representativo ocupa una página carta.
+
+### Criterios de aceptación
+
+- Los recibos conservan toda la información, traducen estados desde una fuente común y regresan únicamente a orígenes permitidos.
+- Movimientos se puede buscar y operar de forma responsive sin duplicar lógica de estados ni cálculos.
+- Solo usuarios internos activos pueden recibir tareas; las tareas se editan, completan y cancelan con autorización del servidor.
+- El Dashboard muestra únicamente tareas pendientes asignadas al usuario autenticado y carga sus eventos eficientemente.
+- Exportación, evento y reportes comparten el costo calculado por `FinancialBalanceCalculator`.
+- Calendario y navegación cumplen los ajustes sin romper permisos, enlaces ni presentación móvil.
+
+### Commit sugerido
+
+`feat: incorpora ajustes finales de operación`
+
+---
+
+## 11. Trazabilidad de solicitudes
 
 | ID | Solicitud | Fase |
 |---|---|---|
@@ -503,10 +550,21 @@ Codex debe entregar:
 | R33 | Profile en español | 2 |
 | R34 | Botón Cancelar en nuevo movimiento | 5 |
 | R35 | Costo evento por cotizaciones aprobadas | 3 y 6 |
+| R36 | Recibo en pestaña nueva desde evento | 8 |
+| R37 | PDF de recibo compacto con autenticidad | 8 |
+| R38 | Estados de movimientos y recibos en español | 8 |
+| R39 | Retorno contextual seguro desde recibos | 8 |
+| R40 | Buscador y tabla responsive de Movimientos | 8 |
+| R41 | Responsables internos activos para tareas | 8 |
+| R42 | Edición y transiciones de tareas | 8 |
+| R43 | Tareas asignadas en Dashboard | 8 |
+| R44 | Costo del evento en exportación financiera | 8 |
+| R45 | Nombre del evento como título de calendario | 8 |
+| R46 | Editar perfil en navegación | 8 |
 
 ---
 
-## 11. Despliegue previsto, no ejecutar desde Codex
+## 12. Despliegue previsto, no ejecutar desde Codex
 
 Cuando todas las pruebas pasen y el CTO apruebe el PR:
 

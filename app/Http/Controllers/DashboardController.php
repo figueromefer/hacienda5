@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\Event;
+use App\Models\EventTask;
 use App\Models\Quotation;
 use App\Models\Transaction;
 use App\Services\FinancialBalanceCalculator;
@@ -81,6 +82,14 @@ class DashboardController extends Controller
             'pendingIncome' => $pendingIncome,
             'draftQuotations' => Quotation::where('status', 'draft')->count(),
             'nextEvents' => Event::with('client')->orderBy('event_date')->take(5)->get(),
+            'assignedTasks' => EventTask::query()
+                ->with('event:id,title,event_date')
+                ->pending()
+                ->where('assigned_to', $request->user()->id)
+                ->orderByRaw('CASE WHEN due_date IS NULL THEN 1 ELSE 0 END')
+                ->orderBy('due_date')
+                ->orderBy('id')
+                ->get(),
             'period' => $period,
             'chartLabels' => $chartLabels,
             'chartIncome' => $chartIncome,

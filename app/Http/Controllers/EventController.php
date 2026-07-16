@@ -96,7 +96,7 @@ class EventController extends Controller
             ->sortByDesc('date')
             ->values();
 
-        $users = User::whereDoesntHave('roles', fn ($query) => $query->where('name', 'cliente'))
+        $users = User::assignableToEventTasks()
             ->orderBy('name')
             ->get();
 

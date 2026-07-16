@@ -12,7 +12,9 @@ use App\Models\Transaction;
 use App\Rules\EmailList;
 use App\Services\ReceiptEmailSender;
 use App\Services\TransactionReferenceGenerator;
+use App\Support\DomainLabels;
 use App\Support\MoneyNormalizer;
+use App\Support\SearchTerm;
 use App\Support\SpanishMoney;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -29,6 +31,40 @@ class TransactionController extends Controller
     {
         $query = Transaction::with(['client', 'event', 'quotation', 'supplier', 'expenseConcept'])
             ->latest('transaction_date');
+
+        $search = SearchTerm::clean($request->query('search'));
+
+        if ($search !== '') {
+            $like = SearchTerm::like($search);
+            $normalizedSearch = Str::lower($search);
+            $types = collect(DomainLabels::TRANSACTION_TYPES)
+                ->filter(fn (string $label) => str_contains(Str::lower($label), $normalizedSearch))
+                ->keys();
+            $statuses = collect(DomainLabels::TRANSACTION_STATUSES)
+                ->filter(fn (string $label) => str_contains(Str::lower($label), $normalizedSearch))
+                ->keys();
+            $methods = collect(DomainLabels::TRANSACTION_METHODS)
+                ->filter(fn (string $label) => str_contains(Str::lower($label), $normalizedSearch))
+                ->keys();
+
+            $query->where(function ($query) use ($like, $types, $statuses, $methods) {
+                $query->where('reference', 'like', $like)
+                    ->orWhere('type', 'like', $like)
+                    ->orWhere('status', 'like', $like)
+                    ->orWhere('method', 'like', $like)
+                    ->orWhere('amount', 'like', $like)
+                    ->orWhere('transaction_date', 'like', $like)
+                    ->orWhere('notes', 'like', $like)
+                    ->when($types->isNotEmpty(), fn ($query) => $query->orWhereIn('type', $types))
+                    ->when($statuses->isNotEmpty(), fn ($query) => $query->orWhereIn('status', $statuses))
+                    ->when($methods->isNotEmpty(), fn ($query) => $query->orWhereIn('method', $methods))
+                    ->orWhereHas('client', fn ($query) => $query->where('full_name', 'like', $like))
+                    ->orWhereHas('event', fn ($query) => $query->where('title', 'like', $like))
+                    ->orWhereHas('quotation', fn ($query) => $query->where('folio', 'like', $like))
+                    ->orWhereHas('supplier', fn ($query) => $query->where('name', 'like', $like))
+                    ->orWhereHas('expenseConcept', fn ($query) => $query->where('name', 'like', $like));
+            });
+        }
 
         if ($request->filled('type')) {
             $query->where('type', $request->type);
@@ -66,6 +102,7 @@ class TransactionController extends Controller
             'income' => $income,
             'expenses' => $expenses,
             'balance' => $balance,
+            'search' => $search,
         ]);
     }
 
@@ -253,11 +290,14 @@ class TransactionController extends Controller
         return redirect()->route('transactions.index')->with($messageType, $message);
     }
 
-    public function show(Transaction $transaction)
+    public function show(Request $request, Transaction $transaction)
     {
         $transaction->load(['client', 'event', 'quotation', 'supplier', 'expenseConcept', 'receiptEmailLogs.sender']);
 
-        return view('transactions.show', $this->receiptViewData($transaction));
+        return view('transactions.show', [
+            ...$this->receiptViewData($transaction),
+            ...$this->receiptBackContext($transaction, $request->string('origin')->toString()),
+        ]);
     }
 
     public function pdf(Transaction $transaction)
@@ -445,5 +485,21 @@ class TransactionController extends Controller
             'brandGreen' => '#243834',
             'publicUrl' => $publicUrl,
         ];
+    }
+
+    private function receiptBackContext(Transaction $transaction, string $origin): array
+    {
+        return match ($origin) {
+            'event' => $transaction->event_id
+                ? ['backUrl' => route('events.show', $transaction->event_id), 'backLabel' => 'Volver al evento']
+                : ['backUrl' => route('transactions.index'), 'backLabel' => 'Volver a Movimientos'],
+            'expenses' => $transaction->type === Transaction::TYPE_EXPENSE
+                ? ['backUrl' => route('expenses.index'), 'backLabel' => 'Volver a Gastos']
+                : ['backUrl' => route('transactions.index'), 'backLabel' => 'Volver a Movimientos'],
+            'incomes' => $transaction->type === Transaction::TYPE_INCOME
+                ? ['backUrl' => route('incomes.index'), 'backLabel' => 'Volver a Ingresos']
+                : ['backUrl' => route('transactions.index'), 'backLabel' => 'Volver a Movimientos'],
+            default => ['backUrl' => route('transactions.index'), 'backLabel' => 'Volver a Movimientos'],
+        };
     }
 }

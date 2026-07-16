@@ -63,4 +63,17 @@ class NavigationTest extends TestCase
             ->assertDontSee('Nuevo evento')
             ->assertDontSee('Nueva cotización');
     }
+
+    public function test_profile_link_is_visible_in_user_dropdown_and_mobile_navigation(): void
+    {
+        $user = User::factory()->create(['is_active' => true]);
+        Permission::findOrCreate('view dashboard');
+        $user->givePermissionTo('view dashboard');
+
+        $html = $this->actingAs($user)->get(route('dashboard'))->assertOk()->getContent();
+
+        $this->assertSame(2, substr_count($html, 'href="'.route('profile.edit').'"'));
+        $this->assertSame(2, substr_count($html, 'Editar perfil'));
+        $this->assertGreaterThanOrEqual(2, substr_count($html, 'Cerrar sesión'));
+    }
 }
