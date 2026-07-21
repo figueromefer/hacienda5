@@ -115,7 +115,7 @@
                                     <div class="flex flex-wrap gap-2">
                                         <a href="{{ route('transactions.show', ['transaction' => $transaction, 'origin' => $isExpense ? 'expenses' : 'incomes']) }}" class="rounded-full bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700">Ver</a>
                                         @if($transaction->proof_file_path)
-                                            <a href="{{ route('transactions.proof', $transaction) }}" class="rounded-full bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700">Comprobante</a>
+                                            <a href="{{ route('transactions.proof', $transaction) }}" target="_blank" rel="noopener noreferrer" class="rounded-full bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700">Comprobante</a>
                                         @endif
                                         @if($transaction->status !== \App\Models\Transaction::STATUS_CANCELLED)
                                             <a href="{{ route('transactions.edit', $transaction) }}" class="rounded-full bg-amber-50 px-3 py-2 text-xs font-bold text-amber-700">Editar</a>

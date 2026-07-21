@@ -147,7 +147,7 @@
                                                 <x-dropdown-link :href="route('receipts.public.show', $transaction->receipt_token)" target="_blank" rel="noopener noreferrer">Validar</x-dropdown-link>
                                         @endif
                                         @if($transaction->proof_file_path)
-                                                <x-dropdown-link :href="route('transactions.proof', $transaction)">Comprobante</x-dropdown-link>
+                                                <x-dropdown-link :href="route('transactions.proof', $transaction)" target="_blank" rel="noopener noreferrer">Ver comprobante</x-dropdown-link>
                                         @endif
                                         @if($transaction->status !== \App\Models\Transaction::STATUS_CANCELLED)
                                                 <x-dropdown-link :href="route('transactions.edit', $transaction)">Editar</x-dropdown-link>

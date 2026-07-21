@@ -68,12 +68,6 @@
                     </div>
 
                     <div>
-                        <label for="address" class="block mb-1">Dirección</label>
-                        <input id="address" type="text" name="address" class="w-full border rounded" value="{{ old('address') }}">
-                        <x-input-error :messages="$errors->get('address')" class="mt-2" />
-                    </div>
-
-                    <div>
                         <label for="notes" class="block mb-1">Notas</label>
                         <textarea id="notes" name="notes" class="w-full border rounded">{{ old('notes') }}</textarea>
                         <x-input-error :messages="$errors->get('notes')" class="mt-2" />

@@ -16,6 +16,7 @@ class DomainLabels
 
     public const CLIENT_TYPES = [
         'prospect' => 'Prospecto',
+        'customer' => 'Cliente',
         'active' => 'Activo',
         'past' => 'Anterior',
     ];
