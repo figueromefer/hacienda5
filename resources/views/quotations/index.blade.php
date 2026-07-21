@@ -54,10 +54,20 @@
                                 <td data-label="Folio" class="py-2">{{ $quotation->folio }}</td>
                                 <td data-label="Cliente" class="py-2">{{ $quotation->client->full_name }}</td>
                                 <td data-label="Evento" class="py-2">{{ $quotation->event?->title ?? 'Sin evento' }}</td>
-                                <td data-label="Estatus" class="py-2">{{ $quotation->status_label }}</td>
+                                <td data-label="Estatus" class="py-2"><span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $quotation->status_classes }}">{{ $quotation->status_label }}</span></td>
                                 <td data-label="Total" class="py-2">$ {{ number_format($quotation->total, 2) }}</td>
                                 <td data-label="Válida hasta" class="py-2">{{ $quotation->valid_until?->format('d/m/Y') ?? '-' }}</td>
                                 <td data-label="Acciones" class="py-2">
+                                    <form method="POST" action="{{ route('quotations.status.update', $quotation) }}" class="mb-2 flex items-center gap-2" onsubmit="return confirm('Cambiar el estado puede afectar los cálculos financieros. ¿Continuar?')">
+                                        @csrf @method('PATCH')
+                                        <label for="status-{{ $quotation->id }}" class="sr-only">Cambiar estatus</label>
+                                        <select id="status-{{ $quotation->id }}" name="status" class="rounded border-gray-300 py-1 text-xs">
+                                            @foreach(\App\Support\DomainLabels::QUOTATION_STATUSES as $value => $label)
+                                                <option value="{{ $value }}" @selected($quotation->status === $value)>{{ $label }}</option>
+                                            @endforeach
+                                        </select>
+                                        <button class="rounded bg-brand-green px-2 py-1 text-xs font-semibold text-white">Cambiar</button>
+                                    </form>
                                     <x-action-buttons
                                         :show="route('quotations.show', $quotation)"
                                         :download="route('quotations.pdf', $quotation)"

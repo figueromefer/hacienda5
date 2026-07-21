@@ -61,7 +61,24 @@ class TransactionPhaseFiveTest extends TestCase
             ->assertSee($event->title)
             ->assertSee($client->full_name)
             ->assertSee('expense')
-            ->assertSee('events');
+            ->assertSee('name="scope" value="event"', false)
+            ->assertSee(route('events.show', $event), false)
+            ->assertDontSee('<select name="scope"', false);
+    }
+
+    public function test_type_pages_pass_a_whitelisted_type_and_cancel_origin(): void
+    {
+        $user = $this->user();
+
+        $this->actingAs($user)->get(route('expenses.index'))
+            ->assertSee(route('transactions.create', ['type' => 'expense', 'origin' => 'expenses']));
+
+        $this->actingAs($user)->get(route('transactions.create', ['type' => 'expense', 'origin' => 'expenses']))
+            ->assertSee(route('expenses.index'), false);
+
+        $this->actingAs($user)->get(route('transactions.create', ['origin' => 'https://evil.example']))
+            ->assertSee(route('transactions.index'), false)
+            ->assertDontSee('https://evil.example', false);
     }
 
     public function test_new_movement_normalizes_amount_forces_paid_and_ignores_removed_fields(): void

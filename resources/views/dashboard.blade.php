@@ -7,7 +7,7 @@
                     @can("manage clients")<a href="{{ route("clients.create") }}" class="rounded bg-black px-3 py-2 text-sm text-white">Nuevo cliente</a>@endcan
                     @can("manage events")<a href="{{ route("events.create") }}" class="rounded bg-black px-3 py-2 text-sm text-white">Nuevo evento</a>@endcan
                     @can("manage quotations")<a href="{{ route("quotations.create") }}" class="rounded bg-black px-3 py-2 text-sm text-white">Nueva cotización</a>@endcan
-                    @can("manage payments")<a href="{{ route("transactions.create") }}" class="rounded bg-black px-3 py-2 text-sm text-white">Nuevo movimiento</a>@endcan
+                    @can("manage payments")<a href="{{ route("transactions.create", ['origin' => 'transactions']) }}" class="rounded bg-black px-3 py-2 text-sm text-white">Nuevo movimiento</a>@endcan
                 </div>
             </div>
 
@@ -22,32 +22,6 @@
     </x-slot>
 
     <div class="py-6 space-y-6">
-
-        <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-white p-5 shadow rounded">
-                <div class="text-sm text-gray-500">Ingresos</div>
-                <div class="text-2xl font-bold text-green-700">${{ number_format($income, 2) }}</div>
-            </div>
-            <div class="bg-white p-5 shadow rounded">
-                <div class="text-sm text-gray-500">Gastos</div>
-                <div class="text-2xl font-bold text-red-700">${{ number_format($expenses, 2) }}</div>
-            </div>
-            <div class="bg-white p-5 shadow rounded">
-                <div class="text-sm text-gray-500">Pendiente por cobrar</div>
-                <div class="text-2xl font-bold text-yellow-600">${{ number_format($pendingIncome, 2) }}</div>
-            </div>
-            <div class="bg-white p-5 shadow rounded">
-                <div class="text-sm text-gray-500">Balance</div>
-                <div class="text-2xl font-bold {{ $balance >= 0 ? 'text-green-700' : 'text-red-700' }}">${{ number_format($balance, 2) }}</div>
-            </div>
-        </div>
-
-        <div class="max-w-7xl mx-auto bg-white p-4 sm:p-6 shadow rounded overflow-x-auto">
-            <h3 class="text-lg font-semibold mb-4">Flujo financiero</h3>
-            <div class="min-w-[36rem] sm:min-w-0">
-                <canvas id="financeChart" height="120"></canvas>
-            </div>
-        </div>
 
         <section class="mx-auto max-w-7xl rounded-xl bg-white p-4 shadow sm:p-6" aria-labelledby="assigned-tasks-title">
             <div class="mb-4 flex items-center justify-between gap-3">
@@ -90,6 +64,33 @@
                 @endforelse
             </div>
         </section>
+
+        <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white p-5 shadow rounded">
+                <div class="text-sm text-gray-500">Ingresos</div>
+                <div class="text-2xl font-bold text-green-700">${{ number_format($income, 2) }}</div>
+            </div>
+            <div class="bg-white p-5 shadow rounded">
+                <div class="text-sm text-gray-500">Gastos</div>
+                <div class="text-2xl font-bold text-red-700">${{ number_format($expenses, 2) }}</div>
+            </div>
+            <div class="bg-white p-5 shadow rounded">
+                <div class="text-sm text-gray-500">Pendiente por cobrar</div>
+                <div class="text-2xl font-bold text-yellow-600">${{ number_format($pendingIncome, 2) }}</div>
+            </div>
+            <div class="bg-white p-5 shadow rounded">
+                <div class="text-sm text-gray-500">Balance</div>
+                <div class="text-2xl font-bold {{ $balance >= 0 ? 'text-green-700' : 'text-red-700' }}">${{ number_format($balance, 2) }}</div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto bg-white p-4 sm:p-6 shadow rounded overflow-x-auto">
+            <h3 class="text-lg font-semibold mb-4">Flujo financiero</h3>
+            <div class="min-w-[36rem] sm:min-w-0">
+                <canvas id="financeChart" height="120"></canvas>
+            </div>
+        </div>
+
 
     </div>
 

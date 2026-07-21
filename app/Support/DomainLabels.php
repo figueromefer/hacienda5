@@ -14,8 +14,17 @@ class DomainLabels
         'expired' => 'Vencida',
     ];
 
+    public const QUOTATION_STATUS_CLASSES = [
+        'draft' => 'bg-gray-100 text-gray-800',
+        'sent' => 'bg-blue-100 text-blue-800',
+        'approved' => 'bg-emerald-100 text-emerald-800',
+        'rejected' => 'bg-red-100 text-red-800',
+        'expired' => 'bg-amber-100 text-amber-800',
+    ];
+
     public const CLIENT_TYPES = [
         'prospect' => 'Prospecto',
+        'customer' => 'Cliente',
         'active' => 'Activo',
         'past' => 'Anterior',
     ];
@@ -55,6 +64,11 @@ class DomainLabels
     public static function quotationStatus(?string $status): string
     {
         return self::QUOTATION_STATUSES[$status] ?? (string) $status;
+    }
+
+    public static function quotationStatusClasses(?string $status): string
+    {
+        return self::QUOTATION_STATUS_CLASSES[$status] ?? 'bg-gray-100 text-gray-800';
     }
 
     public static function clientType(?string $type): string

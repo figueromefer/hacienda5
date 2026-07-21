@@ -128,6 +128,61 @@ class QuotationPhaseFourTest extends TestCase
         $this->assertSame(['2501.00', '500.25'], $quotation->items->pluck('total')->all());
     }
 
+    public function test_percentage_discount_is_persisted_calculated_and_limited(): void
+    {
+        $client = $this->client('Cliente porcentaje');
+        $payload = $this->payload($client);
+        $payload['discount_type'] = 'percentage';
+        $payload['discount'] = '25.50';
+        $payload['items'][0]['unit_price'] = '200.00';
+
+        $this->actingAs($this->authorizedUser())->post(route('quotations.store'), $payload)
+            ->assertRedirect(route('quotations.index'));
+
+        $quotation = Quotation::sole();
+        $this->assertSame('percentage', $quotation->discount_type);
+        $this->assertSame('25.50', $quotation->discount);
+        $this->assertSame('149.00', $quotation->total);
+
+        $invalidPrice = $payload;
+        $invalidPrice['items'][0]['unit_price'] = 'texto';
+        $this->actingAs($this->authorizedUser())->post(route('quotations.store'), $invalidPrice)
+            ->assertSessionHasErrors('items.0.unit_price');
+
+        foreach (['-1', '100.01'] as $invalid) {
+            $payload['discount'] = $invalid;
+            $this->actingAs($this->authorizedUser())->post(route('quotations.store'), $payload)
+                ->assertSessionHasErrors('discount');
+        }
+
+        $payload['discount'] = '100';
+        $this->actingAs($this->authorizedUser())->post(route('quotations.store'), $payload);
+        $this->assertSame('0.00', Quotation::latest('id')->firstOrFail()->total);
+    }
+
+    public function test_quick_status_change_is_authorized_validated_and_rejects_approval_without_items(): void
+    {
+        $quotation = $this->quotation($this->client('Cliente estado'), null, 'C-ESTADO');
+
+        $this->actingAs(User::factory()->create())
+            ->patch(route('quotations.status.update', $quotation), ['status' => 'sent'])
+            ->assertForbidden();
+        $this->actingAs($this->authorizedUser())
+            ->patch(route('quotations.status.update', $quotation), ['status' => 'unknown'])
+            ->assertSessionHasErrors('status');
+
+        $quotation->items()->delete();
+        $this->actingAs($this->authorizedUser())
+            ->patch(route('quotations.status.update', $quotation), ['status' => 'approved'])
+            ->assertSessionHasErrors('status');
+
+        $quotation->items()->create(['description' => 'Servicio', 'quantity' => 1, 'unit_price' => 100, 'total' => 100]);
+        $this->actingAs($this->authorizedUser())
+            ->patch(route('quotations.status.update', $quotation), ['status' => 'approved'])
+            ->assertSessionHas('success');
+        $this->assertSame('approved', $quotation->fresh()->status);
+    }
+
     public function test_updating_a_historical_quotation_preserves_its_folio(): void
     {
         $client = $this->client('Cliente histórico');

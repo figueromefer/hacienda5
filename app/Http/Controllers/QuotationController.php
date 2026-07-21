@@ -69,7 +69,8 @@ class QuotationController extends Controller
             ],
             'status' => ['required', 'in:draft,sent,approved,rejected,expired'],
             'valid_until' => ['nullable', 'date'],
-            'discount' => ['nullable', 'numeric', 'min:0'],
+            'discount_type' => ['nullable', Rule::in(['amount', 'percentage'])],
+            'discount' => ['nullable', 'numeric', 'min:0', Rule::when($request->input('discount_type') === 'percentage', ['max:100'])],
             'notes' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.service_id' => ['nullable', 'exists:services,id'],
@@ -88,6 +89,7 @@ class QuotationController extends Controller
                 'status' => $data['status'],
                 'subtotal' => $subtotal,
                 'discount' => $discount,
+                'discount_type' => $data['discount_type'] ?? 'amount',
                 'total' => $total,
                 'valid_until' => $data['valid_until'] ?? null,
                 'notes' => $data['notes'] ?? null,
@@ -152,7 +154,8 @@ class QuotationController extends Controller
             ],
             'status' => ['required', 'in:draft,sent,approved,rejected,expired'],
             'valid_until' => ['nullable', 'date'],
-            'discount' => ['nullable', 'numeric', 'min:0'],
+            'discount_type' => ['nullable', Rule::in(['amount', 'percentage'])],
+            'discount' => ['nullable', 'numeric', 'min:0', Rule::when($request->input('discount_type') === 'percentage', ['max:100'])],
             'notes' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.service_id' => ['nullable', 'exists:services,id'],
@@ -170,6 +173,7 @@ class QuotationController extends Controller
                 'status' => $data['status'],
                 'subtotal' => $subtotal,
                 'discount' => $discount,
+                'discount_type' => $data['discount_type'] ?? 'amount',
                 'total' => $total,
                 'valid_until' => $data['valid_until'] ?? null,
                 'notes' => $data['notes'] ?? null,
@@ -183,6 +187,21 @@ class QuotationController extends Controller
         });
 
         return redirect()->route('quotations.index')->with('success', 'Cotización actualizada correctamente.');
+    }
+
+    public function updateStatus(Request $request, Quotation $quotation)
+    {
+        $data = $request->validate([
+            'status' => ['required', Rule::in(array_keys(DomainLabels::QUOTATION_STATUSES))],
+        ]);
+
+        if ($data['status'] === 'approved' && ! $quotation->items()->exists()) {
+            return back()->withErrors(['status' => 'Una cotización sin partidas no puede aprobarse.']);
+        }
+
+        $quotation->update(['status' => $data['status']]);
+
+        return back()->with('success', 'Estatus de cotización actualizado.');
     }
 
     public function destroy(Quotation $quotation)
@@ -218,8 +237,11 @@ class QuotationController extends Controller
         }
 
         $discount = bcadd('0.00', (string) ($data['discount'] ?? 0), 2);
-        $total = bccomp($subtotal, $discount, 2) === 1
-            ? bcsub($subtotal, $discount, 2)
+        $effectiveDiscount = ($data['discount_type'] ?? 'amount') === 'percentage'
+            ? bcdiv(bcmul($subtotal, $discount, 4), '100', 2)
+            : $discount;
+        $total = bccomp($subtotal, $effectiveDiscount, 2) === 1
+            ? bcsub($subtotal, $effectiveDiscount, 2)
             : '0.00';
 
         return [$items, $subtotal, $discount, $total];

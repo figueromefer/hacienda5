@@ -148,7 +148,6 @@ class EventController extends Controller
             'end_time' => ['nullable'],
             'guest_count' => ['nullable', 'integer', 'min:0'],
             'budget_estimate' => ['nullable', 'numeric', 'min:0'],
-            'address' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],
         ]);
     }

@@ -12,7 +12,7 @@
                 <h2 class="text-xl font-semibold leading-tight text-gray-800">{{ $title }}</h2>
                 <a href="{{ route('transactions.index') }}" class="mt-1 inline-flex text-sm font-medium text-blue-700 hover:underline">Volver a Movimientos</a>
             </div>
-            <a href="{{ route('transactions.create', ['type' => $type]) }}" class="inline-flex min-h-11 items-center justify-center rounded bg-black px-4 py-2 text-white">
+            <a href="{{ route('transactions.create', ['type' => $type, 'origin' => $isExpense ? 'expenses' : 'incomes']) }}" class="inline-flex min-h-11 items-center justify-center rounded bg-black px-4 py-2 text-white">
                 Nuevo {{ $singular }}
             </a>
         </div>
@@ -115,7 +115,7 @@
                                     <div class="flex flex-wrap gap-2">
                                         <a href="{{ route('transactions.show', ['transaction' => $transaction, 'origin' => $isExpense ? 'expenses' : 'incomes']) }}" class="rounded-full bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700">Ver</a>
                                         @if($transaction->proof_file_path)
-                                            <a href="{{ route('transactions.proof', $transaction) }}" class="rounded-full bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700">Comprobante</a>
+                                            <a href="{{ route('transactions.proof', $transaction) }}" target="_blank" rel="noopener noreferrer" class="rounded-full bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700">Comprobante</a>
                                         @endif
                                         @if($transaction->status !== \App\Models\Transaction::STATUS_CANCELLED)
                                             <a href="{{ route('transactions.edit', $transaction) }}" class="rounded-full bg-amber-50 px-3 py-2 text-xs font-bold text-amber-700">Editar</a>

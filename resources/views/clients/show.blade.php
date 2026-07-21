@@ -21,7 +21,7 @@
             <div class="bg-white shadow rounded p-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div><strong>Nombre:</strong> {{ $client->full_name }}</div>
-                    <div><strong>Tipo:</strong> {{ $client->type }}</div>
+                    <div><strong>Tipo:</strong> {{ $client->type_label }}</div>
                     <div><strong>Empresa:</strong> {{ $client->company_name ?: '-' }}</div>
                     <div><strong>Email:</strong> {{ $client->email ?: '-' }}</div>
                     <div><strong>Teléfono:</strong> {{ $client->phone ?: '-' }}</div>

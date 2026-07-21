@@ -110,9 +110,9 @@ class ExpenseConceptTest extends TestCase
         $this->actingAs($user)->get(route('expense-concepts.index'))
             ->assertOk()
             ->assertSee('responsive-table', false)
-            ->assertSee('aria-label="Ver concepto Montaje"', false)
-            ->assertSee('aria-label="Editar concepto Montaje"', false)
-            ->assertSee('aria-label="Archivar concepto Montaje"', false)
+            ->assertSee('actionsOpen', false)
+            ->assertSee('>Acciones<', false)
+            ->assertSee('ARCHIVAR', false)
             ->assertSee('min-h-11', false)
             ->assertSee(route('expense-concepts.show', $active), false);
 

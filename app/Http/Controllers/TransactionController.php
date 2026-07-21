@@ -183,6 +183,19 @@ class TransactionController extends Controller
             $event?->client?->user?->email,
         ])->filter()->unique(fn (string $email) => strtolower($email))->values();
 
+        $origin = match ($request->string('origin')->toString()) {
+            'expenses' => $selectedType === Transaction::TYPE_EXPENSE ? 'expenses' : 'transactions',
+            'incomes' => $selectedType === Transaction::TYPE_INCOME ? 'incomes' : 'transactions',
+            default => 'transactions',
+        };
+        $cancelUrl = $event
+            ? route('events.show', $event)
+            : match ($origin) {
+                'expenses' => route('expenses.index'),
+                'incomes' => route('incomes.index'),
+                default => route('transactions.index'),
+            };
+
         return view('transactions.create', [
             'clients' => $clients,
             'events' => $events,
@@ -191,6 +204,8 @@ class TransactionController extends Controller
             'expenseConcepts' => ExpenseConcept::where('is_active', true)->orderBy('name')->get(),
             'selectedType' => $selectedType,
             'selectedEvent' => $event,
+            'fixedEventContext' => (bool) $event,
+            'cancelUrl' => $cancelUrl,
             'suggestedRecipients' => $suggestedRecipients,
             'clientRecipientMap' => $clients->mapWithKeys(fn (Client $client) => [
                 $client->id => collect([$client->email, $client->user?->email])->filter()->unique()->values(),
