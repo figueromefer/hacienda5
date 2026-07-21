@@ -23,7 +23,7 @@
                     enctype="multipart/form-data"
                     class="space-y-4"
                     x-data='receiptEmailFields(
-                        @json(old('type', $selectedType ?? 'income')),
+                        @json(old('type', $selectedType)),
                         @json(old('receipt_to', $suggestedRecipients->implode(', '))),
                         @json(old('receipt_cc', '')),
                         @json($clientRecipientMap),
@@ -38,9 +38,9 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label>Tipo</label>
-                            <select name="type" class="w-full border rounded" x-model="type">
-                                <option value="income" @selected(old('type', $selectedType ?? 'income') === 'income')>Ingreso</option>
-                                <option value="expense" @selected(old('type', $selectedType ?? 'income') === 'expense')>Gasto</option>
+                            <select name="type" class="w-full border rounded" x-model="transactionType">
+                                <option value="income">Ingreso</option>
+                                <option value="expense">Gasto</option>
                             </select>
                         </div>
                         <div>
@@ -115,7 +115,7 @@
 
                     <div class="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-800">El movimiento se registrará como pagado. Para anularlo después se utilizará la acción Cancelar, conservando su auditoría.</div>
 
-                    <div x-cloak x-show="type === 'expense'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div x-cloak x-show="transactionType === 'expense'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label>Proveedor (opcional)</label>
                             <select name="supplier_id" class="w-full border rounded">
@@ -142,7 +142,7 @@
 
                     <section
                         x-cloak
-                        x-show="type === 'income'"
+                        x-show="transactionType === 'income'"
                         class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 space-y-4"
                     >
                         <div>
@@ -189,9 +189,9 @@
 
 @push('scripts')
     <script>
-        function receiptEmailFields(type, to, cc, clientMap, eventMap, clientId, eventId, quotationId) {
+        function receiptEmailFields(initialType, to, cc, clientMap, eventMap, clientId, eventId, quotationId) {
             return {
-                type,
+                transactionType: initialType,
                 to,
                 cc,
                 clientMap,

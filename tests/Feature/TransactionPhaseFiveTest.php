@@ -58,12 +58,52 @@ class TransactionPhaseFiveTest extends TestCase
             'type' => Transaction::TYPE_EXPENSE,
             'event_id' => $event->id,
         ]))->assertOk()
+            ->assertViewHas('selectedType', Transaction::TYPE_EXPENSE)
             ->assertSee($event->title)
             ->assertSee($client->full_name)
-            ->assertSee('expense')
+            ->assertSee('x-model="transactionType"', false)
+            ->assertSee("receiptEmailFields(\n                        \"expense\",", false)
+            ->assertDontSee('<option value="expense" selected', false)
             ->assertSee('name="scope" value="event"', false)
             ->assertSee(route('events.show', $event), false)
             ->assertDontSee('<select name="scope"', false);
+    }
+
+    public function test_create_initializes_alpine_with_type_from_each_entry_flow_and_old_input(): void
+    {
+        $user = $this->user();
+        $event = $this->event($this->client());
+
+        $flows = [
+            'event income' => [
+                route('transactions.create', ['type' => Transaction::TYPE_INCOME, 'event_id' => $event->id]),
+                Transaction::TYPE_INCOME,
+            ],
+            'event expense' => [
+                route('transactions.create', ['type' => Transaction::TYPE_EXPENSE, 'event_id' => $event->id]),
+                Transaction::TYPE_EXPENSE,
+            ],
+            'expenses index' => [
+                route('transactions.create', ['type' => Transaction::TYPE_EXPENSE, 'origin' => 'expenses']),
+                Transaction::TYPE_EXPENSE,
+            ],
+            'movements index' => [route('transactions.create'), Transaction::TYPE_INCOME],
+        ];
+
+        foreach ($flows as $flow => [$url, $expectedType]) {
+            $response = $this->actingAs($user)->get($url);
+
+            $response->assertOk()
+                ->assertViewHas('selectedType', $expectedType)
+                ->assertSee("receiptEmailFields(\n                        \"{$expectedType}\",", false);
+        }
+
+        $this->actingAs($user)
+            ->withSession(['_old_input' => ['type' => Transaction::TYPE_EXPENSE]])
+            ->get(route('transactions.create', ['type' => Transaction::TYPE_INCOME]))
+            ->assertOk()
+            ->assertViewHas('selectedType', Transaction::TYPE_INCOME)
+            ->assertSee("receiptEmailFields(\n                        \"expense\",", false);
     }
 
     public function test_type_pages_pass_a_whitelisted_type_and_cancel_origin(): void
