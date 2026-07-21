@@ -12,7 +12,7 @@
                 <h2 class="text-xl font-semibold leading-tight text-gray-800">{{ $title }}</h2>
                 <a href="{{ route('transactions.index') }}" class="mt-1 inline-flex text-sm font-medium text-blue-700 hover:underline">Volver a Movimientos</a>
             </div>
-            <a href="{{ route('transactions.create', ['type' => $type]) }}" class="inline-flex min-h-11 items-center justify-center rounded bg-black px-4 py-2 text-white">
+            <a href="{{ route('transactions.create', ['type' => $type, 'origin' => $isExpense ? 'expenses' : 'incomes']) }}" class="inline-flex min-h-11 items-center justify-center rounded bg-black px-4 py-2 text-white">
                 Nuevo {{ $singular }}
             </a>
         </div>

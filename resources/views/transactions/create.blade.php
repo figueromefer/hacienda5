@@ -45,10 +45,15 @@
                         </div>
                         <div>
                             <label>Alcance</label>
-                            <select name="scope" class="w-full border rounded">
-                                <option value="event" @selected(old('scope', 'event') === 'event')>Evento</option>
-                                <option value="operation" @selected(old('scope') === 'operation')>Operación</option>
-                            </select>
+                            @if($fixedEventContext)
+                                <input type="hidden" name="scope" value="event">
+                                <div class="w-full rounded border bg-gray-50 px-3 py-2 text-gray-700">Evento</div>
+                            @else
+                                <select name="scope" class="w-full border rounded">
+                                    <option value="event" @selected(old("scope", "event") === "event")>Evento</option>
+                                    <option value="operation" @selected(old("scope") === "operation")>Operación</option>
+                                </select>
+                            @endif
                         </div>
                     </div>
 
@@ -173,7 +178,7 @@
                     </div>
 
                     <div class="flex flex-col-reverse gap-2 md:flex-row">
-                        <a x-bind:href="eventId ? @js(url('/events')).concat('/', eventId) : @js(route('transactions.index'))" class="w-full rounded bg-gray-200 px-4 py-3 text-center md:w-auto md:py-2">Cancelar</a>
+                        <a href="{{ $cancelUrl }}" class="w-full rounded bg-gray-200 px-4 py-3 text-center md:w-auto md:py-2">Cancelar</a>
                         <button class="w-full md:w-auto px-4 py-3 md:py-2 bg-black text-white rounded">Guardar</button>
                     </div>
                 </form>

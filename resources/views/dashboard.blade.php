@@ -7,7 +7,7 @@
                     @can("manage clients")<a href="{{ route("clients.create") }}" class="rounded bg-black px-3 py-2 text-sm text-white">Nuevo cliente</a>@endcan
                     @can("manage events")<a href="{{ route("events.create") }}" class="rounded bg-black px-3 py-2 text-sm text-white">Nuevo evento</a>@endcan
                     @can("manage quotations")<a href="{{ route("quotations.create") }}" class="rounded bg-black px-3 py-2 text-sm text-white">Nueva cotización</a>@endcan
-                    @can("manage payments")<a href="{{ route("transactions.create") }}" class="rounded bg-black px-3 py-2 text-sm text-white">Nuevo movimiento</a>@endcan
+                    @can("manage payments")<a href="{{ route("transactions.create", ['origin' => 'transactions']) }}" class="rounded bg-black px-3 py-2 text-sm text-white">Nuevo movimiento</a>@endcan
                 </div>
             </div>
 
