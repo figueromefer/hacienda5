@@ -100,6 +100,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::middleware('permission:manage quotations')->group(function () {
         Route::get('/quotations/{quotation}/pdf', [QuotationController::class, 'pdf'])->name('quotations.pdf');
+        Route::patch('/quotations/{quotation}/status', [QuotationController::class, 'updateStatus'])->name('quotations.status.update');
         Route::resource('quotations', QuotationController::class);
     });
 

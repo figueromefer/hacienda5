@@ -116,7 +116,16 @@
     @error('items')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
 </section>
 
-<div class="max-w-sm">
+<div class="grid max-w-xl grid-cols-1 gap-4 sm:grid-cols-2">
+    <div>
+        <label for="discount_type" class="mb-1 block">Tipo de descuento</label>
+        <select id="discount_type" name="discount_type" class="w-full rounded border-gray-300">
+            <option value="amount" @selected(old('discount_type', $quotation->discount_type ?? 'amount') === 'amount')>Monto</option>
+            <option value="percentage" @selected(old('discount_type', $quotation->discount_type ?? 'amount') === 'percentage')>Porcentaje</option>
+        </select>
+        @error('discount_type')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+    </div>
+    <div>
     <label for="discount" class="mb-1 block">Descuento</label>
     <x-money-input
         name="discount"
@@ -127,6 +136,7 @@
         x-on:input="$dispatch('quotation-money-change')"
     />
     @error('discount')<p id="discount-error" class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+    </div>
 </div>
 
 <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -217,9 +227,11 @@
                         subtotal += total;
                     });
                     const discount = money(document.getElementById('discount')?.value);
+                    const discountType = document.getElementById('discount_type')?.value;
+                    const effectiveDiscount = discountType === 'percentage' ? subtotal * discount / 100 : discount;
                     document.getElementById('subtotal-display').textContent = formatMoney(subtotal);
                     document.getElementById('discount-display').textContent = formatMoney(discount);
-                    document.getElementById('total-display').textContent = formatMoney(Math.max(subtotal - discount, 0));
+                    document.getElementById('total-display').textContent = formatMoney(Math.max(subtotal - effectiveDiscount, 0));
                 }
 
                 function bindRow(row) {
@@ -248,6 +260,7 @@
                 clientSelect.addEventListener('change', () => renderEventOptions());
                 eventSelect.addEventListener('change', renderEventSummary);
                 window.addEventListener('quotation-money-change', recalculateTotals);
+                document.getElementById('discount_type').addEventListener('change', recalculateTotals);
                 document.getElementById('add-item').addEventListener('click', () => {
                     const template = document.getElementById('quotation-item-template').innerHTML.replaceAll('__INDEX__', nextIndex++);
                     itemsBody.insertAdjacentHTML('beforeend', template);

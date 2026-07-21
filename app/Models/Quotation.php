@@ -17,6 +17,7 @@ class Quotation extends Model
         'status',
         'subtotal',
         'discount',
+        'discount_type',
         'total',
         'valid_until',
         'notes',
@@ -32,6 +33,20 @@ class Quotation extends Model
     public function getStatusLabelAttribute(): string
     {
         return DomainLabels::quotationStatus($this->status);
+    }
+
+    public function getStatusClassesAttribute(): string
+    {
+        return DomainLabels::quotationStatusClasses($this->status);
+    }
+
+    public function getEffectiveDiscountAttribute(): string
+    {
+        if ($this->discount_type === 'percentage') {
+            return bcdiv(bcmul((string) $this->subtotal, (string) $this->discount, 4), '100', 2);
+        }
+
+        return (string) $this->discount;
     }
 
     public function client()

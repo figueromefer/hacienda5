@@ -94,7 +94,7 @@
 
     <table class="summary">
         <tr><td>Subtotal</td><td class="number">$ {{ number_format($quotation->subtotal, 2) }}</td></tr>
-        <tr><td>Descuento</td><td class="number">$ {{ number_format($quotation->discount, 2) }}</td></tr>
+        <tr><td>Descuento{{ $quotation->discount_type === 'percentage' ? ' ('.number_format($quotation->discount, 2).'%)' : '' }}</td><td class="number">$ {{ number_format($quotation->effective_discount, 2) }}</td></tr>
         <tr class="grand-total"><td>Total</td><td class="number">$ {{ number_format($quotation->total, 2) }}</td></tr>
     </table>
 
